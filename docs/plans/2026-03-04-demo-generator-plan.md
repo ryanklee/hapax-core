@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Build a Tier 2 Pydantic AI agent that generates audience-tailored slide decks with live system screenshots from a natural language request like "produce a demo of the entire system for my wife."
+**Goal:** Build a Tier 2 Pydantic AI agent that generates audience-tailored slide decks with live system screenshots from a natural language request like "produce a demo of the entire system for a non-technical friend."
 
 **Architecture:** Demo agent (LLM) produces a structured DemoScript. A deterministic pipeline captures screenshots via Playwright, then renders Marp slides. Audience personas stored in YAML drive content/tone selection. Phase 1 = slides only; Phase 2 (future) adds voice + video.
 
@@ -15,7 +15,7 @@
 ### Task 1: Add Dependencies
 
 **Files:**
-- Modify: `~/projects/ai-agents/pyproject.toml`
+- Modify: `<ai-agents>/pyproject.toml`
 
 **Step 1: Add playwright and Pillow to dependencies**
 
@@ -30,7 +30,7 @@ In `pyproject.toml`, add to the `dependencies` list:
 
 Run:
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv sync
 uv run playwright install chromium
 ```
@@ -41,7 +41,7 @@ Expected: Dependencies install, Chromium downloads (~150MB).
 
 Run:
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run python -c "from playwright.async_api import async_playwright; print('ok')"
 uv run python -c "from PIL import Image; print('ok')"
 ```
@@ -51,7 +51,7 @@ Expected: Both print "ok".
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add pyproject.toml uv.lock
 git commit -m "chore: add playwright and Pillow dependencies for demo agent"
 ```
@@ -61,13 +61,13 @@ git commit -m "chore: add playwright and Pillow dependencies for demo agent"
 ### Task 2: Audience Persona File
 
 **Files:**
-- Create: `~/projects/ai-agents/profiles/demo-personas.yaml`
+- Create: `<ai-agents>/profiles/demo-personas.yaml`
 
 **Step 1: Create the persona definitions**
 
 ```yaml
 # Audience archetypes for demo generation.
-# The demo agent resolves natural language ("my wife", "a Senior EA") to one of these.
+# The demo agent resolves natural language ("a non-technical friend", "a Senior EA") to one of these.
 
 archetypes:
   family:
@@ -139,7 +139,7 @@ archetypes:
 **Step 2: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add profiles/demo-personas.yaml
 git commit -m "feat(demo): add audience persona archetypes"
 ```
@@ -149,8 +149,8 @@ git commit -m "feat(demo): add audience persona archetypes"
 ### Task 3: DemoScript Models
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_models.py`
-- Create: `~/projects/ai-agents/tests/test_demo_models.py`
+- Create: `<ai-agents>/agents/demo_models.py`
+- Create: `<ai-agents>/tests/test_demo_models.py`
 
 **Step 1: Write the test**
 
@@ -238,7 +238,7 @@ class TestLoadPersonas:
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_models.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_models.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'agents.demo_models'`
 
 **Step 3: Write the implementation**
@@ -316,13 +316,13 @@ def load_personas(path: Path | None = None) -> dict[str, AudiencePersona]:
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_models.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_models.py -v`
 Expected: All 6 tests PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_models.py tests/test_demo_models.py
 git commit -m "feat(demo): add DemoScript models and persona loader"
 ```
@@ -332,9 +332,9 @@ git commit -m "feat(demo): add DemoScript models and persona loader"
 ### Task 4: Screenshot Pipeline
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_pipeline/__init__.py`
-- Create: `~/projects/ai-agents/agents/demo_pipeline/screenshots.py`
-- Create: `~/projects/ai-agents/tests/test_demo_screenshots.py`
+- Create: `<ai-agents>/agents/demo_pipeline/__init__.py`
+- Create: `<ai-agents>/agents/demo_pipeline/screenshots.py`
+- Create: `<ai-agents>/tests/test_demo_screenshots.py`
 
 **Step 1: Write the test**
 
@@ -416,12 +416,12 @@ class TestCaptureScreenshots:
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_screenshots.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_screenshots.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Write the init file**
 
-`~/projects/ai-agents/agents/demo_pipeline/__init__.py`:
+`<ai-agents>/agents/demo_pipeline/__init__.py`:
 ```python
 """Demo generation pipeline — screenshot capture, slide rendering."""
 ```
@@ -504,13 +504,13 @@ async def capture_screenshots(
 
 **Step 5: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_screenshots.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_screenshots.py -v`
 Expected: All tests PASS.
 
 **Step 6: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_pipeline/ tests/test_demo_screenshots.py
 git commit -m "feat(demo): screenshot capture pipeline with Playwright"
 ```
@@ -520,9 +520,9 @@ git commit -m "feat(demo): screenshot capture pipeline with Playwright"
 ### Task 5: Marp Slide Renderer
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_pipeline/slides.py`
-- Create: `~/projects/ai-agents/agents/demo_pipeline/gruvbox-marp.css`
-- Create: `~/projects/ai-agents/tests/test_demo_slides.py`
+- Create: `<ai-agents>/agents/demo_pipeline/slides.py`
+- Create: `<ai-agents>/agents/demo_pipeline/gruvbox-marp.css`
+- Create: `<ai-agents>/tests/test_demo_slides.py`
 
 **Step 1: Write the test**
 
@@ -644,12 +644,12 @@ class TestRenderSlides:
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_slides.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_slides.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Create Gruvbox Marp theme**
 
-`~/projects/ai-agents/agents/demo_pipeline/gruvbox-marp.css`:
+`<ai-agents>/agents/demo_pipeline/gruvbox-marp.css`:
 ```css
 /* @theme gruvbox */
 @import 'default';
@@ -877,13 +877,13 @@ async def render_slides(
 
 **Step 5: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_slides.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_slides.py -v`
 Expected: All tests PASS.
 
 **Step 6: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_pipeline/slides.py agents/demo_pipeline/gruvbox-marp.css tests/test_demo_slides.py
 git commit -m "feat(demo): Marp slide renderer with Gruvbox theme"
 ```
@@ -893,8 +893,8 @@ git commit -m "feat(demo): Marp slide renderer with Gruvbox theme"
 ### Task 6: Demo Agent (LLM Core)
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo.py`
-- Create: `~/projects/ai-agents/tests/test_demo_agent.py`
+- Create: `<ai-agents>/agents/demo.py`
+- Create: `<ai-agents>/tests/test_demo_agent.py`
 
 **Step 1: Write the test**
 
@@ -959,9 +959,9 @@ class TestParseRequest:
     def test_simple_for_pattern(self):
         from agents.demo import parse_request
 
-        scope, audience = parse_request("the entire system for my wife")
+        scope, audience = parse_request("the entire system for a non-technical friend")
         assert scope == "the entire system"
-        assert audience == "my wife"
+        assert audience == "a non-technical friend"
 
     def test_no_audience(self):
         from agents.demo import parse_request
@@ -982,7 +982,7 @@ class TestParseRequest:
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_agent.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_agent.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Write the implementation**
@@ -1017,8 +1017,8 @@ OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output" / "demos"
 
 # Map common natural-language audience hints to archetypes
 AUDIENCE_HINTS: dict[str, str] = {
-    "wife": "family",
-    "husband": "family",
+    "friend": "family",
+    "neighbor": "family",
     "partner": "family",
     "mom": "family",
     "dad": "family",
@@ -1205,7 +1205,7 @@ async def main() -> None:
         description="Generate audience-tailored system demos",
         prog="python -m agents.demo",
     )
-    parser.add_argument("request", help="Natural language request, e.g. 'the entire system for my wife'")
+    parser.add_argument("request", help="Natural language request, e.g. 'the entire system for a non-technical friend'")
     parser.add_argument("--audience", help="Override audience archetype (family, technical-peer, leadership, team-member)")
     parser.add_argument("--format", choices=["slides", "markdown-only"], default="slides", help="Output format")
     parser.add_argument("--json", action="store_true", help="Print script JSON instead of generating demo")
@@ -1247,13 +1247,13 @@ if __name__ == "__main__":
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_agent.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_agent.py -v`
 Expected: All tests PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo.py tests/test_demo_agent.py
 git commit -m "feat(demo): demo agent with audience resolution and pipeline orchestration"
 ```
@@ -1263,11 +1263,11 @@ git commit -m "feat(demo): demo agent with audience resolution and pipeline orch
 ### Task 7: Cockpit API Route
 
 **Files:**
-- Modify: `~/projects/ai-agents/cockpit/data/agents.py` (add demo to agent list)
+- Modify: `<ai-agents>/cockpit/data/agents.py` (add demo to agent list)
 
 **Step 1: Check existing agent registration**
 
-Read `~/projects/ai-agents/cockpit/data/agents.py` to see how agents are registered. The demo agent should appear in the agent list so the cockpit API can invoke it via `POST /api/agents/demo/run`.
+Read `<ai-agents>/cockpit/data/agents.py` to see how agents are registered. The demo agent should appear in the agent list so the cockpit API can invoke it via `POST /api/agents/demo/run`.
 
 **Step 2: Add demo agent to the registry**
 
@@ -1285,12 +1285,12 @@ Add to the `AGENTS` list (following the existing pattern):
 
 **Step 3: Verify**
 
-Run: `cd ~/projects/ai-agents && uv run cockpit --once 2>/dev/null | grep -i demo || echo "Check agent list manually"`
+Run: `cd <ai-agents> && uv run cockpit --once 2>/dev/null | grep -i demo || echo "Check agent list manually"`
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/agents.py
 git commit -m "feat(demo): register demo agent in cockpit API"
 ```
@@ -1300,7 +1300,7 @@ git commit -m "feat(demo): register demo agent in cockpit API"
 ### Task 8: Integration Test
 
 **Files:**
-- Create: `~/projects/ai-agents/tests/test_demo_integration.py`
+- Create: `<ai-agents>/tests/test_demo_integration.py`
 
 **Step 1: Write an integration test that mocks the LLM but tests the full pipeline**
 
@@ -1404,18 +1404,18 @@ class TestDemoIntegration:
 
 **Step 2: Run integration test**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_integration.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_integration.py -v`
 Expected: PASS.
 
 **Step 3: Run all demo tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo*.py -v`
 Expected: All tests PASS.
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add tests/test_demo_integration.py
 git commit -m "test(demo): add integration test for full demo pipeline"
 ```
@@ -1425,7 +1425,7 @@ git commit -m "test(demo): add integration test for full demo pipeline"
 ### Task 9: Output Directory and .gitignore
 
 **Files:**
-- Modify: `~/projects/ai-agents/.gitignore`
+- Modify: `<ai-agents>/.gitignore`
 
 **Step 1: Add output directory to .gitignore**
 
@@ -1437,14 +1437,14 @@ output/demos/
 **Step 2: Create output directory placeholder**
 
 ```bash
-mkdir -p ~/projects/ai-agents/output/demos
-touch ~/projects/ai-agents/output/demos/.gitkeep
+mkdir -p <ai-agents>/output/demos
+touch <ai-agents>/output/demos/.gitkeep
 ```
 
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add .gitignore output/demos/.gitkeep
 git commit -m "chore(demo): gitignore demo output, add directory placeholder"
 ```
@@ -1467,17 +1467,17 @@ Recommended: 1 → 2 → 3,4,5 (parallel) → 6 → 7,8,9 (parallel)
 After all tasks:
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 
 # All tests pass
 uv run pytest tests/test_demo*.py -v
 
 # Dry run (plan only, no screenshots)
-uv run python -m agents.demo "the entire system for my wife" --json
+uv run python -m agents.demo "the entire system for a non-technical friend" --json
 
 # Full run (requires cockpit API + web server running)
 # Terminal 1: uv run cockpit
-# Terminal 2: cd ~/projects/cockpit-web && pnpm dev
+# Terminal 2: cd <cockpit-web> && pnpm dev
 # Terminal 3:
-uv run python -m agents.demo "the entire system for my wife"
+uv run python -m agents.demo "the entire system for a non-technical friend"
 ```

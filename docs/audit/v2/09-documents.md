@@ -9,17 +9,17 @@
 
 | Document | LOC | Purpose | Authority |
 |----------|-----|---------|-----------|
-| `~/projects/hapaxromana/CLAUDE.md` | 178 | Project-level agent specification | Primary — agents, timers, channels |
-| `~/projects/hapaxromana/agent-architecture.md` | 281 | Original design proposal | Historical — pre-implementation |
-| `~/projects/ai-agents/README.md` | 192 | Agent project documentation | Primary — developer reference |
-| `~/projects/ai-agents/n8n-workflows/README.md` | 105 | n8n workflow setup guide | Primary — workflow reference |
-| `~/projects/ai-agents/profiles/operations-manual.md` | 303 | Operator task reference | Primary — operational reference |
-| `~/projects/ai-agents/profiles/component-registry.yaml` | 371 | Scout agent input | Primary — component inventory |
-| `~/.claude/CLAUDE.md` | ~267 | Global Claude Code context | Primary — environment reference |
-| `~/.claude/rules/environment.md` | 11 | Environment context | Supplementary |
-| `~/.claude/rules/toolchain.md` | 13 | Toolchain conventions | Supplementary |
-| `~/.claude/rules/models.md` | 17 | Model selection guide | Supplementary |
-| `~/.claude/rules/music-production.md` | 21 | Music production context | Supplementary |
+| `<hapaxromana>/CLAUDE.md` | 178 | Project-level agent specification | Primary — agents, timers, channels |
+| `<hapaxromana>/agent-architecture.md` | 281 | Original design proposal | Historical — pre-implementation |
+| `<ai-agents>/README.md` | 192 | Agent project documentation | Primary — developer reference |
+| `<ai-agents>/n8n-workflows/README.md` | 105 | n8n workflow setup guide | Primary — workflow reference |
+| `<ai-agents>/profiles/operations-manual.md` | 303 | Operator task reference | Primary — operational reference |
+| `<ai-agents>/profiles/component-registry.yaml` | 371 | Scout agent input | Primary — component inventory |
+| `<claude-config>/CLAUDE.md` | ~267 | Global Claude Code context | Primary — environment reference |
+| `<claude-config>/rules/environment.md` | 11 | Environment context | Supplementary |
+| `<claude-config>/rules/toolchain.md` | 13 | Toolchain conventions | Supplementary |
+| `<claude-config>/rules/models.md` | 17 | Model selection guide | Supplementary |
+| `<claude-config>/rules/music-production.md` | 21 | Music production context | Supplementary |
 
 ### Audit Axes (Document-Specific)
 
@@ -40,7 +40,7 @@ Four documents claim different health check counts:
 
 | Document | Claim | Groups |
 |----------|-------|--------|
-| `~/.claude/CLAUDE.md` | 44 checks | — |
+| `<claude-config>/CLAUDE.md` | 44 checks | — |
 | `operations-manual.md` (lines 33, 139) | 44 checks, 10 groups | 10 |
 | `hapaxromana/CLAUDE.md` (line 44) | 49 checks (incl. connectivity) | 11 |
 | `ai-agents/README.md` (line 24) | 49 checks | — |
@@ -58,7 +58,7 @@ The "11 groups" claim in the project CLAUDE.md is correct. The operations manual
 
 #### A-9.3: agent-architecture.md lists sample-watch as implemented [low]
 
-`agent-architecture.md:46` — Tier 3 diagram shows `sample-watch` alongside `rag-ingest`, `health-monitor timer`, `knowledge-maint`. No `sample-watch.service` or `sample-watch.timer` exists in `~/.config/systemd/user/`. The sample-curator agent is still in "planned" status.
+`agent-architecture.md:46` — Tier 3 diagram shows `sample-watch` alongside `rag-ingest`, `health-monitor timer`, `knowledge-maint`. No `sample-watch.service` or `sample-watch.timer` exists in `<systemd-user>/`. The sample-curator agent is still in "planned" status.
 
 #### A-9.4: agent-architecture.md lists knowledge-maint as n8n-scheduled [low]
 
@@ -107,7 +107,7 @@ These agents and timers are documented in the README and project CLAUDE.md, but 
 | `hapaxromana/CLAUDE.md` | 12 | Adds digest, knowledge-maint |
 | `ai-agents/README.md` | 12 | Same as project CLAUDE.md |
 | `operations-manual.md` | 9 | Missing management-prep, digest, knowledge-maint |
-| `~/.claude/CLAUDE.md` | 12 | Full list |
+| `<claude-config>/CLAUDE.md` | 12 | Full list |
 
 The project CLAUDE.md and README are the most current (12 agents). The operations manual and architecture doc have not been updated.
 
@@ -118,7 +118,7 @@ The project CLAUDE.md and README are the most current (12 agents). The operation
 | `operations-manual.md` | 7 (missing digest, knowledge-maint) |
 | `hapaxromana/CLAUDE.md` | 10 (includes digest, knowledge-maint, and notes Obsidian desktop + gdrive-sync planned) |
 | `ai-agents/README.md` | 11 (includes obsidian-sync and gdrive-sync as if active; gdrive-sync noted as planned) |
-| `~/.claude/CLAUDE.md` | 10 |
+| `<claude-config>/CLAUDE.md` | 10 |
 
 The README lists `obsidian-sync` as "Always running" — this is actually the Obsidian Desktop app (desktop autostart entry), not a systemd timer. Listing it as a timer row is misleading.
 
@@ -126,10 +126,10 @@ The README lists `obsidian-sync` as "Always running" — this is actually the Ob
 
 | Document | Model Reference |
 |----------|----------------|
-| `~/.claude/rules/models.md` | `claude-sonnet-4-5` (pinned) |
+| `<claude-config>/rules/models.md` | `claude-sonnet-4-5` (pinned) |
 | `hapaxromana/CLAUDE.md` | `claude-sonnet` (alias) |
 | `agent-architecture.md` | `claude-sonnet` (alias) |
-| `~/.claude/CLAUDE.md` | `claude-sonnet` (alias) in table, specific IDs elsewhere |
+| `<claude-config>/CLAUDE.md` | `claude-sonnet` (alias) in table, specific IDs elsewhere |
 
 The rules/models.md uses a different naming convention (provider model IDs) than the rest of the docs (LiteLLM aliases). Not a conflict, but a reader encountering both would need to know the alias mapping.
 
@@ -161,7 +161,7 @@ Written before management-prep, digest, and knowledge-maint were implemented. Th
 |----------|----------|--------------|-------------|----------|---------|
 | `hapaxromana/CLAUDE.md` | High | High | High | Current | Best |
 | `ai-agents/README.md` | Medium (test count) | High | High | Mostly current | Good |
-| `~/.claude/CLAUDE.md` | Medium (44 checks) | High | High | Mostly current | Good |
+| `<claude-config>/CLAUDE.md` | Medium (44 checks) | High | High | Mostly current | Good |
 | `n8n-workflows/README.md` | High | High | High | Current | Good |
 | `operations-manual.md` | Medium (44/10) | Low (missing 3 agents) | Low | Stale | Needs update |
 | `agent-architecture.md` | Low | Low | Low | Stale | Historical |
@@ -173,7 +173,7 @@ Written before management-prep, digest, and knowledge-maint were implemented. Th
 The documents form an implicit hierarchy, but it's not documented anywhere:
 1. **hapaxromana/CLAUDE.md** — most current, most complete
 2. **ai-agents/README.md** — developer reference, matches #1
-3. **~/.claude/CLAUDE.md** — environment context, mostly matches
+3. **<claude-config>/CLAUDE.md** — environment context, mostly matches
 4. **operations-manual.md** — operator reference, partially stale
 5. **agent-architecture.md** — historical design, significantly stale
 

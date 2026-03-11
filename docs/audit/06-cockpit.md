@@ -2,7 +2,7 @@
 
 **Audited**: 2026-03-02
 **Scope**: ~7,230 LOC source, ~4,054 LOC tests across 30+ source files and 11 test files
-**Files**: `cockpit/` package in `~/projects/ai-agents/`
+**Files**: `cockpit/` package in `<ai-agents>/`
 
 ---
 
@@ -204,7 +204,7 @@ This is the correct behavior -- compaction is best-effort. Failure means slightl
 **Impact**: Low. Graceful degradation.
 
 ### B-6.6: decisions.jsonl Unbounded Growth (Low)
-**Evidence**: `decisions.py:33` appends to `~/.cache/cockpit/decisions.jsonl` on every nudge execution. There is no rotation, truncation, or cleanup mechanism. The `collect_decisions()` function (line 39-64) has a time-based filter (default 7 days), but the file itself grows forever.
+**Evidence**: `decisions.py:33` appends to `<cache>/cockpit/decisions.jsonl` on every nudge execution. There is no rotation, truncation, or cleanup mechanism. The `collect_decisions()` function (line 39-64) has a time-based filter (default 7 days), but the file itself grows forever.
 
 Over time with frequent nudge interactions, this file could become large. However, the read pattern (read all lines, parse JSON, filter by time) is O(n) in file size, so performance would degrade only gradually.
 
@@ -228,7 +228,7 @@ The profiler's `merge_facts` function uses key-based deduplication, so exact dup
 Network interruption: handled via exception propagation from pydantic-ai's streaming, caught in `screens/chat.py:886`. LLM timeout: classified as `"provider_down"` by `classify_chat_error()`. Malformed SSE: would surface as a library exception, caught by the same handler. UI recovery: streaming widget cleared in both success and error paths; input re-enabled in `finally` block. One gap: no explicit timeout on the streaming iterator itself -- a stalled-but-open connection would hang. See **B-6.1**.
 
 ### 3. Interview State Machine
-**States**: `chat` (normal), `interview` (active interview with plan/facts/insights). **Transitions**: `start_interview()` -> interview; `end_interview()` -> chat; `/clear` -> chat. **Stuck paths**: Plan generation failure is recovered (mode reset). LLM failure mid-interview preserves state for retry. `end_interview()` failure leaves mode as "interview" -- operator must retry or `/clear`. Crash mid-interview: session persistence (`save()` called after each turn) preserves interview state to `~/.cache/cockpit/chat-session.json`, restored on reload via `InterviewState.model_validate()`. See **B-6.3**.
+**States**: `chat` (normal), `interview` (active interview with plan/facts/insights). **Transitions**: `start_interview()` -> interview; `end_interview()` -> chat; `/clear` -> chat. **Stuck paths**: Plan generation failure is recovered (mode reset). LLM failure mid-interview preserves state for retry. `end_interview()` failure leaves mode as "interview" -- operator must retry or `/clear`. Crash mid-interview: session persistence (`save()` called after each turn) preserves interview state to `<cache>/cockpit/chat-session.json`, restored on reload via `InterviewState.model_validate()`. See **B-6.3**.
 
 ### 4. Copilot Priority Rules
 Priority levels in `copilot.py`:
@@ -279,11 +279,11 @@ Scores are internally consistent. Health is highest (system integrity), manageme
 Only `"executed"` decisions are recorded (`app.py:392`). No `"dismissed"` or `"expired"` actions are captured. The JSONL append uses `open(..., "a")` which is safe for single-writer. The `collect_decisions()` reader filters by timestamp cutoff. The file grows unbounded. See **C-6.2** and **B-6.6**.
 
 ### 9. Micro-Probe Cooldown
-The 600s cooldown does NOT survive restart. `_last_probe_time` uses `time.monotonic()` and is not persisted. After restart, it resets to `0.0`, making the cooldown immediately expired. The `asked_topics` set IS persisted to `~/.cache/cockpit/probe-state.json`, so already-asked probes are not repeated. Clock changes (NTP drift, timezone) do not affect `time.monotonic()` as it is a monotonic clock. See **R-6.2**.
+The 600s cooldown does NOT survive restart. `_last_probe_time` uses `time.monotonic()` and is not persisted. After restart, it resets to `0.0`, making the cooldown immediately expired. The `asked_topics` set IS persisted to `<cache>/cockpit/probe-state.json`, so already-asked probes are not repeated. Clock changes (NTP drift, timezone) do not affect `time.monotonic()` as it is a monotonic clock. See **R-6.2**.
 
 ### 10. voice.py
 **Working feature, not dead code.** 28 LOC providing two functions:
-- `operator_name()`: reads operator name from `shared.operator.get_operator()`, falls back to "Ryan". Used by `copilot.py:90` for greeting and `copilot.py:211` for session greeting.
+- `operator_name()`: reads operator name from `shared.operator.get_operator()`, falls back to "Operator". Used by `copilot.py:90` for greeting and `copilot.py:211` for session greeting.
 - `greeting()`: time-of-day greeting string. Used by `app.py:89` on mount and `app.py:248` on slow refresh to set the app title.
 
 Both functions are actively called and handle exceptions gracefully with fallbacks.
@@ -292,19 +292,19 @@ Both functions are actively called and handle exceptions gracefully with fallbac
 
 **record_observation** (`chat_agent.py:314-352`):
 1. Chat agent calls `record_observation(dimension, key, value, evidence)`.
-2. Appends JSON line to `~/.cache/cockpit/pending-facts.jsonl`.
+2. Appends JSON line to `<cache>/cockpit/pending-facts.jsonl`.
 3. Operator runs `/flush` -> `_flush_pending_facts()` (`screens/chat.py:213-247`) reads JSONL, creates `RecordedFact` objects, calls `flush_interview_facts(facts, insights=[], source="conversation:cockpit")`.
-4. Profiler's `flush_interview_facts` merges into `profiles/ryan.json`.
+4. Profiler's `flush_interview_facts` merges into `profiles/operator-profile.json`.
 
 **read_profile** (`chat_agent.py:398-439`):
 1. Chat agent calls `read_profile(dimension="")` for summary or `read_profile(dimension="workflow")` for detail.
-2. Reads `profiles/ryan.json` via `load_existing_profile()`.
+2. Reads `profiles/operator-profile.json` via `load_existing_profile()`.
 3. Returns formatted text. No write side-effects.
 
 **correct_profile_fact** (`chat_agent.py:442-470`):
 1. Chat agent calls `correct_profile_fact(dimension, key, value)`.
 2. Creates correction dict with `value=None` for DELETE or actual value for update.
-3. Calls `apply_corrections()` from profiler, which writes to `profiles/ryan.json` with source `"operator:correction"` and confidence `1.0`.
+3. Calls `apply_corrections()` from profiler, which writes to `profiles/operator-profile.json` with source `"operator:correction"` and confidence `1.0`.
 
 All three tools trace end-to-end correctly. The `/pending` and `/flush` commands provide operator visibility into the pending-facts pipeline.
 

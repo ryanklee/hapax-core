@@ -7,7 +7,7 @@
 
 ## Inventory
 
-### Docker Compose (`~/llm-stack/docker-compose.yml`)
+### Docker Compose (`<llm-stack>/docker-compose.yml`)
 | Service | Image | Profile | mem_limit | Healthcheck | sha256 |
 |---------|-------|---------|-----------|-------------|--------|
 | qdrant | qdrant/qdrant:latest | core | 4g | TCP :6333 | yes |
@@ -32,7 +32,7 @@
 | Cleanup | `ExecStopPost=rm -f .env` | Deleted on service stop |
 | Agent access | `.envrc` (22 LOC) | `eval "$(<.envrc)"` in watchdog scripts |
 
-### Systemd Units (`~/.config/systemd/user/`)
+### Systemd Units (`<systemd-user>/`)
 | Unit | Type | MemoryMax | CPUQuota | OnFailure |
 |------|------|-----------|----------|-----------|
 | llm-stack.service | oneshot (RemainAfterExit) | — | — | yes |
@@ -49,7 +49,7 @@
 | midi-route.service | oneshot (RemainAfterExit) | — | — | — |
 | notify-failure@.service | template | — | — | — |
 
-### Watchdog Scripts (`~/.local/bin/`)
+### Watchdog Scripts (`<local-bin>/`)
 | Script | LOC | Uses shared.notify |
 |--------|-----|--------------------|
 | health-watchdog | 141 | yes |
@@ -92,7 +92,7 @@ Complete redesign. `generate-env.sh` (52 LOC) reads all 14 secrets from `pass` s
 
 ### Fix 4: Vault path mismatch — VERIFIED
 
-`.envrc:18` — `$HOME/Documents/Personal`. `generate-env.sh:44` — `/home/hapaxlegomenon/Documents/Personal`. Consistent and correct.
+`.envrc:18` — `$HOME/Documents/Personal`. `generate-env.sh:44` — `<home>/Documents/Personal`. Consistent and correct.
 
 ### Fix 9: Docker resource limits — VERIFIED
 
@@ -129,7 +129,7 @@ Still the same schedule (02:00 backup, 02:30 manifest). But both services now ha
 
 ### Fix 59: n8n backup path — VERIFIED
 
-`backup.sh:67-81` — Uses `docker compose exec -T n8n n8n export:workflow --all` and `export:credentials --all`. Checks container is running first. No longer references host `~/.n8n`.
+`backup.sh:67-81` — Uses `docker compose exec -T n8n n8n export:workflow --all` and `export:credentials --all`. Checks container is running first. No longer references host `<n8n-data>`.
 
 ### Fix 60: n8n setup documentation — VERIFIED
 
@@ -236,7 +236,7 @@ v1 R-8.4 still open. No services use PrivateTmp, ProtectSystem, NoNewPrivileges.
 
 #### B2-8.2: n8n credential backup stored unencrypted [low]
 
-`backup.sh:74-78` — `n8n export:credentials --all` writes credentials (Telegram bot token, LiteLLM API key) to `$BACKUP_DIR/n8n/credentials.json` in plaintext. The backup directory `~/backups/llm-stack/` has standard user permissions. While the secrets are also in `pass`, having unencrypted copies in backup directories expands the attack surface.
+`backup.sh:74-78` — `n8n export:credentials --all` writes credentials (Telegram bot token, LiteLLM API key) to `$BACKUP_DIR/n8n/credentials.json` in plaintext. The backup directory `<backups>/` has standard user permissions. While the secrets are also in `pass`, having unencrypted copies in backup directories expands the attack surface.
 
 ---
 

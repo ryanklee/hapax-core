@@ -85,7 +85,7 @@
 **File:** `shared/vault_writer.py:28-32`
 **Severity:** low
 **Finding:** `VAULT_PATH`, `SYSTEM_DIR`, `BRIEFINGS_DIR`, `DIGESTS_DIR`, and `INBOX_DIR` are computed at module load time. Tests must patch all five constants independently (see `tests/test_vault_writer.py:30-33` patching 4 of 5). `DIGESTS_DIR` is not patched in the test fixture, meaning `_ensure_dirs()` at line 37 would attempt to create real filesystem directories under the original `SYSTEM_DIR / "digests"` path. This does not cause test failures because `write_to_vault` independently creates its target directory, but `_ensure_dirs()` has an unpatched side effect.
-**Impact:** Low. The test fixture patches `VAULT_PATH`, `SYSTEM_DIR`, `BRIEFINGS_DIR`, and `INBOX_DIR` but misses `DIGESTS_DIR`. In practice this means `_ensure_dirs()` tries to `mkdir` the real `~/Documents/Personal/30-system/digests/` during tests. If the real path doesn't exist and the parent is unwritable, `_ensure_dirs` could fail, though `write_to_vault` would still succeed because it calls `target_dir.mkdir(parents=True, exist_ok=True)` independently.
+**Impact:** Low. The test fixture patches `VAULT_PATH`, `SYSTEM_DIR`, `BRIEFINGS_DIR`, and `INBOX_DIR` but misses `DIGESTS_DIR`. In practice this means `_ensure_dirs()` tries to `mkdir` the real `<personal-vault>/30-system/digests/` during tests. If the real path doesn't exist and the parent is unwritable, `_ensure_dirs` could fail, though `write_to_vault` would still succeed because it calls `target_dir.mkdir(parents=True, exist_ok=True)` independently.
 
 ---
 

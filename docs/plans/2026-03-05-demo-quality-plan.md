@@ -193,7 +193,7 @@ class TestParseDuration:
         assert parse_duration("300", "family") == 300
 ```
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo_models_extended.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo_models_extended.py -v`
 
 ---
 
@@ -466,7 +466,7 @@ class TestFormatPlanningContext:
         assert "AVOID" in text
 ```
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo_narrative.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo_narrative.py -v`
 
 ---
 
@@ -547,7 +547,7 @@ Use `agents.health_monitor.http_get` for HTTP checks (it returns response text o
 
 Mock `agents.health_monitor.run_checks` and `agents.health_monitor.http_get` via `@patch`. Create minimal `HealthReport` or mock objects with the needed attributes.
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo_readiness.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo_readiness.py -v`
 
 ---
 
@@ -632,7 +632,7 @@ The final context document is formatted with clear section headers:
 
 For web research tests, mock the Tavily call. For Langfuse/Qdrant, mock the clients.
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo_research.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo_research.py -v`
 
 ---
 
@@ -723,7 +723,7 @@ The revision prompt must include: the original script, the critique report, and 
 
 Mock the Pydantic AI agents using `@patch` on the `agent.run()` method. Create mock `RunResult` objects with `.output` attributes.
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo_critique.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo_critique.py -v`
 
 ---
 
@@ -906,7 +906,7 @@ savefig.pad_inches: 0.3
 - `test_gruvbox_style_applied` — verify matplotlib uses gruvbox.mplstyle (check figure facecolor after loading)
 - `test_invalid_chart_type` — unknown type → raises ValueError
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo_diagrams.py tests/test_demo_charts.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo_diagrams.py tests/test_demo_charts.py -v`
 
 ---
 
@@ -1081,7 +1081,7 @@ These are integration-level tests. Mock the LLM calls and external services:
 - `test_visual_type_routing` — create script with mixed visual types → verify diagram/chart render functions called
 - `test_metadata_includes_quality_fields` — verify new metadata fields present
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo_quality_integration.py tests/test_demo_agent.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo_quality_integration.py tests/test_demo_agent.py -v`
 
 ---
 
@@ -1095,9 +1095,9 @@ These are integration-level tests. Mock the LLM calls and external services:
 1. Add `"matplotlib>=3.9"` to pyproject.toml dependencies (alphabetically)
 2. Install D2: `curl -fsSL https://d2lang.com/install.sh | sh -s --` (or check if available via package manager)
 3. Run the full demo test suite: `uv run pytest tests/test_demo*.py -v`
-4. Verify cockpit-web still builds: `cd ~/projects/cockpit-web && pnpm build`
+4. Verify cockpit-web still builds: `cd <cockpit-web> && pnpm build`
 
-**Run:** `cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v`
+**Run:** `cd <ai-agents> && uv run pytest tests/test_demo*.py -v`
 
 ---
 
@@ -1105,19 +1105,19 @@ These are integration-level tests. Mock the LLM calls and external services:
 
 ```bash
 # All demo tests pass
-cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v
+cd <ai-agents> && uv run pytest tests/test_demo*.py -v
 
 # Full test suite still passes
-cd ~/projects/ai-agents && uv run pytest -x --timeout=30 2>&1 | tail -5
+cd <ai-agents> && uv run pytest -x --timeout=30 2>&1 | tail -5
 
 # Cockpit-web builds
-cd ~/projects/cockpit-web && pnpm build
+cd <cockpit-web> && pnpm build
 
 # D2 installed
 d2 --version
 
 # Manual smoke test (if services running):
-# 1. Short demo: uv run python -m agents.demo "the dashboard for my wife" --duration 3m
+# 1. Short demo: uv run python -m agents.demo "the dashboard for a non-technical friend" --duration 3m
 # 2. Long demo: uv run python -m agents.demo "health monitoring for leadership" --duration 10m --format video
 # 3. Check output: demo.html opens, has architecture diagrams, charts, proper narration
 ```

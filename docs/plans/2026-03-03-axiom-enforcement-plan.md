@@ -4,9 +4,9 @@
 
 **Goal:** Implement a 7-layer axiom enforcement system where axioms gain enforceable meaning through accumulated precedent (case law), backed by Qdrant vector search.
 
-**Architecture:** Axiom definitions live in `~/projects/hapaxromana/axioms/` (YAML). Enforcement modules live in `~/projects/ai-agents/shared/` (Python). A Qdrant collection (`axiom-precedents`) stores accumulated decisions. LLM agents get decision-time tools to check compliance and record precedents. Drift detector, health monitor, briefing, and cockpit are extended.
+**Architecture:** Axiom definitions live in `<hapaxromana>/axioms/` (YAML). Enforcement modules live in `<ai-agents>/shared/` (Python). A Qdrant collection (`axiom-precedents`) stores accumulated decisions. LLM agents get decision-time tools to check compliance and record precedents. Drift detector, health monitor, briefing, and cockpit are extended.
 
-**Tech Stack:** Python 3.12+, Pydantic, pydantic-ai, Qdrant (768d nomic-embed-text-v2-moe), PyYAML, pytest (asyncio_mode=auto). Package manager: `uv`. All work in `~/projects/ai-agents/` unless noted.
+**Tech Stack:** Python 3.12+, Pydantic, pydantic-ai, Qdrant (768d nomic-embed-text-v2-moe), PyYAML, pytest (asyncio_mode=auto). Package manager: `uv`. All work in `<ai-agents>/` unless noted.
 
 **Baseline:** 1095 tests passing. Flaky test deselected: `tests/test_profiler.py::test_detect_changed_sources_nothing_changed`
 
@@ -17,16 +17,16 @@
 Create the axiom definition files that all enforcement code reads from.
 
 **Files:**
-- Create: `~/projects/hapaxromana/axioms/registry.yaml`
-- Create: `~/projects/hapaxromana/axioms/precedents/seed/single-user-seeds.yaml`
-- Create: `~/projects/hapaxromana/axioms/precedents/seed/executive-function-seeds.yaml`
-- Create: `~/projects/hapaxromana/axioms/implications/single-user.yaml` (placeholder, populated by derivation pipeline later)
-- Create: `~/projects/hapaxromana/axioms/implications/executive-function.yaml` (placeholder)
+- Create: `<hapaxromana>/axioms/registry.yaml`
+- Create: `<hapaxromana>/axioms/precedents/seed/single-user-seeds.yaml`
+- Create: `<hapaxromana>/axioms/precedents/seed/executive-function-seeds.yaml`
+- Create: `<hapaxromana>/axioms/implications/single-user.yaml` (placeholder, populated by derivation pipeline later)
+- Create: `<hapaxromana>/axioms/implications/executive-function.yaml` (placeholder)
 
 **Step 1: Create directory structure**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 mkdir -p axioms/implications axioms/precedents/seed
 ```
 
@@ -41,7 +41,7 @@ axioms:
   - id: single_user
     text: >
       This system is developed for a single user and by that single user,
-      Ryan Kleeberger (Hapax). This will always be the case. All decisions
+      the operator (Hapax). This will always be the case. All decisions
       must be made respecting and leveraging that fact.
     weight: 100
     type: hardcoded
@@ -198,7 +198,7 @@ implications: []
 **Step 6: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add axioms/
 git commit -m "feat: axiom registry with seed precedents for single_user and executive_function"
 ```
@@ -210,8 +210,8 @@ git commit -m "feat: axiom registry with seed precedents for single_user and exe
 Python module to load and validate axiom definitions from hapaxromana.
 
 **Files:**
-- Create: `~/projects/ai-agents/shared/axiom_registry.py`
-- Create: `~/projects/ai-agents/tests/test_axiom_registry.py`
+- Create: `<ai-agents>/shared/axiom_registry.py`
+- Create: `<ai-agents>/tests/test_axiom_registry.py`
 
 **Step 1: Write the failing tests**
 
@@ -308,7 +308,7 @@ def test_load_implications_missing_file(sample_registry):
 **Step 2: Run tests to verify they fail**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_axiom_registry.py -v
 ```
 
@@ -437,7 +437,7 @@ def load_implications(
 **Step 4: Run tests to verify they pass**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_axiom_registry.py -v
 ```
 
@@ -454,7 +454,7 @@ Expected: 1101 passed
 **Step 6: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add shared/axiom_registry.py tests/test_axiom_registry.py
 git commit -m "feat: axiom registry loader — reads YAML definitions from hapaxromana"
 ```
@@ -466,8 +466,8 @@ git commit -m "feat: axiom registry loader — reads YAML definitions from hapax
 Qdrant-backed precedent database with semantic search, CRUD, seed loading, and authority management.
 
 **Files:**
-- Create: `~/projects/ai-agents/shared/axiom_precedents.py`
-- Create: `~/projects/ai-agents/tests/test_axiom_precedents.py`
+- Create: `<ai-agents>/shared/axiom_precedents.py`
+- Create: `<ai-agents>/tests/test_axiom_precedents.py`
 
 **Step 1: Write the failing tests**
 
@@ -931,9 +931,9 @@ git commit -m "feat: precedent store — Qdrant-backed case law for axiom enforc
 Tools that LLM agents call to check axiom compliance and record decisions.
 
 **Files:**
-- Create: `~/projects/ai-agents/shared/axiom_tools.py`
-- Create: `~/projects/ai-agents/tests/test_axiom_tools.py`
-- Modify: `~/projects/ai-agents/shared/operator.py` (enhance axiom injection)
+- Create: `<ai-agents>/shared/axiom_tools.py`
+- Create: `<ai-agents>/tests/test_axiom_tools.py`
+- Modify: `<ai-agents>/shared/operator.py` (enhance axiom injection)
 
 **Step 1: Write the failing tests**
 
@@ -1248,9 +1248,9 @@ git commit -m "feat: axiom decision-time tools — check_axiom_compliance + reco
 Add axiom health checks and tier defaults.
 
 **Files:**
-- Modify: `~/projects/ai-agents/agents/health_monitor.py` (new `@check_group("axioms")`)
-- Modify: `~/projects/ai-agents/shared/service_tiers.py` (add axiom group default)
-- Modify: `~/projects/ai-agents/tests/test_health_monitor.py` (update registry test, add axiom check tests)
+- Modify: `<ai-agents>/agents/health_monitor.py` (new `@check_group("axioms")`)
+- Modify: `<ai-agents>/shared/service_tiers.py` (add axiom group default)
+- Modify: `<ai-agents>/tests/test_health_monitor.py` (update registry test, add axiom check tests)
 
 **Step 1: Add tier default for axioms group**
 
@@ -1393,8 +1393,8 @@ git commit -m "feat: axiom health checks — registry, precedent collection, imp
 Extend the drift detector to check axiom compliance alongside docs-vs-reality.
 
 **Files:**
-- Modify: `~/projects/ai-agents/agents/drift_detector.py`
-- Modify: `~/projects/ai-agents/tests/test_drift_detector.py`
+- Modify: `<ai-agents>/agents/drift_detector.py`
+- Modify: `<ai-agents>/tests/test_drift_detector.py`
 
 **Step 1: Update DriftItem category to include axiom-violation**
 
@@ -1470,8 +1470,8 @@ git commit -m "feat: drift detector axiom compliance pass — checks axioms alon
 Add axiom section to briefing and review tools to cockpit.
 
 **Files:**
-- Modify: `~/projects/ai-agents/agents/briefing.py`
-- Modify: `~/projects/ai-agents/cockpit/chat_agent.py`
+- Modify: `<ai-agents>/agents/briefing.py`
+- Modify: `<ai-agents>/cockpit/chat_agent.py`
 
 **Step 1: Add axiom data collection to briefing**
 
@@ -1607,8 +1607,8 @@ git commit -m "feat: axiom enforcement integration — briefing section, cockpit
 One-shot LLM derivation of axiom implications with self-consistency.
 
 **Files:**
-- Create: `~/projects/ai-agents/shared/axiom_derivation.py`
-- Create: `~/projects/ai-agents/tests/test_axiom_derivation.py`
+- Create: `<ai-agents>/shared/axiom_derivation.py`
+- Create: `<ai-agents>/tests/test_axiom_derivation.py`
 
 **Step 1: Write failing tests**
 
@@ -1938,7 +1938,7 @@ git commit -m "feat: axiom derivation pipeline — self-consistent LLM implicati
 **Step 1: Run full test suite**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/ -x -q --deselect tests/test_profiler.py::test_detect_changed_sources_nothing_changed
 ```
 
@@ -1986,11 +1986,11 @@ Add `"axiom-precedents"` to the set at line 82.
 **Step 6: Commit everything**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add -A && git status  # Verify only axioms/ files
 git commit -m "feat: axiom registry with seed precedents and placeholder implications"
 
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add -A && git status  # Verify all new/modified files
 git commit -m "feat: complete axiom enforcement infrastructure — 7-layer architecture"
 ```

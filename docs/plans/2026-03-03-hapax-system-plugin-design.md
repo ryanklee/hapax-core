@@ -12,7 +12,7 @@ Private Claude Code plugin that consolidates all project-specific configuration 
 ## Plugin Structure
 
 ```
-~/.claude/plugins/local/hapax-system/
+<claude-config>/plugins/local/hapax-system/
   .claude-plugin/
     plugin.json              # Plugin manifest
   skills/
@@ -119,7 +119,7 @@ Health: 40/40 healthy (15m ago) | Docker: 12/12 running
 GPU: 8192/24576 MiB used
 ```
 
-Subsumes the global `~/.claude/hooks.json` SessionStart compact hook (which currently shows branch/commit/docker/GPU). The global hook can be removed after plugin activation.
+Subsumes the global `<claude-config>/hooks.json` SessionStart compact hook (which currently shows branch/commit/docker/GPU). The global hook can be removed after plugin activation.
 
 ### compact-restore.sh (DEFERRED)
 
@@ -129,7 +129,7 @@ PreCompact hook for preserving critical context during compaction. Deferred to B
 
 ### Migrated from Commands (7)
 
-Each command at `~/.claude/commands/*.md` becomes a SKILL.md in the plugin. The upgrade adds:
+Each command at `<claude-config>/commands/*.md` becomes a SKILL.md in the plugin. The upgrade adds:
 - Structured YAML frontmatter (name, description, trigger patterns)
 - Richer context injection (skills can include tool allowlists, model overrides)
 - Plugin portability (moves with the plugin, not scattered globally)
@@ -237,7 +237,7 @@ No changes needed. The plugin loads globally. Repo-specific CLAUDE.md files cont
 
 ## Global Configuration Changes
 
-### ~/.claude/hooks.json
+### <claude-config>/hooks.json
 
 Remove the SessionStart compact hook (absorbed by plugin's session-context.sh). Keep:
 - PostToolUse prettier (non-conflicting, useful for non-project files)
@@ -262,16 +262,16 @@ After:
 }
 ```
 
-### ~/.claude/commands/
+### <claude-config>/commands/
 
 All 7 command files are removed after plugin skills are verified working:
 - `status.md`, `briefing.md`, `studio.md`, `vram.md`, `ingest.md`, `axiom-check.md`, `axiom-review.md`
 
-### ~/.claude/rules/
+### <claude-config>/rules/
 
 All 4 global rule files stay. They provide context in non-project sessions too. The plugin's `conventions.md` is a project-focused distillation, not a replacement.
 
-### ~/.claude/settings.json — Plugin Cleanup
+### <claude-config>/settings.json — Plugin Cleanup
 
 Disable these plugins (duplicates or irrelevant):
 
@@ -311,10 +311,10 @@ This is a low-priority enhancement. The built-in StatusLine shows branch and mod
 ## Migration Plan
 
 ### Phase 1: Create Plugin Structure
-1. Create `~/.claude/plugins/local/hapax-system/` directory tree
+1. Create `<claude-config>/plugins/local/hapax-system/` directory tree
 2. Write `plugin.json` manifest
 3. Copy/adapt all scripts, skills, agents, rules
-4. Register plugin in `~/.claude/settings.json`
+4. Register plugin in `<claude-config>/settings.json`
 
 ### Phase 2: Verify Plugin Loads
 1. Start new Claude Code session
@@ -326,9 +326,9 @@ This is a low-priority enhancement. The built-in StatusLine shows branch and mod
 ### Phase 3: Remove Migrated Configs
 1. Remove `ai-agents/.claude/settings.json`, `rules/`, `hooks/`
 2. Remove `hapaxromana/.claude/agents/operator-voice.md`
-3. Remove `~/.claude/commands/*.md` (all 7)
-4. Remove SessionStart compact hook from `~/.claude/hooks.json`
-5. Disable duplicate/irrelevant plugins in `~/.claude/settings.json`
+3. Remove `<claude-config>/commands/*.md` (all 7)
+4. Remove SessionStart compact hook from `<claude-config>/hooks.json`
+5. Disable duplicate/irrelevant plugins in `<claude-config>/settings.json`
 
 ### Phase 4: Iterate (Batch 4 from axiom plan)
 1. Analyze audit data after 1 week
@@ -351,10 +351,10 @@ This is a low-priority enhancement. The built-in StatusLine shows branch and mod
 
 | Item | Location | Why |
 |------|----------|-----|
-| Global rules (4 files) | `~/.claude/rules/` | Apply to all projects, not just this stack |
+| Global rules (4 files) | `<claude-config>/rules/` | Apply to all projects, not just this stack |
 | Per-repo CLAUDE.md | Each repo root | Repo-specific context, maintained alongside code |
 | Per-repo .claudeignore | Each repo root | Repo-specific file exclusions |
-| Prettier PostToolUse hook | `~/.claude/hooks.json` | Applies to all projects |
-| Notification hook | `~/.claude/hooks.json` | Applies to all projects |
+| Prettier PostToolUse hook | `<claude-config>/hooks.json` | Applies to all projects |
+| Notification hook | `<claude-config>/hooks.json` | Applies to all projects |
 | Project permissions | Each repo's `settings.local.json` | Per-repo, not portable |
 | Operator-voice memory | `hapaxromana/.claude/agent-memory/` | Persists independently of agent definition |

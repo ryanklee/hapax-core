@@ -10,7 +10,7 @@
 
 **Design doc:** `docs/plans/2026-03-09-screen-awareness-design.md`
 
-**Implementation repo:** `~/projects/ai-agents/`
+**Implementation repo:** `<ai-agents>/`
 
 ---
 
@@ -76,7 +76,7 @@ def test_screen_analysis_no_issues():
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_models.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_models.py -v`
 Expected: FAIL with `ModuleNotFoundError: No module named 'agents.hapax_voice.screen_models'`
 
 **Step 3: Write minimal implementation**
@@ -112,13 +112,13 @@ class ScreenAnalysis:
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_models.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_models.py -v`
 Expected: 4 passed
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/hapax_voice/screen_models.py tests/hapax_voice/test_screen_models.py
 git commit -m "feat(voice): add screen analysis data models"
 ```
@@ -210,7 +210,7 @@ def test_change_detector_no_atspi_graceful():
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_change_detector.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_change_detector.py -v`
 Expected: FAIL with `ModuleNotFoundError`
 
 **Step 3: Write minimal implementation**
@@ -319,13 +319,13 @@ class ChangeDetector:
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_change_detector.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_change_detector.py -v`
 Expected: 5 passed
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/hapax_voice/screen_change_detector.py tests/hapax_voice/test_screen_change_detector.py
 git commit -m "feat(voice): add AT-SPI change detector for screen awareness"
 ```
@@ -402,7 +402,7 @@ def test_capturer_cleans_up_temp_files():
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_capturer.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_capturer.py -v`
 Expected: FAIL with `ModuleNotFoundError`
 
 **Step 3: Write minimal implementation**
@@ -494,13 +494,13 @@ class ScreenCapturer:
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_capturer.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_capturer.py -v`
 Expected: 4 passed
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/hapax_voice/screen_capturer.py tests/hapax_voice/test_screen_capturer.py
 git commit -m "feat(voice): add screen capturer with cosmic-screenshot"
 ```
@@ -513,7 +513,7 @@ git commit -m "feat(voice): add screen capturer with cosmic-screenshot"
 - Create: `agents/hapax_voice/screen_analyzer.py`
 - Create: `tests/hapax_voice/test_screen_analyzer.py`
 
-**Context:** Sends base64 screenshot to Gemini Flash via LiteLLM's OpenAI-compatible API. System prompt includes static core context loaded from `~/.local/share/hapax-voice/screen_context.md` and optional RAG chunks. Returns structured `ScreenAnalysis`. The analyzer explicitly avoids commenting on non-work content or narrating obvious actions.
+**Context:** Sends base64 screenshot to Gemini Flash via LiteLLM's OpenAI-compatible API. System prompt includes static core context loaded from `<local-share>/hapax-voice/screen_context.md` and optional RAG chunks. Returns structured `ScreenAnalysis`. The analyzer explicitly avoids commenting on non-work content or narrating obvious actions.
 
 **Step 1: Write the failing test**
 
@@ -587,7 +587,7 @@ def test_analyzer_works_without_context_file():
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_analyzer.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_analyzer.py -v`
 Expected: FAIL with `ModuleNotFoundError`
 
 **Step 3: Write minimal implementation**
@@ -731,13 +731,13 @@ class ScreenAnalyzer:
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_analyzer.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_analyzer.py -v`
 Expected: 4 passed
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/hapax_voice/screen_analyzer.py tests/hapax_voice/test_screen_analyzer.py
 git commit -m "feat(voice): add Gemini Flash screen analyzer"
 ```
@@ -840,7 +840,7 @@ def test_monitor_disabled_without_crash():
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_monitor.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_monitor.py -v`
 Expected: FAIL with `ModuleNotFoundError`
 
 **Step 3: Write minimal implementation**
@@ -1000,13 +1000,13 @@ class ScreenMonitor:
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_screen_monitor.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_screen_monitor.py -v`
 Expected: 6 passed
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/hapax_voice/screen_monitor.py tests/hapax_voice/test_screen_monitor.py
 git commit -m "feat(voice): add ScreenMonitor orchestrator"
 ```
@@ -1045,7 +1045,7 @@ def test_voice_config_screen_disabled():
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_daemon_screen_integration.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_daemon_screen_integration.py -v`
 Expected: FAIL with `ValidationError` (fields don't exist yet)
 
 **Step 3: Add config fields to VoiceConfig**
@@ -1064,7 +1064,7 @@ Add these fields to `agents/hapax_voice/config.py` in the `VoiceConfig` class, a
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/hapax_voice/test_daemon_screen_integration.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/hapax_voice/test_daemon_screen_integration.py -v`
 Expected: 2 passed
 
 **Step 5: Wire ScreenMonitor into VoiceDaemon**
@@ -1118,7 +1118,7 @@ def screen_context_block(analysis) -> str:
 **Step 7: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/hapax_voice/config.py agents/hapax_voice/__main__.py agents/hapax_voice/persona.py tests/hapax_voice/test_daemon_screen_integration.py
 git commit -m "feat(voice): integrate ScreenMonitor into daemon"
 ```
@@ -1130,7 +1130,7 @@ git commit -m "feat(voice): integrate ScreenMonitor into daemon"
 **Files:**
 - Create: `scripts/generate_screen_context.py`
 
-**Context:** Generates the static system context file at `~/.local/share/hapax-voice/screen_context.md` by querying live system state: `docker compose ps`, `systemctl --user list-units`, port scan, agent directory listing. This is the file the screen analyzer loads as its system knowledge prompt. The drift detector (Task 9) will regenerate this automatically, but this script allows manual generation.
+**Context:** Generates the static system context file at `<local-share>/hapax-voice/screen_context.md` by querying live system state: `docker compose ps`, `systemctl --user list-units`, port scan, agent directory listing. This is the file the screen analyzer loads as its system knowledge prompt. The drift detector (Task 9) will regenerate this automatically, but this script allows manual generation.
 
 **Step 1: Write the script**
 
@@ -1141,7 +1141,7 @@ git commit -m "feat(voice): integrate ScreenMonitor into daemon"
 Queries live system state and writes a context file that the screen
 analyzer uses as its system knowledge prompt.
 
-Output: ~/.local/share/hapax-voice/screen_context.md
+Output: <local-share>/hapax-voice/screen_context.md
 """
 from __future__ import annotations
 
@@ -1231,7 +1231,7 @@ def generate() -> str:
         "- VS Code (Flatpak): code editor",
         "- Google Chrome (Flatpak): web browser",
         "- cosmic-term: terminal emulator",
-        "- Obsidian: knowledge management (vault at ~/Documents/Personal/)",
+        "- Obsidian: knowledge management (vault at <personal-vault>/)",
         "- Claude Code: CLI AI assistant (this system)",
         "",
     ]
@@ -1252,18 +1252,18 @@ if __name__ == "__main__":
 
 **Step 2: Run it**
 
-Run: `cd ~/projects/ai-agents && uv run python scripts/generate_screen_context.py`
+Run: `cd <ai-agents> && uv run python scripts/generate_screen_context.py`
 Expected: outputs path and size
 
 **Step 3: Verify the output**
 
-Run: `cat ~/.local/share/hapax-voice/screen_context.md | head -30`
+Run: `cat <local-share>/hapax-voice/screen_context.md | head -30`
 Expected: well-formatted markdown with live system data
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add scripts/generate_screen_context.py
 git commit -m "feat(voice): add screen context generator script"
 ```
@@ -1273,8 +1273,8 @@ git commit -m "feat(voice): add screen context generator script"
 ### Task 8: Cross-Repo Documentation Updates
 
 **Files:**
-- Modify: `~/projects/hapaxromana/docs/agent-architecture.md` (or equivalent) — add ScreenMonitor subsystem
-- Modify: `~/projects/ai-agents/profiles/component-registry.yaml` — add screen monitor entry
+- Modify: `<hapaxromana>/docs/agent-architecture.md` (or equivalent) — add ScreenMonitor subsystem
+- Modify: `<ai-agents>/profiles/component-registry.yaml` — add screen monitor entry
 
 **Context:** The design doc specifies that drift corrections and new subsystems must be documented across all relevant Hapax repos. This task adds the screen monitor to architecture docs and the component registry.
 
@@ -1308,11 +1308,11 @@ Add an entry to `profiles/component-registry.yaml` in ai-agents:
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/agent-architecture.md
 git commit -m "docs: add screen awareness subsystem to voice daemon architecture"
 
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add profiles/component-registry.yaml
 git commit -m "docs: add screen-monitor to component registry"
 ```
@@ -1324,7 +1324,7 @@ git commit -m "docs: add screen-monitor to component registry"
 **Files:**
 - Modify: `agents/drift_detector/__main__.py` (or main module) — add `screen_analyzer_context` dimension
 
-**Context:** The drift-detector agent runs weekly (Sunday 03:00). It gets a new dimension: `screen_analyzer_context`. This dimension compares the static core prompt at `~/.local/share/hapax-voice/screen_context.md` against live state (`docker compose ps`, `systemctl --user list-units`, port scan, agent directory). If drift detected, it regenerates the context file using the logic from Task 7's script. Drift corrections also trigger documentation updates across Hapax repos.
+**Context:** The drift-detector agent runs weekly (Sunday 03:00). It gets a new dimension: `screen_analyzer_context`. This dimension compares the static core prompt at `<local-share>/hapax-voice/screen_context.md` against live state (`docker compose ps`, `systemctl --user list-units`, port scan, agent directory). If drift detected, it regenerates the context file using the logic from Task 7's script. Drift corrections also trigger documentation updates across Hapax repos.
 
 **Step 1: Read the drift detector's current code**
 
@@ -1334,7 +1334,7 @@ Understand the existing dimension pattern.
 **Step 2: Add the new dimension**
 
 Add a `screen_analyzer_context` check that:
-1. Loads `~/.local/share/hapax-voice/screen_context.md`
+1. Loads `<local-share>/hapax-voice/screen_context.md`
 2. Queries live state (same as Task 7)
 3. Uses the LLM to compare and detect meaningful differences
 4. If drift found: regenerates the context file
@@ -1342,13 +1342,13 @@ Add a `screen_analyzer_context` check that:
 
 **Step 3: Test manually**
 
-Run: `cd ~/projects/ai-agents && uv run python -m agents.drift_detector --json 2>/dev/null | jq '.dimensions.screen_analyzer_context'`
+Run: `cd <ai-agents> && uv run python -m agents.drift_detector --json 2>/dev/null | jq '.dimensions.screen_analyzer_context'`
 Expected: shows drift status for the new dimension
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/drift_detector/
 git commit -m "feat(drift-detector): add screen_analyzer_context dimension"
 ```

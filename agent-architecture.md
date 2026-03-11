@@ -1,6 +1,6 @@
 # Agent Architecture
 
-> **Note:** This document is the canonical architecture reference. It was originally a design proposal and has been updated to reflect the current implemented state. For per-agent operational details, see `~/projects/ai-agents/profiles/operations-manual.md`.
+> **Note:** This document is the canonical architecture reference. It was originally a design proposal and has been updated to reflect the current implemented state. For per-agent operational details, see `<ai-agents>/profiles/operations-manual.md`.
 
 ## Philosophy
 
@@ -74,7 +74,7 @@ The **System Cockpit** is the operational dashboard, built as a **FastAPI API ba
 - `cockpit --once` produces a one-shot CLI snapshot for terminal use or piping
 - The React frontend connects to the FastAPI backend and renders the dashboard in the browser
 
-The cockpit consumes data from health-monitor, briefing, scout, activity-analyzer, and profiler agents. Persistent state lives in `~/.cache/cockpit/` (probes, decisions, facts).
+The cockpit consumes data from health-monitor, briefing, scout, activity-analyzer, and profiler agents. Persistent state lives in `<cache>/cockpit/` (probes, decisions, facts).
 
 ### Extended Interactive Surfaces
 
@@ -89,15 +89,15 @@ Beyond Claude Code and the Cockpit, Tier 1 includes additional LLM-enabled surfa
 | Voice daemon | Hapax Voice (`agents/hapax_voice`) | Always-on voice interaction: wake word, presence detection, Gemini Live S2S + local STT/TTS cascade, speaker ID, PANNs ambient sound classification, context gate, screen awareness (AT-SPI + Gemini Flash vision) |
 | Desktop hotkeys | fuzzel + aichat + wl-copy | Selection transforms, prompt dialogs, model switching |
 
-Design: `docs/plans/2026-03-05-llm-enablement-design.md` (waves 1-4), `~/projects/distro-work/docs/plans/2026-03-09-voice-modality-design.md` (Hapax Voice). Implementation: `~/projects/distro-work/`.
+Design: `docs/plans/2026-03-05-llm-enablement-design.md` (waves 1-4), `<distro-work>/docs/plans/2026-03-09-voice-modality-design.md` (Hapax Voice). Implementation: `<distro-work>/`.
 
 **Hapax Voice utilities:** `scripts/train_wake_word.py` (generate custom OpenWakeWord models from text phrases), `scripts/enroll_speaker.py` (register speaker embedding for speaker ID verification), and `scripts/generate_screen_context.py` (generate static system context for screen awareness).
 
-**Screen awareness subsystem:** AT-SPI2 polls for focused window changes (2s interval), grim captures on context change, Gemini Flash analyzes via LiteLLM. High-confidence errors route to TTS via NotificationQueue + ContextGate. Static system context loaded from `~/.local/share/hapax-voice/screen_context.md` (auto-generated, drift-detected). Design: `docs/plans/2026-03-09-screen-awareness-design.md`.
+**Screen awareness subsystem:** AT-SPI2 polls for focused window changes (2s interval), grim captures on context change, Gemini Flash analyzes via LiteLLM. High-confidence errors route to TTS via NotificationQueue + ContextGate. Static system context loaded from `<local-share>/hapax-voice/screen_context.md` (auto-generated, drift-detected). Design: `docs/plans/2026-03-09-screen-awareness-design.md`.
 
 ## Tier 2: On-Demand Agents (Pydantic AI)
 
-These live in `~/projects/ai-agents/`. Claude Code invokes them via shell or imports them as modules. Each agent uses LiteLLM as its backend (never direct provider APIs) and logs to Langfuse.
+These live in `<ai-agents>/`. Claude Code invokes them via shell or imports them as modules. Each agent uses LiteLLM as its backend (never direct provider APIs) and logs to Langfuse.
 
 ### research-agent
 
@@ -239,19 +239,19 @@ These live in `~/projects/ai-agents/`. Claude Code invokes them via shell or imp
 
 ### rag-ingest (systemd user service)
 
-**Status:** Partially implemented at `~/projects/rag-pipeline/ingest.py`.
+**Status:** Partially implemented at `<rag-pipeline>/ingest.py`.
 **Behavior:** Watches `~/documents/rag-sources/` via inotify/watchdog. New files → Docling extraction → chunk → nomic-embed-text → Qdrant `documents` collection. Handles PDF, DOCX, MD, HTML, TXT.
-**Service:** `~/.config/systemd/user/rag-ingest.service`
+**Service:** `<systemd-user>/rag-ingest.service`
 
 ### health-monitor timer (systemd timer)
 
 **Behavior:** Every 15 minutes, invokes the health-monitor agent (Tier 2). Runs deterministic checks across 18 groups, auto-fixes safe issues, notifies via ntfy + desktop on failures. History appended to `profiles/health-history.jsonl`. Uses `health-watchdog.service` with `notify-failure@.service` template on failure.
-**Service:** `~/.config/systemd/user/health-monitor.timer` + `health-watchdog.service`
+**Service:** `<systemd-user>/health-monitor.timer` + `health-watchdog.service`
 
 ### knowledge-maint (systemd timer)
 
 **Behavior:** Weekly (Sunday 04:30). Deduplicates Qdrant vectors (cosine similarity > 0.98). Prunes stale entries from deleted source files. Validates embedding dimensions (768d). Reports stats with error counts. Dry-run by default, `--apply` for deletions. Optional `--summarize` for LLM summary.
-**Service:** `~/.config/systemd/user/knowledge-maint.timer` + `knowledge-maint.service`
+**Service:** `<systemd-user>/knowledge-maint.timer` + `knowledge-maint.service`
 
 ## Implementation Status
 
@@ -264,7 +264,7 @@ All Tier 3 services are running as systemd timers (not n8n). n8n is used for not
 All Tier 2 agents share:
 
 ```python
-# ~/projects/ai-agents/shared/config.py
+# <ai-agents>/shared/config.py
 import os
 
 LITELLM_BASE = os.getenv("LITELLM_BASE_URL", "http://localhost:4000")
@@ -291,18 +291,18 @@ Claude Code invokes Tier 2 agents via shell:
 
 ```bash
 # From Claude Code:
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run python -m agents.research --topic "ExLlamaV3 speculative decoding" --depth deep
 uv run python -m agents.sample_curator --path ~/samples/new-pack/
 uv run python -m agents.midi_programmer --style "boom bap" --key "Dm" --bpm 90
 ```
 
-Or via custom slash commands (already scaffolded in ~/.claude/commands/).
+Or via custom slash commands (already scaffolded in <claude-config>/commands/).
 Results flow back through stdout, files, or Qdrant queries.
 
 ## Obsidian as Operational Surface
 
-Obsidian serves as the primary operational surface during work hours. Two vaults: Work vault (`~/Documents/Work/`) syncs via VS Code GitDoc (git auto-commit + push) to corporate work laptop; Personal vault (`~/Documents/Personal/`) is local only.
+Obsidian serves as the primary operational surface during work hours. Two vaults: Work vault (`<work-vault>/`) syncs via VS Code GitDoc (git auto-commit + push) to corporate work laptop; Personal vault (`<personal-vault>/`) is local only.
 
 **Bidirectional data flows:**
 - **System → Vault:** `vault_writer.py` writes briefings, nudges, goals to `30-system/` → GitDoc auto-commits → git push propagates to work laptop
@@ -319,7 +319,7 @@ Obsidian serves as the primary operational surface during work hours. Two vaults
 
 1. **Agent-to-agent communication:** No — flat orchestration. Claude Code orchestrates, agents never invoke each other. This avoids cascading failures and keeps the call graph auditable.
 
-2. **State management:** Agents are stateless per-invocation. All persistent state lives in Qdrant, filesystem (`profiles/`), or cache (`~/.cache/cockpit/`). This works well for the current 15-agent roster.
+2. **State management:** Agents are stateless per-invocation. All persistent state lives in Qdrant, filesystem (`profiles/`), or cache (`<cache>/cockpit/`). This works well for the current 15-agent roster.
 
 3. **Cost controls:** LiteLLM fallback chains provide implicit cost control (expensive model fails → cheaper model). Langfuse traces all calls for cost visibility. High-frequency Tier 3 tasks (health-monitor, knowledge-maint) use zero LLM by default.
 

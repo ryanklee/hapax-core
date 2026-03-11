@@ -55,9 +55,9 @@ Things that exist in the system. Discovered by introspecting live state:
 | `repo` | Git repos in `~/projects/` with hapax-related CLAUDE.md | Filesystem scan |
 | `agent` | Python modules in `agents/` with `if __name__` or `__main__.py` | Filesystem scan |
 | `timer` | `systemctl --user list-unit-files '*.timer'` | Systemd query |
-| `service` | Docker containers from `docker compose ps` in `~/llm-stack/` | Docker query |
+| `service` | Docker containers from `docker compose ps` in `<llm-stack>/` | Docker query |
 | `mcp-server` | Entries in Claude Code MCP config | JSON parse |
-| `rule` | `.md` files in `~/.claude/rules/` and `hapax-system/rules/` | Filesystem scan |
+| `rule` | `.md` files in `<claude-config>/rules/` and `hapax-system/rules/` | Filesystem scan |
 | `axiom` | Axiom registry entries | `shared/axiom_registry.py` |
 
 ### Document Archetypes
@@ -87,7 +87,7 @@ Typed assertions: "for every CI of type X, there must exist a reference in docum
 | `service` | `environment.md` | Core Infrastructure table | Service name in table |
 | `repo` | `hapaxromana/CLAUDE.md` | `## Related Repos` | Repo name in table |
 | `repo` | own `CLAUDE.md` | — | File must exist |
-| `mcp-server` | `~/.claude/CLAUDE.md` | `## MCP Servers` | Server name in list |
+| `mcp-server` | `<claude-config>/CLAUDE.md` | `## MCP Servers` | Server name in list |
 | `axiom` | `axioms.md` | `## Axiom:` sections | Axiom ID in heading |
 
 ### Mutual Awareness Rules
@@ -196,30 +196,30 @@ repos:
 # ── Coverage rules ───────────────────────────────────────────────────
 coverage_rules:
   - ci_type: agent
-    reference_doc: "~/projects/hapax-system/rules/system-context.md"
+    reference_doc: "<hapax-system>/rules/system-context.md"
     reference_section: "## Management Agents"
     match_by: name
     severity: medium
   - ci_type: agent
-    reference_doc: "~/projects/hapaxromana/agent-architecture.md"
+    reference_doc: "<hapaxromana>/agent-architecture.md"
     match_by: name_in_heading
     severity: low  # architecture doc lags implementation
   - ci_type: timer
-    reference_doc: "~/projects/hapax-system/rules/system-context.md"
+    reference_doc: "<hapax-system>/rules/system-context.md"
     reference_section: "## Management Timers"
     match_by: name
     severity: medium
   - ci_type: service
-    reference_doc: "~/.claude/rules/environment.md"
+    reference_doc: "<claude-config>/rules/environment.md"
     match_by: name
     severity: medium
   - ci_type: repo
-    reference_doc: "~/projects/hapaxromana/CLAUDE.md"
+    reference_doc: "<hapaxromana>/CLAUDE.md"
     reference_section: "## Related Repos"
     match_by: name
     severity: medium
   - ci_type: mcp_server
-    reference_doc: "~/.claude/CLAUDE.md"
+    reference_doc: "<claude-config>/CLAUDE.md"
     reference_section: "## MCP Servers"
     match_by: name
     severity: low
@@ -228,7 +228,7 @@ coverage_rules:
 mutual_awareness:
   - type: repo_registry
     description: "All hapax repos must appear in hapaxromana's Related Repos"
-    registry_doc: "~/projects/hapaxromana/CLAUDE.md"
+    registry_doc: "<hapaxromana>/CLAUDE.md"
     registry_section: "## Related Repos"
     severity: medium
   - type: spec_reference
@@ -238,8 +238,8 @@ mutual_awareness:
   - type: byte_identical
     description: "Cross-project boundary must be identical in both repos"
     docs:
-      - "~/projects/hapaxromana/docs/cross-project-boundary.md"
-      - "~/projects/hapax-mgmt/docs/cross-project-boundary.md"
+      - "<hapaxromana>/docs/cross-project-boundary.md"
+      - "<hapax-mgmt>/docs/cross-project-boundary.md"
     severity: high
 ```
 
@@ -274,9 +274,9 @@ Each CI type has a discovery function:
 
 - **agents:** Scan `agents/` directory for Python modules with `if __name__` blocks. Normalize names: `drift_detector.py` → `drift-detector`.
 - **timers:** `systemctl --user list-unit-files '*.timer' --no-legend` → parse timer names.
-- **services:** `docker compose -f ~/llm-stack/docker-compose.yml ps --format '{{.Name}}'` → service names.
+- **services:** `docker compose -f <llm-stack>/docker-compose.yml ps --format '{{.Name}}'` → service names.
 - **repos:** Scan `~/projects/` for directories containing `.git/` and either `CLAUDE.md` mentioning "hapax" or directory names matching `hapax-*`.
-- **mcp_servers:** Parse `~/.claude/mcp_servers.json` for server names.
+- **mcp_servers:** Parse `<claude-config>/mcp_servers.json` for server names.
 
 ### DriftItem Categories
 

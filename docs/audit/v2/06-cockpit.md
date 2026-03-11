@@ -202,7 +202,7 @@ None of these are bugs (graceful degradation is correct), but the absence of eve
 
 #### B2-6.4: decisions.jsonl rotation leaves orphaned temp file on NameError [low]
 
-Related to R2-6.1: when rotation fails due to missing `os` import, `tempfile.mkstemp()` at line 39 creates a temp file that is never cleaned up (since `os.unlink(tmp)` also fails). Over many failed rotations, temp files accumulate in `~/.cache/cockpit/`.
+Related to R2-6.1: when rotation fails due to missing `os` import, `tempfile.mkstemp()` at line 39 creates a temp file that is never cleaned up (since `os.unlink(tmp)` also fails). Over many failed rotations, temp files accumulate in `<cache>/cockpit/`.
 
 ---
 

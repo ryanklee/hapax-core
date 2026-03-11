@@ -132,7 +132,7 @@ The decision/accommodation tracking flow is severed by two bugs in `decisions.py
 
 ### H2-3.2: Micro-probe state is a dead end [low]
 
-Micro-probes collect operator responses to experiential questions ("How focused do you feel right now?"). The state is saved to `~/.cache/cockpit/probe-state.json`. No downstream component reads this file:
+Micro-probes collect operator responses to experiential questions ("How focused do you feel right now?"). The state is saved to `<cache>/cockpit/probe-state.json`. No downstream component reads this file:
 - The profiler doesn't discover it as a source
 - The briefing agent doesn't include probe trends
 - The accommodation system doesn't react to probe responses

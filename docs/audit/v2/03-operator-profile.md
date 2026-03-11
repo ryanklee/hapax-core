@@ -42,7 +42,7 @@
 - No atomic write (write-to-temp-then-rename)
 - No validation that the resulting JSON is non-empty or structurally valid
 
-If the LLM returns an empty or corrupted update, or if the process is killed mid-write, `operator.json` is silently corrupted. Additionally, `load_existing_profile()` at line 507 swallows all exceptions with `except Exception: return None` — a corrupted `ryan.json` becomes invisible, triggering full re-extraction as if no profile existed.
+If the LLM returns an empty or corrupted update, or if the process is killed mid-write, `operator.json` is silently corrupted. Additionally, `load_existing_profile()` at line 507 swallows all exceptions with `except Exception: return None` — a corrupted `operator-profile.json` becomes invisible, triggering full re-extraction as if no profile existed.
 **Impact:** Medium. The operator's profile is the single source of truth for system behavior. A corrupted `operator.json` would degrade all agents that use context tools. The `regenerate_operator()` path runs during `--auto` (the 12h timer), so corruption would happen silently during unattended operation.
 
 ### Fix 28: Profiler fact dedup — VERIFIED
@@ -131,7 +131,7 @@ If the LLM returns an empty or corrupted update, or if the process is killed mid
 ### R2-3.1: load_existing_profile() silently swallows all exceptions
 **File:** `agents/profiler.py:507-516`
 **Severity:** medium
-**Finding:** `except Exception: return None` with no logging. A corrupted `ryan.json` (e.g., from an interrupted write by Fix 27's missing atomic write) silently returns `None`. The caller in `run_auto()` treats `None` as "no profile exists" and triggers full re-extraction — potentially destroying the version history and accumulated curation work.
+**Finding:** `except Exception: return None` with no logging. A corrupted `operator-profile.json` (e.g., from an interrupted write by Fix 27's missing atomic write) silently returns `None`. The caller in `run_auto()` treats `None` as "no profile exists" and triggers full re-extraction — potentially destroying the version history and accumulated curation work.
 **Impact:** Medium. Profile corruption becomes invisible. The operator's carefully curated profile could be silently replaced by a fresh extraction with no indication of what happened.
 
 ### R2-3.2: load_structured_facts() silently discards malformed items

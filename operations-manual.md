@@ -24,7 +24,7 @@ Tier 2/3 agents route all LLM calls through LiteLLM for observability (Claude Co
 Open a terminal. Check infrastructure health:
 
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)" && uv run python -m agents.health_monitor
+cd <ai-agents> && eval "$(<.envrc)" && uv run python -m agents.health_monitor
 ```
 
 This runs 85+ deterministic checks across 17 groups: auth, axioms, budget, capacity, connectivity, credentials, disk, docker, endpoints, gpu, latency, models, profiles, qdrant, queues, secrets, systemd. No LLM calls — pure infrastructure verification.
@@ -43,10 +43,10 @@ Expected output: `85/85 HEALTHY` (check count grows as new checks are added). If
 The briefing agent runs daily at 07:00 via systemd timer. To generate one manually:
 
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)" && uv run python -m agents.briefing --hours 24 --save
+cd <ai-agents> && eval "$(<.envrc)" && uv run python -m agents.briefing --hours 24 --save
 ```
 
-The briefing synthesizes: LLM call volume and cost, error rates by model, health check history, axiom compliance status, drift items, and action items ranked by priority. Output saves to `~/projects/ai-agents/profiles/briefing.md` and writes to the Obsidian vault at `30-system/`.
+The briefing synthesizes: LLM call volume and cost, error rates by model, health check history, axiom compliance status, drift items, and action items ranked by priority. Output saves to `<ai-agents>/profiles/briefing.md` and writes to the Obsidian vault at `30-system/`.
 
 The briefing is your daily operational summary. Read it. Act on any high-priority items it flags.
 
@@ -57,7 +57,7 @@ The cockpit is a web application: a FastAPI backend serves data on port 8051 and
 **Start the API server** (if not running as Docker container):
 
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)" && uv run cockpit
+cd <ai-agents> && eval "$(<.envrc)" && uv run cockpit
 ```
 
 This launches the FastAPI API server. The Docker container maps it to http://localhost:8051.
@@ -65,7 +65,7 @@ This launches the FastAPI API server. The Docker container maps it to http://loc
 **Start the web frontend** (in a separate terminal):
 
 ```bash
-cd ~/projects/cockpit-web && pnpm dev
+cd <cockpit-web> && pnpm dev
 ```
 
 Open http://localhost:5173. The web dashboard shows health status, Docker containers, systemd timers, GPU/VRAM, nudges, cost tracking, domain health, briefings, and scout reports. In production, the built SPA can be served directly from the API server.
@@ -83,8 +83,8 @@ These print a point-in-time system overview to the terminal and exit — useful 
 
 Obsidian is the knowledge interface. Two vaults with different sync mechanisms:
 
-- **Work vault** (`~/Documents/Work/`) — git repo, syncs via VS Code GitDoc (auto-commit + push) to corporate work laptop
-- **Personal vault** (`~/Documents/Personal/`) — local only (no sync needed)
+- **Work vault** (`<work-vault>/`) — git repo, syncs via VS Code GitDoc (auto-commit + push) to corporate work laptop
+- **Personal vault** (`<personal-vault>/`) — local only (no sync needed)
 
 Work vault folders:
 
@@ -130,7 +130,7 @@ Key slash commands available in Claude Code:
 | `/deploy-check` | Pre-push readiness verification |
 | `/weekly-review` | Week's aggregated system data |
 
-Claude Code also has access to the operator profile (13 dimensions in Qdrant), axiom governance (4 axioms, 16 T0 implications), and the full system topology. Skills are defined in `~/projects/hapax-system/skills/`.
+Claude Code also has access to the operator profile (13 dimensions in Qdrant), axiom governance (4 axioms, 16 T0 implications), and the full system topology. Skills are defined in `<hapax-system>/skills/`.
 
 ### 6. First-Day Checklist
 
@@ -168,14 +168,14 @@ Your morning routine: read the briefing (arrives as ntfy push notification, also
 
 **Research** — when you need to know something, with RAG context:
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)"
+cd <ai-agents> && eval "$(<.envrc)"
 uv run python -m agents.research "How does the LiteLLM fallback chain work?"
 ```
 This queries Qdrant for relevant document chunks and synthesizes an answer.
 
 **Code review** — when you want a second opinion on a file:
 ```bash
-uv run python -m agents.code_review ~/projects/ai-agents/cockpit/app.py
+uv run python -m agents.code_review <ai-agents>/cockpit/app.py
 ```
 
 **Management prep** — before 1:1s:
@@ -235,7 +235,7 @@ The system is governed by 4 axioms:
 | `management_safety` | 95 | LLMs prepare, humans deliver — never generate feedback language |
 | `corporate_boundary` | dormant | Obsidian plugin cross-network boundary (retained for reference) |
 
-These aren't aspirational — they're enforced. The axiom enforcement infrastructure (defined in `~/projects/hapax-system/hooks/`) includes SessionStart hooks that verify axiom count, PreToolUse pattern scanners that block violations, and PostToolUse audit loggers. 16 T0 implications block code that violates existential constraints. 15 sufficiency probes verify agent compliance.
+These aren't aspirational — they're enforced. The axiom enforcement infrastructure (defined in `<hapax-system>/hooks/`) includes SessionStart hooks that verify axiom count, PreToolUse pattern scanners that block violations, and PostToolUse audit loggers. 16 T0 implications block code that violates existential constraints. 15 sufficiency probes verify agent compliance.
 
 Check compliance: `/axiom-check` in Claude Code. Review pending precedents: `/axiom-review`.
 
@@ -296,7 +296,7 @@ Sources that feed the profiler:
 
 The profiler runs every 12h automatically. You can trigger it manually:
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)"
+cd <ai-agents> && eval "$(<.envrc)"
 uv run python -m agents.profiler --auto          # Incremental from all sources
 uv run python -m agents.profiler --digest         # From digest content
 uv run python -m agents.profiler --source vault-inbox  # From specific source
@@ -335,7 +335,7 @@ If VRAM is full, Ollama queues requests until a model unloads. The health monito
 Backups run Sunday at 02:00. Verify they're working:
 
 ```bash
-ls -la ~/backups/llm-stack/
+ls -la <backups>/
 ```
 
 Each backup directory contains: `claude-config/`, `qdrant/` (7 collection snapshots), `postgres/` (database dumps), `n8n/` (workflows + credentials), `systemd/`, `profiles/`, `hotkeys/`, `langfuse-prompts.json`. Last 8 backups retained.
@@ -436,7 +436,7 @@ Reviews with operator context (coding preferences from profile), checks axiom co
 ### "I want to import data from Google Takeout"
 
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)"
+cd <ai-agents> && eval "$(<.envrc)"
 uv run python -m shared.takeout --list-services ~/Downloads/takeout.zip
 uv run python -m shared.takeout ~/Downloads/takeout.zip --services chrome,keep,calendar --since 2025-01-01
 ```
@@ -457,7 +457,7 @@ Compares documentation claims against actual system state. Run with `--fix` to a
 
 ```bash
 # Health
-cd ~/projects/ai-agents && eval "$(<.envrc)"
+cd <ai-agents> && eval "$(<.envrc)"
 uv run python -m agents.health_monitor           # Check health
 uv run python -m agents.health_monitor --fix      # Auto-fix
 uv run python -m agents.health_monitor --history  # Trend
@@ -469,7 +469,7 @@ uv run python -m agents.briefing --hours 24 --save
 uv run cockpit                                     # API server (port 8051 via Docker)
 uv run cockpit --once                              # Plain text CLI snapshot
 uv run cockpit --color                             # Rich CLI snapshot
-cd ~/projects/cockpit-web && pnpm dev              # Web frontend (port 5173)
+cd <cockpit-web> && pnpm dev              # Web frontend (port 5173)
 
 # Docker
 cd ~/llm-stack
@@ -486,26 +486,26 @@ journalctl --user -u health-watchdog -n 20        # Timer service logs
 nvidia-smi --query-gpu=memory.used,memory.total,memory.free --format=csv,noheader,nounits
 
 # Obsidian plugin
-cd ~/projects/obsidian-hapax && pnpm run build    # Rebuild after changes
+cd <obsidian-hapax> && pnpm run build    # Rebuild after changes
 ```
 
 ### Key Paths
 
 | Path | What |
 |------|------|
-| `~/llm-stack/` | Docker Compose, service configs |
-| `~/projects/ai-agents/` | Agent implementations + cockpit API |
-| `~/projects/hapaxromana/` | Architecture specs, axioms, this manual |
-| `~/projects/hapax-system/` | Claude Code skills, agents, rules, hooks |
-| `~/projects/cockpit-web/` | Web dashboard (React SPA) |
-| `~/projects/obsidian-hapax/` | Obsidian plugin |
-| `~/projects/rag-pipeline/` | Docling + watchdog RAG ingestion (deprecated — now in ai-agents) |
-| `~/Documents/Work/` | Obsidian Work vault (syncs via GitDoc) |
-| `~/Documents/Personal/` | Obsidian Personal vault (home only) |
+| `<llm-stack>/` | Docker Compose, service configs |
+| `<ai-agents>/` | Agent implementations + cockpit API |
+| `<hapaxromana>/` | Architecture specs, axioms, this manual |
+| `<hapax-system>/` | Claude Code skills, agents, rules, hooks |
+| `<cockpit-web>/` | Web dashboard (React SPA) |
+| `<obsidian-hapax>/` | Obsidian plugin |
+| `<rag-pipeline>/` | Docling + watchdog RAG ingestion (deprecated — now in ai-agents) |
+| `<work-vault>/` | Obsidian Work vault (syncs via GitDoc) |
+| `<personal-vault>/` | Obsidian Personal vault (home only) |
 | `~/documents/rag-sources/` | RAG ingestion drop zone |
-| `~/backups/llm-stack/` | Weekly backups |
-| `~/.cache/axiom-audit/` | Axiom audit trail |
-| `~/.config/systemd/user/` | Timer/service definitions |
+| `<backups>/` | Weekly backups |
+| `<cache>/axiom-audit/` | Axiom audit trail |
+| `<systemd-user>/` | Timer/service definitions |
 
 ### Model Aliases (via LiteLLM at localhost:4000)
 
@@ -530,7 +530,7 @@ All in `pass` (GPG-encrypted). Access: `pass show <path>`. Per-directory `.envrc
 
 ## Agent Reference
 
-All agents invoked as: `cd ~/projects/ai-agents && eval "$(<.envrc)" && uv run python -m agents.<name> [flags]`
+All agents invoked as: `cd <ai-agents> && eval "$(<.envrc)" && uv run python -m agents.<name> [flags]`
 
 | Agent | Purpose | LLM? | Key Flags |
 |-------|---------|------|-----------|
@@ -568,7 +568,7 @@ All agents invoked as: `cd ~/projects/ai-agents && eval "$(<.envrc)" && uv run p
 Nearly all data pipelines converge through two paths:
 
 1. **RAG path**: Source → sync agent → `~/documents/rag-sources/<service>/*.md` → `ingest.py` (watchdog) → Docling parse → nomic-embed-text embedding → Qdrant `documents` collection
-2. **Profile bridge**: Every sync agent also writes `*-profile-facts.jsonl` to `~/.cache/<agent>/` → profiler loads these as zero-LLM-cost deterministic facts → Qdrant `profile-facts` collection
+2. **Profile bridge**: Every sync agent also writes `*-profile-facts.jsonl` to `<cache>/<agent>/` → profiler loads these as zero-LLM-cost deterministic facts → Qdrant `profile-facts` collection
 
 ### Ambient Audio Pipeline
 
@@ -629,7 +629,7 @@ The digest agent runs at 06:45 (15 min before briefing) to aggregate recently in
 | claude_code_sync | Local JSONL | Transcript sessions (user + assistant messages) | Every 2h | Per-file size + mtime |
 | obsidian_sync | Local vault files | Notes with frontmatter, tags, wikilinks | Every 30min | Per-note content MD5 hash |
 
-State files stored at `~/.cache/<agent>-sync/state.json`. Google agents authenticate via shared OAuth2 token.
+State files stored at `<cache>/<agent>-sync/state.json`. Google agents authenticate via shared OAuth2 token.
 
 ---
 
@@ -642,18 +642,18 @@ State files stored at `~/.cache/<agent>-sync/state.json`. Google agents authenti
 | health_monitor | `profiles/health-history.jsonl` | — | — | — |
 | drift_detector | In-place doc edits + git commits (`--fix --apply`) | — | — | ntfy on applied fixes |
 | scout | `profiles/scout-report.json` | — | `30-system/` | ntfy |
-| profiler | `profiles/ryan.json`, `ryan.md`, `operator.json` | `profile-facts` | — | — |
+| profiler | `profiles/operator-profile.json`, `operator-profile.md`, `operator.json` | `profile-facts` | — | — |
 | management_prep | — | — | `10-work/1on1-prep/` | — |
 | meeting_lifecycle | — | — | Updates meeting notes | — |
 | knowledge_maint | `profiles/knowledge-maint-report.json` | Prunes `documents`, `profile-facts`, `claude-memory` | — | ntfy |
-| demo | `~/projects/ai-agents/output/demos/` | — | — | — |
-| ingest | `~/.cache/rag-ingest/retry-queue.jsonl` | `documents` | — | — |
+| demo | `<ai-agents>/output/demos/` | — | — | — |
+| ingest | `<cache>/rag-ingest/retry-queue.jsonl` | `documents` | — | — |
 | *sync agents* | `~/documents/rag-sources/<service>/` | `documents` (via ingest) | — | — |
 | code_review | stdout | — | — | — |
 | research | stdout | — | — | — |
 | query | stdout | — | — | — |
 
-`profiles/` = `~/projects/ai-agents/profiles/`. Sync agents also write `*-profile-facts.jsonl` to `~/.cache/<agent>/` for the profiler bridge. `hapax_voice` is a notification *consumer* — it subscribes to ntfy and delivers alerts via TTS audio.
+`profiles/` = `<ai-agents>/profiles/`. Sync agents also write `*-profile-facts.jsonl` to `<cache>/<agent>/` for the profiler bridge. `hapax_voice` is a notification *consumer* — it subscribes to ntfy and delivers alerts via TTS audio.
 
 ---
 
@@ -665,12 +665,12 @@ State files stored at `~/.cache/<agent>-sync/state.json`. Google agents authenti
 | `nvidia-smi` fails | Driver crash, kernel module unloaded | `sudo modprobe nvidia`; reboot if persistent |
 | VRAM >90%, model loading fails | Multiple Ollama models loaded | `docker exec ollama ollama stop <model>`; Ollama auto-unloads after 5 min idle |
 | GPU temperature >80°C | Sustained inference, poor airflow | Unload models, check fans |
-| Langfuse auth failure (49x pattern) | GPG `scdaemon` crash blocks `pass show` | `gpgconf --kill scdaemon && gpgconf --launch scdaemon`; add `disable-scdaemon` to `~/.gnupg/gpg-agent.conf` if no hardware key |
+| Langfuse auth failure (49x pattern) | GPG `scdaemon` crash blocks `pass show` | `gpgconf --kill scdaemon && gpgconf --launch scdaemon`; add `disable-scdaemon` to `<gnupg>/gpg-agent.conf` if no hardware key |
 | LiteLLM 401 errors | Stale API key (same `pass` failure) or key mismatch | `pass show litellm/master-key` to verify; `docker compose restart litellm` |
 | Sonnet rate limiting (429s) | Concurrent agent LLM calls saturating Anthropic limits | Reduce `max_parallel_requests` in litellm-config.yaml; stagger timer schedules |
-| RAG retry queue stuck (>50 items) | macOS resource forks (`._*`) or binary files failing Docling | `> ~/.cache/rag-ingest/retry-queue.jsonl` to clear; pre-filters now skip these |
+| RAG retry queue stuck (>50 items) | macOS resource forks (`._*`) or binary files failing Docling | `> <cache>/rag-ingest/retry-queue.jsonl` to clear; pre-filters now skip these |
 | Qdrant unreachable | Container down or not started | `docker compose up -d qdrant`; collections auto-create on first use |
-| Systemd timer not firing | Unit files out of sync after code update | `cd ~/projects/ai-agents && make install-systemd` |
+| Systemd timer not firing | Unit files out of sync after code update | `cd <ai-agents> && make install-systemd` |
 | ntfy notifications silent | ntfy container stopped | `docker compose up -d ntfy`; fallback: `notify-send` fires for desktop |
 | DNS stale after container restart | Docker internal DNS cache stale | Full restart: `docker compose down && docker compose up -d` |
 | Uptime shows 0% but system is fine | Single degraded check taints all runs | Check which check is persistently degraded via `--history`; fix the underlying check |
@@ -679,8 +679,8 @@ State files stored at `~/.cache/<agent>-sync/state.json`. Google agents authenti
 | Profile stale (>48h) | `profile-update.timer` failed | `uv run python -m agents.profiler --auto` |
 | Disk usage >85% | Docker images, audio recordings accumulating | `docker system prune -f`; audio-archiver moves raw audio daily at 03:00 |
 | Service latency degraded | Container resource contention | `docker stats` to check; restart the offending container |
-| Axiom hooks not firing | `install.sh` not re-run after hapax-system update | `cd ~/projects/hapax-system && ./install.sh`; restart Claude Code |
-| Voice daemon VRAM lock stale | `hapax-voice` crashed without releasing lock | `rm ~/.cache/hapax-voice/vram.lock`; lock class auto-detects stale PIDs |
+| Axiom hooks not firing | `install.sh` not re-run after hapax-system update | `cd <hapax-system> && ./install.sh`; restart Claude Code |
+| Voice daemon VRAM lock stale | `hapax-voice` crashed without releasing lock | `rm <cache>/hapax-voice/vram.lock`; lock class auto-detects stale PIDs |
 
 For any issue: start with `/status` (or `uv run python -m agents.health_monitor`). Run with `--fix --yes` to auto-remediate common failures.
 

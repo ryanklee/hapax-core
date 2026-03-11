@@ -17,15 +17,15 @@
 ### Task 1: Create Domain Registry YAML
 
 **Files:**
-- Create: `~/projects/hapaxromana/domains/registry.yaml`
+- Create: `<hapaxromana>/domains/registry.yaml`
 
 **Step 1: Create the directory and file**
 
 ```bash
-mkdir -p ~/projects/hapaxromana/domains
+mkdir -p <hapaxromana>/domains
 ```
 
-Create `~/projects/hapaxromana/domains/registry.yaml`:
+Create `<hapaxromana>/domains/registry.yaml`:
 
 ```yaml
 # domains/registry.yaml — Life domain definitions for the Domain Lattice Engine.
@@ -165,7 +165,7 @@ domains:
 **Step 2: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add domains/registry.yaml
 git commit -m "feat: domain registry — 4 domains with relationships, governance, person extensions"
 ```
@@ -175,9 +175,9 @@ git commit -m "feat: domain registry — 4 domains with relationships, governanc
 ### Task 2: Create Stub Sufficiency Models
 
 **Files:**
-- Create: `~/projects/hapaxromana/knowledge/music-sufficiency.yaml`
-- Create: `~/projects/hapaxromana/knowledge/personal-sufficiency.yaml`
-- Create: `~/projects/hapaxromana/knowledge/technical-sufficiency.yaml`
+- Create: `<hapaxromana>/knowledge/music-sufficiency.yaml`
+- Create: `<hapaxromana>/knowledge/personal-sufficiency.yaml`
+- Create: `<hapaxromana>/knowledge/technical-sufficiency.yaml`
 
 **Step 1: Create music-sufficiency.yaml**
 
@@ -425,7 +425,7 @@ requirements:
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add knowledge/music-sufficiency.yaml knowledge/personal-sufficiency.yaml knowledge/technical-sufficiency.yaml
 git commit -m "feat: stub sufficiency models for music, personal, technical domains"
 ```
@@ -435,12 +435,12 @@ git commit -m "feat: stub sufficiency models for music, personal, technical doma
 ### Task 3: Add Domain Registry Loader to knowledge_sufficiency.py
 
 **Files:**
-- Modify: `~/projects/ai-agents/cockpit/data/knowledge_sufficiency.py:17-23`
-- Test: `~/projects/ai-agents/tests/test_knowledge_sufficiency.py`
+- Modify: `<ai-agents>/cockpit/data/knowledge_sufficiency.py:17-23`
+- Test: `<ai-agents>/tests/test_knowledge_sufficiency.py`
 
 **Step 1: Write the failing test**
 
-Add to `~/projects/ai-agents/tests/test_knowledge_sufficiency.py`:
+Add to `<ai-agents>/tests/test_knowledge_sufficiency.py`:
 
 ```python
 from cockpit.data.knowledge_sufficiency import (
@@ -485,7 +485,7 @@ class TestDomainRegistry:
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestDomainRegistry -v
 ```
 
@@ -493,7 +493,7 @@ Expected: FAIL with `ImportError` — `DOMAIN_REGISTRY_PATH` and `load_domain_re
 
 **Step 3: Implement registry loader**
 
-In `~/projects/ai-agents/cockpit/data/knowledge_sufficiency.py`, add after line 23 (after `KNOWLEDGE_MODEL_PATH`):
+In `<ai-agents>/cockpit/data/knowledge_sufficiency.py`, add after line 23 (after `KNOWLEDGE_MODEL_PATH`):
 
 ```python
 DOMAIN_REGISTRY_PATH = (
@@ -518,7 +518,7 @@ def load_domain_registry(path: Path | None = None) -> dict:
 **Step 4: Run test to verify it passes**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestDomainRegistry -v
 ```
 
@@ -527,7 +527,7 @@ Expected: PASS (5 tests)
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/knowledge_sufficiency.py tests/test_knowledge_sufficiency.py
 git commit -m "feat: domain registry loader — DOMAIN_REGISTRY_PATH, load_domain_registry()"
 ```
@@ -537,12 +537,12 @@ git commit -m "feat: domain registry loader — DOMAIN_REGISTRY_PATH, load_domai
 ### Task 4: Multi-Domain Audit Function
 
 **Files:**
-- Modify: `~/projects/ai-agents/cockpit/data/knowledge_sufficiency.py:294-311`
-- Test: `~/projects/ai-agents/tests/test_knowledge_sufficiency.py`
+- Modify: `<ai-agents>/cockpit/data/knowledge_sufficiency.py:294-311`
+- Test: `<ai-agents>/tests/test_knowledge_sufficiency.py`
 
 **Step 1: Write the failing test**
 
-Add to `~/projects/ai-agents/tests/test_knowledge_sufficiency.py`:
+Add to `<ai-agents>/tests/test_knowledge_sufficiency.py`:
 
 ```python
 from cockpit.data.knowledge_sufficiency import collect_all_domain_gaps
@@ -593,7 +593,7 @@ class TestMultiDomainAudit:
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestMultiDomainAudit -v
 ```
 
@@ -601,7 +601,7 @@ Expected: FAIL — `collect_all_domain_gaps` doesn't exist.
 
 **Step 3: Implement collect_all_domain_gaps**
 
-Add to `~/projects/ai-agents/cockpit/data/knowledge_sufficiency.py`, after `collect_knowledge_gaps()`:
+Add to `<ai-agents>/cockpit/data/knowledge_sufficiency.py`, after `collect_knowledge_gaps()`:
 
 ```python
 def collect_all_domain_gaps(
@@ -646,7 +646,7 @@ def collect_all_domain_gaps(
 **Step 4: Run test to verify it passes**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestMultiDomainAudit -v
 ```
 
@@ -655,7 +655,7 @@ Expected: PASS
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/knowledge_sufficiency.py tests/test_knowledge_sufficiency.py
 git commit -m "feat: collect_all_domain_gaps — multi-domain sufficiency audit"
 ```
@@ -665,13 +665,13 @@ git commit -m "feat: collect_all_domain_gaps — multi-domain sufficiency audit"
 ### Task 5: Domain-Scoped Nudge Generation
 
 **Files:**
-- Modify: `~/projects/ai-agents/cockpit/data/knowledge_sufficiency.py:319-362` (gaps_to_nudges)
-- Modify: `~/projects/ai-agents/cockpit/data/nudges.py:501-508` (_collect_knowledge_sufficiency_nudges)
-- Test: `~/projects/ai-agents/tests/test_knowledge_sufficiency.py`
+- Modify: `<ai-agents>/cockpit/data/knowledge_sufficiency.py:319-362` (gaps_to_nudges)
+- Modify: `<ai-agents>/cockpit/data/nudges.py:501-508` (_collect_knowledge_sufficiency_nudges)
+- Test: `<ai-agents>/tests/test_knowledge_sufficiency.py`
 
 **Step 1: Write the failing test**
 
-Add to `~/projects/ai-agents/tests/test_knowledge_sufficiency.py`:
+Add to `<ai-agents>/tests/test_knowledge_sufficiency.py`:
 
 ```python
 class TestDomainScopedNudges:
@@ -710,7 +710,7 @@ class TestDomainScopedNudges:
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestDomainScopedNudges -v
 ```
 
@@ -718,7 +718,7 @@ Expected: FAIL — `gaps_to_nudges` doesn't accept `domain_id` parameter.
 
 **Step 3: Implement domain_id parameter**
 
-In `~/projects/ai-agents/cockpit/data/knowledge_sufficiency.py`, modify `gaps_to_nudges`:
+In `<ai-agents>/cockpit/data/knowledge_sufficiency.py`, modify `gaps_to_nudges`:
 
 Change the function signature from:
 ```python
@@ -740,7 +740,7 @@ To:
 
 **Step 4: Update _collect_knowledge_sufficiency_nudges**
 
-In `~/projects/ai-agents/cockpit/data/nudges.py`, replace lines 501-508:
+In `<ai-agents>/cockpit/data/nudges.py`, replace lines 501-508:
 
 ```python
 def _collect_knowledge_sufficiency_nudges(nudges: list[Nudge]) -> None:
@@ -757,7 +757,7 @@ def _collect_knowledge_sufficiency_nudges(nudges: list[Nudge]) -> None:
 **Step 5: Run test to verify it passes**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestDomainScopedNudges -v
 ```
 
@@ -766,7 +766,7 @@ Expected: PASS
 **Step 6: Run full test suite**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py tests/test_nudges.py -v
 ```
 
@@ -775,7 +775,7 @@ Expected: All PASS
 **Step 7: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/knowledge_sufficiency.py cockpit/data/nudges.py tests/test_knowledge_sufficiency.py
 git commit -m "feat: domain-scoped nudges — gaps_to_nudges(domain_id=), multi-domain nudge collector"
 ```
@@ -787,12 +787,12 @@ git commit -m "feat: domain-scoped nudges — gaps_to_nudges(domain_id=), multi-
 ### Task 6: Create Momentum Data Collector
 
 **Files:**
-- Create: `~/projects/ai-agents/cockpit/data/momentum.py`
-- Create: `~/projects/ai-agents/tests/test_momentum.py`
+- Create: `<ai-agents>/cockpit/data/momentum.py`
+- Create: `<ai-agents>/tests/test_momentum.py`
 
 **Step 1: Write the failing tests**
 
-Create `~/projects/ai-agents/tests/test_momentum.py`:
+Create `<ai-agents>/tests/test_momentum.py`:
 
 ```python
 """Tests for cockpit.data.momentum — domain momentum tracking."""
@@ -934,7 +934,7 @@ class TestDomainMomentum:
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_momentum.py -v
 ```
 
@@ -942,7 +942,7 @@ Expected: FAIL — module `cockpit.data.momentum` doesn't exist.
 
 **Step 3: Implement momentum.py**
 
-Create `~/projects/ai-agents/cockpit/data/momentum.py`:
+Create `<ai-agents>/cockpit/data/momentum.py`:
 
 ```python
 """Domain momentum tracking — activity rate, regularity, alignment.
@@ -1265,7 +1265,7 @@ def collect_domain_momentum(
 **Step 4: Run tests to verify they pass**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_momentum.py -v
 ```
 
@@ -1274,7 +1274,7 @@ Expected: All PASS
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/momentum.py tests/test_momentum.py
 git commit -m "feat: domain momentum collector — activity rate, regularity, alignment slope"
 ```
@@ -1286,12 +1286,12 @@ git commit -m "feat: domain momentum collector — activity rate, regularity, al
 ### Task 7: Update Person Template
 
 **Files:**
-- Modify: `~/Documents/Personal/50-templates/tpl-person.md`
+- Modify: `<personal-vault>/50-templates/tpl-person.md`
 
 **Step 1: Read current template**
 
 ```bash
-cat ~/Documents/Personal/50-templates/tpl-person.md
+cat <personal-vault>/50-templates/tpl-person.md
 ```
 
 **Step 2: Add domains field to frontmatter**
@@ -1316,12 +1316,12 @@ No git commit for vault changes. Obsidian Sync handles distribution.
 ### Task 8: Update PersonState to Read New Fields
 
 **Files:**
-- Modify: `~/projects/ai-agents/cockpit/data/management.py`
-- Test: `~/projects/ai-agents/tests/test_management.py`
+- Modify: `<ai-agents>/cockpit/data/management.py`
+- Test: `<ai-agents>/tests/test_management.py`
 
 **Step 1: Write the failing test**
 
-Add to `~/projects/ai-agents/tests/test_management.py`:
+Add to `<ai-agents>/tests/test_management.py`:
 
 ```python
 class TestPersonStateDomains:
@@ -1343,7 +1343,7 @@ class TestPersonStateDomains:
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_management.py::TestPersonStateDomains -v
 ```
 
@@ -1351,7 +1351,7 @@ Expected: FAIL — `domains` field doesn't exist on PersonState.
 
 **Step 3: Add fields to PersonState**
 
-In `~/projects/ai-agents/cockpit/data/management.py`, add to the PersonState dataclass (after the existing fields):
+In `<ai-agents>/cockpit/data/management.py`, add to the PersonState dataclass (after the existing fields):
 
 ```python
     # Universal person model fields
@@ -1376,7 +1376,7 @@ And pass `domains=domains, relationship=str(fm.get("relationship", ""))` to the 
 **Step 4: Run test to verify it passes**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_management.py::TestPersonStateDomains -v
 ```
 
@@ -1385,7 +1385,7 @@ Expected: PASS
 **Step 5: Run full management tests**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_management.py -v
 ```
 
@@ -1394,7 +1394,7 @@ Expected: All PASS
 **Step 6: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/management.py tests/test_management.py
 git commit -m "feat: PersonState universal fields — domains list, relationship"
 ```
@@ -1406,12 +1406,12 @@ git commit -m "feat: PersonState universal fields — domains list, relationship
 ### Task 9: Create Emergence Data Collector
 
 **Files:**
-- Create: `~/projects/ai-agents/cockpit/data/emergence.py`
-- Create: `~/projects/ai-agents/tests/test_emergence.py`
+- Create: `<ai-agents>/cockpit/data/emergence.py`
+- Create: `<ai-agents>/tests/test_emergence.py`
 
 **Step 1: Write the failing tests**
 
-Create `~/projects/ai-agents/tests/test_emergence.py`:
+Create `<ai-agents>/tests/test_emergence.py`:
 
 ```python
 """Tests for cockpit.data.emergence — undomained activity detection."""
@@ -1506,7 +1506,7 @@ class TestEmergenceSnapshot:
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_emergence.py -v
 ```
 
@@ -1514,7 +1514,7 @@ Expected: FAIL — module doesn't exist.
 
 **Step 3: Implement emergence.py**
 
-Create `~/projects/ai-agents/cockpit/data/emergence.py`:
+Create `<ai-agents>/cockpit/data/emergence.py`:
 
 ```python
 """Emergence detection — clusters undomained activity into domain candidates.
@@ -1865,7 +1865,7 @@ def run_emergence_scan(vault_path: Path | None = None) -> EmergenceSnapshot:
 **Step 4: Run tests to verify they pass**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_emergence.py -v
 ```
 
@@ -1874,7 +1874,7 @@ Expected: All PASS
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/emergence.py tests/test_emergence.py
 git commit -m "feat: emergence detection — undomained activity clustering, candidate tracking"
 ```
@@ -1886,12 +1886,12 @@ git commit -m "feat: emergence detection — undomained activity clustering, can
 ### Task 10: Create Domain Health Data Aggregator
 
 **Files:**
-- Create: `~/projects/ai-agents/cockpit/data/domain_health.py`
-- Create: `~/projects/ai-agents/tests/test_domain_health.py`
+- Create: `<ai-agents>/cockpit/data/domain_health.py`
+- Create: `<ai-agents>/tests/test_domain_health.py`
 
 **Step 1: Write the failing tests**
 
-Create `~/projects/ai-agents/tests/test_domain_health.py`:
+Create `<ai-agents>/tests/test_domain_health.py`:
 
 ```python
 """Tests for cockpit.data.domain_health — aggregated domain health."""
@@ -1945,7 +1945,7 @@ class TestDomainHealthSnapshot:
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_domain_health.py -v
 ```
 
@@ -1953,7 +1953,7 @@ Expected: FAIL — module doesn't exist.
 
 **Step 3: Implement domain_health.py**
 
-Create `~/projects/ai-agents/cockpit/data/domain_health.py`:
+Create `<ai-agents>/cockpit/data/domain_health.py`:
 
 ```python
 """Domain health aggregator — combines sufficiency, momentum, emergence.
@@ -2087,7 +2087,7 @@ def collect_domain_health(
 **Step 4: Run tests to verify they pass**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_domain_health.py -v
 ```
 
@@ -2096,7 +2096,7 @@ Expected: All PASS
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/domain_health.py tests/test_domain_health.py
 git commit -m "feat: domain health aggregator — sufficiency + momentum + emergence"
 ```
@@ -2106,11 +2106,11 @@ git commit -m "feat: domain health aggregator — sufficiency + momentum + emerg
 ### Task 11: Create Domain Health Widget
 
 **Files:**
-- Create: `~/projects/ai-agents/cockpit/widgets/domain_health.py`
+- Create: `<ai-agents>/cockpit/widgets/domain_health.py`
 
 **Step 1: Implement the widget**
 
-Create `~/projects/ai-agents/cockpit/widgets/domain_health.py`:
+Create `<ai-agents>/cockpit/widgets/domain_health.py`:
 
 ```python
 """DomainHealthWidget — per-domain sufficiency bars with momentum arrows."""
@@ -2186,7 +2186,7 @@ def render_domain_health(snapshot: DomainHealthSnapshot | None) -> Text:
 **Step 2: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/widgets/domain_health.py
 git commit -m "feat: domain health widget — per-domain bars with momentum arrows"
 ```
@@ -2196,12 +2196,12 @@ git commit -m "feat: domain health widget — per-domain bars with momentum arro
 ### Task 12: Integrate Domain Health into Sidebar
 
 **Files:**
-- Modify: `~/projects/ai-agents/cockpit/widgets/sidebar.py:57-63`
-- Modify: `~/projects/ai-agents/cockpit/app.py:195-245`
+- Modify: `<ai-agents>/cockpit/widgets/sidebar.py:57-63`
+- Modify: `<ai-agents>/cockpit/app.py:195-245`
 
 **Step 1: Add domain health section to sidebar**
 
-In `~/projects/ai-agents/cockpit/widgets/sidebar.py`, in the `compose()` method (line 57-63), add after the `goals` section:
+In `<ai-agents>/cockpit/widgets/sidebar.py`, in the `compose()` method (line 57-63), add after the `goals` section:
 
 ```python
         yield SidebarSection("domain-health", id="sb-domain-health")
@@ -2225,7 +2225,7 @@ Add a new method to SidebarStatus:
 
 **Step 2: Call domain health collector in refresh_slow**
 
-In `~/projects/ai-agents/cockpit/app.py`, in `refresh_slow()` (around line 195):
+In `<ai-agents>/cockpit/app.py`, in `refresh_slow()` (around line 195):
 
 Add import at top of file:
 ```python
@@ -2247,7 +2247,7 @@ After `sidebar.update_goals(goals)` (line 238), add:
 **Step 3: Run cockpit to verify**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run cockpit --once 2>&1 | head -30
 ```
 
@@ -2256,7 +2256,7 @@ Expected: No crash, domain health data appears.
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/widgets/sidebar.py cockpit/app.py
 git commit -m "feat: domain health in cockpit sidebar — sufficiency bars + momentum"
 ```
@@ -2266,12 +2266,12 @@ git commit -m "feat: domain health in cockpit sidebar — sufficiency bars + mom
 ### Task 13: Add Emergence Nudges
 
 **Files:**
-- Modify: `~/projects/ai-agents/cockpit/data/nudges.py`
-- Test: `~/projects/ai-agents/tests/test_nudges.py`
+- Modify: `<ai-agents>/cockpit/data/nudges.py`
+- Test: `<ai-agents>/tests/test_nudges.py`
 
 **Step 1: Write the failing test**
 
-Add to `~/projects/ai-agents/tests/test_nudges.py`:
+Add to `<ai-agents>/tests/test_nudges.py`:
 
 ```python
 class TestEmergenceNudges:
@@ -2288,7 +2288,7 @@ class TestEmergenceNudges:
 
 **Step 2: Implement emergence nudge collector**
 
-In `~/projects/ai-agents/cockpit/data/nudges.py`, add a new collector function before `collect_nudges()`:
+In `<ai-agents>/cockpit/data/nudges.py`, add a new collector function before `collect_nudges()`:
 
 ```python
 def _collect_emergence_nudges(nudges: list[Nudge]) -> None:
@@ -2323,7 +2323,7 @@ In `collect_nudges()`, add the call after `_collect_knowledge_sufficiency_nudges
 **Step 3: Run tests**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_nudges.py -v
 ```
 
@@ -2332,7 +2332,7 @@ Expected: All PASS
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/nudges.py tests/test_nudges.py
 git commit -m "feat: emergence nudges — surface domain candidates in action items"
 ```
@@ -2344,7 +2344,7 @@ git commit -m "feat: emergence nudges — surface domain candidates in action it
 **Step 1: Run all knowledge sufficiency tests**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py -v
 ```
 
@@ -2353,7 +2353,7 @@ Expected: All PASS
 **Step 2: Run all new test files**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_momentum.py tests/test_emergence.py tests/test_domain_health.py -v
 ```
 
@@ -2362,7 +2362,7 @@ Expected: All PASS
 **Step 3: Run full test suite**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/ -v --timeout=60
 ```
 
@@ -2371,7 +2371,7 @@ Expected: All PASS (may have 1 pre-existing failure)
 **Step 4: Verify YAML files load correctly**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 python3 -c "
 import yaml
 for f in ['domains/registry.yaml', 'knowledge/management-sufficiency.yaml', 'knowledge/music-sufficiency.yaml', 'knowledge/personal-sufficiency.yaml', 'knowledge/technical-sufficiency.yaml']:
@@ -2396,7 +2396,7 @@ knowledge/technical-sufficiency.yaml: 5 requirements
 **Step 5: Verify cockpit snapshot mode**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run cockpit --once 2>&1 | head -40
 ```
 
@@ -2404,12 +2404,12 @@ Expected: Domain health section visible, no crashes.
 
 **Step 6: Update CLAUDE.md**
 
-In `~/projects/hapaxromana/CLAUDE.md`, add the domain registry to the architecture documentation. In the description of hapaxromana, note that `domains/registry.yaml` defines life domains and `knowledge/*.yaml` has per-domain sufficiency models.
+In `<hapaxromana>/CLAUDE.md`, add the domain registry to the architecture documentation. In the description of hapaxromana, note that `domains/registry.yaml` defines life domains and `knowledge/*.yaml` has per-domain sufficiency models.
 
 **Step 7: Commit documentation**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add CLAUDE.md
 git commit -m "docs: add domain lattice engine to CLAUDE.md"
 ```

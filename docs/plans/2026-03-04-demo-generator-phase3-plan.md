@@ -26,7 +26,7 @@ These Phase 3 design items were implemented early:
 ### Task 1: Create `/demo` Skill
 
 **Files:**
-- Create: `~/projects/hapax-system/skills/demo/SKILL.md`
+- Create: `<hapax-system>/skills/demo/SKILL.md`
 
 **Step 1: Write the skill file**
 
@@ -38,20 +38,20 @@ description: Generate an audience-tailored system demo. Use when the user asks t
 
 Generate a demo from a natural language request. Examples:
 
-- `/demo the entire system for my wife`
+- `/demo the entire system for a non-technical friend`
 - `/demo health monitoring for a technical peer`
 - `/demo the agent architecture for my manager --format video`
 
 Available formats: `slides` (default), `video` (requires Chatterbox TTS), `markdown-only`.
 
 Prerequisites for video format:
-- Cockpit web running: `cd ~/projects/cockpit-web && pnpm dev`
+- Cockpit web running: `cd <cockpit-web> && pnpm dev`
 - Chatterbox TTS running: `cd ~/llm-stack && docker compose --profile tts up -d chatterbox`
 
 Run the demo agent:
 
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)" && uv run python -m agents.demo "{user_request}"
+cd <ai-agents> && eval "$(<.envrc)" && uv run python -m agents.demo "{user_request}"
 ```
 
 After generation, report the output directory and list generated files. If format is video, note the MP4 path. If format is slides, note the PDF path.
@@ -61,7 +61,7 @@ After generation, report the output directory and list generated files. If forma
 
 Run:
 ```bash
-grep -n "skills" ~/projects/hapax-system/install.sh | head -5
+grep -n "skills" <hapax-system>/install.sh | head -5
 ```
 
 The install script should already handle skills/ — verify the demo skill will be picked up.
@@ -70,7 +70,7 @@ The install script should already handle skills/ — verify the demo skill will 
 
 Run:
 ```bash
-ls ~/projects/hapax-system/skills/demo/SKILL.md
+ls <hapax-system>/skills/demo/SKILL.md
 ```
 
 Expected: File exists.
@@ -78,7 +78,7 @@ Expected: File exists.
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add skills/demo/SKILL.md
 git commit -m "feat: add /demo skill for demo generation"
 ```
@@ -88,7 +88,7 @@ git commit -m "feat: add /demo skill for demo generation"
 ### Task 2: Add Langfuse Tracing to Demo Agent
 
 **Files:**
-- Modify: `~/projects/ai-agents/agents/demo.py`
+- Modify: `<ai-agents>/agents/demo.py`
 
 **Step 1: Add Langfuse OTel import**
 
@@ -105,13 +105,13 @@ This follows the exact pattern from `agents/briefing.py:36`, `agents/scout.py:43
 
 **Step 2: Run existing demo tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_agent.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_agent.py -v`
 Expected: All PASS (import is a no-op in test context).
 
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo.py
 git commit -m "feat(demo): add Langfuse OTel tracing"
 ```
@@ -121,8 +121,8 @@ git commit -m "feat(demo): add Langfuse OTel tracing"
 ### Task 3: Graceful Video Fallback (silent video when TTS unavailable)
 
 **Files:**
-- Modify: `~/projects/ai-agents/agents/demo.py`
-- Modify: `~/projects/ai-agents/tests/test_demo_agent.py`
+- Modify: `<ai-agents>/agents/demo.py`
+- Modify: `<ai-agents>/tests/test_demo_agent.py`
 
 **Step 1: Write the test**
 
@@ -197,13 +197,13 @@ The rest of the video block (title cards + assemble_video) stays the same — `a
 
 **Step 3: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo*.py -v`
 Expected: All PASS.
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo.py tests/test_demo_agent.py
 git commit -m "feat(demo): graceful fallback — video without narration when TTS unavailable"
 ```
@@ -213,8 +213,8 @@ git commit -m "feat(demo): graceful fallback — video without narration when TT
 ### Task 4: Demo History Listing
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_pipeline/history.py`
-- Create: `~/projects/ai-agents/tests/test_demo_history.py`
+- Create: `<ai-agents>/agents/demo_pipeline/history.py`
+- Create: `<ai-agents>/tests/test_demo_history.py`
 
 **Step 1: Write the test**
 
@@ -273,7 +273,7 @@ class TestGetDemo:
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_history.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_history.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Write implementation**
@@ -320,13 +320,13 @@ def get_demo(demo_dir: Path) -> dict | None:
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_history.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_history.py -v`
 Expected: All PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_pipeline/history.py tests/test_demo_history.py
 git commit -m "feat(demo): demo history listing — list and inspect generated demos"
 ```
@@ -336,9 +336,9 @@ git commit -m "feat(demo): demo history listing — list and inspect generated d
 ### Task 5: Cockpit API Demo Endpoints
 
 **Files:**
-- Create: `~/projects/ai-agents/cockpit/api/routes/demos.py`
-- Modify: `~/projects/ai-agents/cockpit/api/app.py`
-- Create: `~/projects/ai-agents/tests/test_cockpit_demos.py`
+- Create: `<ai-agents>/cockpit/api/routes/demos.py`
+- Modify: `<ai-agents>/cockpit/api/app.py`
+- Create: `<ai-agents>/tests/test_cockpit_demos.py`
 
 **Step 1: Write the test**
 
@@ -442,13 +442,13 @@ Follow the existing pattern — look at how other routers are included (agents, 
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_cockpit_demos.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_cockpit_demos.py -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/api/routes/demos.py cockpit/api/app.py tests/test_cockpit_demos.py
 git commit -m "feat(cockpit): demo API endpoints — list, detail, file serving"
 ```
@@ -458,7 +458,7 @@ git commit -m "feat(cockpit): demo API endpoints — list, detail, file serving"
 ### Task 6: Update Documentation
 
 **Files:**
-- Modify: `~/projects/hapaxromana/CLAUDE.md`
+- Modify: `<hapaxromana>/CLAUDE.md`
 
 **Step 1: Update the demo agent entry in the agent table**
 
@@ -473,13 +473,13 @@ Find the agent table and ensure it includes:
 
 Ensure the invocation pattern section shows:
 ```bash
-uv run python -m agents.demo "the entire system for my wife" --format video
+uv run python -m agents.demo "the entire system for a non-technical friend" --format video
 ```
 
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add CLAUDE.md
 git commit -m "docs: update CLAUDE.md with demo agent capabilities"
 ```
@@ -503,16 +503,16 @@ After all tasks:
 
 ```bash
 # All demo tests pass
-cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v
+cd <ai-agents> && uv run pytest tests/test_demo*.py -v
 
 # Skill is discoverable
-ls ~/projects/hapax-system/skills/demo/SKILL.md
+ls <hapax-system>/skills/demo/SKILL.md
 
 # Cockpit API serves demo endpoints
-cd ~/projects/ai-agents && uv run cockpit &
+cd <ai-agents> && uv run cockpit &
 curl http://localhost:8050/api/demos
 kill %1
 
 # Full test suite
-cd ~/projects/ai-agents && uv run pytest --timeout=30 -x -q
+cd <ai-agents> && uv run pytest --timeout=30 -x -q
 ```

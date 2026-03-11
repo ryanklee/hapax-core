@@ -33,7 +33,7 @@ A new Pydantic AI agent (`agents/demo_eval.py`) that orchestrates generate → e
 User runs: uv run python -m agents.demo_eval
 
 Phase 1: Generate
-    generate_demo("the system for my wife", format="slides", duration="3m")
+    generate_demo("the system for a non-technical friend", format="slides", duration="3m")
     → output/demos/<timestamp>-the-system/
 
 Phase 2: Evaluate (LLM-as-judge via Gemini Pro vision)

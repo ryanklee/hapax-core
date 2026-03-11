@@ -7,7 +7,7 @@
 
 ## Inventory
 
-### Backend — FastAPI (`~/projects/ai-agents/cockpit/api/`)
+### Backend — FastAPI (`<ai-agents>/cockpit/api/`)
 | File | LOC | Purpose |
 |------|-----|---------|
 | `app.py` | 64 | FastAPI app, CORS, lifespan, conditional SPA serving |
@@ -15,7 +15,7 @@
 | `routes/data.py` | 125 | 15 data endpoints with Path-safe serialization |
 | `__main__.py` | 41 | Uvicorn entry point with CLI args |
 
-### Frontend — React SPA (`~/projects/cockpit-web/src/`)
+### Frontend — React SPA (`<cockpit-web>/src/`)
 | File | LOC | Purpose |
 |------|-----|---------|
 | `api/types.ts` | 224 | TypeScript interfaces for all API responses |
@@ -27,7 +27,7 @@
 | `App.tsx` | 15 | Layout shell |
 | `main.tsx` | 19 | React root with QueryClient |
 
-### Obsidian Plugin (`~/projects/obsidian-hapax/src/`)
+### Obsidian Plugin (`<obsidian-hapax>/src/`)
 | File | LOC | Purpose |
 |------|-----|---------|
 | `main.ts` | 88 | Plugin lifecycle, command registration |

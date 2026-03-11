@@ -44,7 +44,7 @@ workflows:
       - "75 deterministic checks across 17 groups (zero LLM)"
       - "auto-fix for known failure patterns (Docker restart, port conflicts)"
       - "desktop notification via notify-send on failures"
-      - "history logged to ~/.cache/hapax-agents/health/"
+      - "history logged to <cache>/hapax-agents/health/"
     components: [health_monitor, ntfy]
 
   rag-ingestion:
@@ -149,7 +149,7 @@ class TestWorkflowCorpus:
 **Step 3: Run tests**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_research.py::TestWorkflowCorpus -v
+cd <ai-agents> && uv run pytest tests/test_demo_research.py::TestWorkflowCorpus -v
 ```
 
 Expected: PASS
@@ -191,7 +191,7 @@ class TestWorkflowInResearch:
 **Step 2: Run tests to see them fail**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_research.py::TestWorkflowInResearch -v
+cd <ai-agents> && uv run pytest tests/test_demo_research.py::TestWorkflowInResearch -v
 ```
 
 Expected: FAIL — `_gather_workflow_patterns` does not exist
@@ -253,7 +253,7 @@ elif source == "workflow_patterns":
 **Step 5: Run tests**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_research.py -v -k "Workflow"
+cd <ai-agents> && uv run pytest tests/test_demo_research.py -v -k "Workflow"
 ```
 
 Expected: PASS
@@ -308,7 +308,7 @@ Visual variety: AT LEAST HALF of all scenes MUST be screenshots or screencasts. 
 **Step 3: Run existing demo tests to verify no breakage**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_*.py -x -q --deselect tests/test_demo_audiences.py::TestLoadAudiences::test_load_audiences_valid --deselect tests/test_demo_voice.py::TestParallelVoiceGeneration::test_max_tts_workers_is_three
+cd <ai-agents> && uv run pytest tests/test_demo_*.py -x -q --deselect tests/test_demo_audiences.py::TestLoadAudiences::test_load_audiences_valid --deselect tests/test_demo_voice.py::TestParallelVoiceGeneration::test_max_tts_workers_is_three
 ```
 
 Expected: All pass
@@ -405,7 +405,7 @@ Illustrations intentionally do NOT count toward the screenshot ratio — they're
 **Step 4: Run tests**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_critique.py -v
+cd <ai-agents> && uv run pytest tests/test_demo_critique.py -v
 ```
 
 Expected: All pass
@@ -473,7 +473,7 @@ class TestIllustrationSpec:
 **Step 2: Run tests to see them fail**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_models_extended.py::TestIllustrationSpec -v
+cd <ai-agents> && uv run pytest tests/test_demo_models_extended.py::TestIllustrationSpec -v
 ```
 
 Expected: FAIL — IllustrationSpec does not exist, "illustration" not in Literal
@@ -519,7 +519,7 @@ Add field to both DemoScene (after `interaction` field) and SceneSkeleton (after
 **Step 4: Run tests**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_models_extended.py::TestIllustrationSpec -v
+cd <ai-agents> && uv run pytest tests/test_demo_models_extended.py::TestIllustrationSpec -v
 ```
 
 Expected: PASS
@@ -527,7 +527,7 @@ Expected: PASS
 **Step 5: Run full model tests to verify no breakage**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_models*.py -v
+cd <ai-agents> && uv run pytest tests/test_demo_models*.py -v
 ```
 
 Expected: All pass
@@ -572,7 +572,7 @@ team-member:
 **Step 2: Verify personas still load**
 
 ```bash
-cd ~/projects/ai-agents && uv run python -c "from agents.demo_models import load_personas; p = load_personas(); print(list(p.keys()))"
+cd <ai-agents> && uv run python -c "from agents.demo_models import load_personas; p = load_personas(); print(list(p.keys()))"
 ```
 
 Expected: prints persona names without error. Note: `illustration_style` is NOT in AudiencePersona model — it's extra YAML data that the illustration pipeline reads directly from the YAML, not through the Pydantic model. This avoids changing the model contract.
@@ -685,7 +685,7 @@ class TestLoadIllustrationStyle:
 **Step 2: Run tests to see them fail**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_illustrations.py -v
+cd <ai-agents> && uv run pytest tests/test_demo_illustrations.py -v
 ```
 
 Expected: FAIL — module does not exist
@@ -805,7 +805,7 @@ async def generate_illustrations(
 **Step 4: Run tests**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_illustrations.py -v
+cd <ai-agents> && uv run pytest tests/test_demo_illustrations.py -v
 ```
 
 Expected: PASS
@@ -882,7 +882,7 @@ In the visual type instruction block (around line 195), add illustration to the 
 **Step 3: Run full demo tests**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_*.py -x -q --deselect tests/test_demo_audiences.py::TestLoadAudiences::test_load_audiences_valid --deselect tests/test_demo_voice.py::TestParallelVoiceGeneration::test_max_tts_workers_is_three
+cd <ai-agents> && uv run pytest tests/test_demo_*.py -x -q --deselect tests/test_demo_audiences.py::TestLoadAudiences::test_load_audiences_valid --deselect tests/test_demo_voice.py::TestParallelVoiceGeneration::test_max_tts_workers_is_three
 ```
 
 Expected: All pass
@@ -934,7 +934,7 @@ In the post-revision scene preservation logic (around line 695), add alongside t
 **Step 3: Run tests**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_critique.py -v
+cd <ai-agents> && uv run pytest tests/test_demo_critique.py -v
 ```
 
 Expected: All pass
@@ -953,7 +953,7 @@ git commit -m "feat(demo): illustration preservation in critique revision loop"
 **Step 1: Run full test suite**
 
 ```bash
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_*.py -x -q --deselect tests/test_demo_audiences.py::TestLoadAudiences::test_load_audiences_valid --deselect tests/test_demo_voice.py::TestParallelVoiceGeneration::test_max_tts_workers_is_three
+cd <ai-agents> && uv run pytest tests/test_demo_*.py -x -q --deselect tests/test_demo_audiences.py::TestLoadAudiences::test_load_audiences_valid --deselect tests/test_demo_voice.py::TestParallelVoiceGeneration::test_max_tts_workers_is_three
 ```
 
 Expected: All pass
@@ -963,19 +963,19 @@ Expected: All pass
 Check if `google-genai` is already in pyproject.toml (it was added to uv.lock in a previous commit):
 
 ```bash
-cd ~/projects/ai-agents && grep "google-genai" pyproject.toml
+cd <ai-agents> && grep "google-genai" pyproject.toml
 ```
 
 If not present, add it:
 
 ```bash
-cd ~/projects/ai-agents && uv add google-genai
+cd <ai-agents> && uv add google-genai
 ```
 
 **Step 3: Smoke test illustration module (mocked)**
 
 ```bash
-cd ~/projects/ai-agents && uv run python -c "
+cd <ai-agents> && uv run python -c "
 from agents.demo_models import IllustrationSpec, DemoScene
 spec = IllustrationSpec(prompt='Warm sunrise over a network of helpful agents')
 scene = DemoScene(
@@ -1004,7 +1004,7 @@ git add -A && git status
 ## Verification Summary
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 
 # 1. All demo tests pass
 uv run pytest tests/test_demo_*.py -x -q \
@@ -1015,8 +1015,8 @@ uv run pytest tests/test_demo_*.py -x -q \
 uv run pytest tests/test_demo_illustrations.py tests/test_demo_research.py -v -k "Illustration or Workflow"
 
 # 3. Generate a demo with illustrations (requires cockpit-web + cockpit API + Gemini API key)
-# Start cockpit: cd ~/projects/cockpit-web && pnpm dev &
-# Start API: cd ~/projects/ai-agents && direnv exec . uv run cockpit &
+# Start cockpit: cd <cockpit-web> && pnpm dev &
+# Start API: cd <ai-agents> && direnv exec . uv run cockpit &
 direnv exec . uv run python -m agents.demo "full system" --audience "chris beron" --duration 10m --voice
 
 # 4. Manual verification:

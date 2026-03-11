@@ -63,7 +63,7 @@ workflows:
       - "17 check groups, 75 deterministic checks"
       - "auto-fix for known failure patterns"
       - "desktop notification on failures"
-      - "history logged to ~/.cache/hapax-agents/"
+      - "history logged to <cache>/hapax-agents/"
     components: [health_monitor, ntfy]
 
   rag-ingestion:

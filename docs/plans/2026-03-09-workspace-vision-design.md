@@ -22,7 +22,7 @@ This design covers the foundational capture primitive, five primary capability a
 - BRIO: Monitor-mounted, facing operator. Clear face and upper body visibility. Also sees MPC Live III and keyboard controller in periphery.
 - C920: Elevated, angled down at desk surface. Full view of Elektron Digitakt II / Digitone II (upper left), OXI One MKII (lower left), SP-404 MKIIs (center), pedal board, keyboard controller. Good coverage of gear LEDs and display screens.
 
-**Group membership:** The operator is not in the `video` group, but device ACLs (`+` permissions) allow access. Adding to `video` group is recommended for reliability: `sudo usermod -aG video hapaxlegomenon`.
+**Group membership:** The operator is not in the `video` group, but device ACLs (`+` permissions) allow access. Adding to `video` group is recommended for reliability: `sudo usermod -aG video <username>`.
 
 ## Architecture
 
@@ -304,7 +304,7 @@ A lightweight continuous recording service parallel to `audio-recorder.service`.
 **Implementation:** Single ffmpeg command per camera, or a small Python script that uses WebcamCapturer on a timer.
 
 **Storage:**
-- Path: `~/.local/share/hapax-voice/timelapse/`
+- Path: `<local-share>/hapax-voice/timelapse/`
 - Naming: `{role}-{YYYYMMDD}-{HHMMSS}.jpg` (e.g., `operator-20260309-140500.jpg`, `hardware-20260309-140500.jpg`)
 - Size: ~80-100KB per frame at 720p JPEG quality 85 → ~144MB/day/camera → ~288MB/day total
 - Retention: 7 days rolling (configurable). Cleanup via systemd timer or the script itself.
@@ -312,7 +312,7 @@ A lightweight continuous recording service parallel to `audio-recorder.service`.
 **Value:**
 - Visual log of production sessions (correlate with audio recordings by timestamp)
 - Briefing agent can reference: "Based on timelapse, you were at the hardware station from 14:00-17:00"
-- Teaching session documentation (when teaching kids on SP-404)
+- Teaching session documentation (when teaching on SP-404)
 - Change detection baseline (frame-diff against timelapse history detects equipment moves)
 - Demo agent could composite timelapses into session recap videos
 
@@ -345,7 +345,7 @@ Activity mode feeds into:
 
 **7b. Teaching Mode Detection**
 
-When the BRIO detects multiple people (operator + child) and the C920 shows SP-404 powered on, the system enters `teaching` mode:
+When the BRIO detects multiple people (operator + guest) and the C920 shows SP-404 powered on, the system enters `teaching` mode:
 - Suppress all notifications
 - Voice assistant switches to simplified, family-friendly language
 - If voice session opens, context includes "You appear to be teaching music production"
@@ -405,7 +405,7 @@ workspace_multi_image: bool = True  # send all frames to Gemini
 timelapse_enabled: bool = False  # opt-in
 timelapse_interval_s: float = 60.0
 timelapse_retention_days: int = 7
-timelapse_path: str = "~/.local/share/hapax-voice/timelapse"
+timelapse_path: str = "<local-share>/hapax-voice/timelapse"
 ```
 
 ## Dependencies

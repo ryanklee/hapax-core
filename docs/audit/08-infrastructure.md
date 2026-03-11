@@ -2,13 +2,13 @@
 
 **Audited**: 2026-03-02
 **Scope**: Docker Compose (~351 LOC), 22 systemd units (~306 LOC), 4 n8n workflows (~544 LOC), Dockerfile.api (20 LOC), .envrc (21 LOC), backup script (~102 LOC), 6 watchdog scripts, ntfy/ClickHouse/LiteLLM configs
-**Files**: `~/llm-stack/`, `~/.config/systemd/user/`, `~/projects/ai-agents/n8n-workflows/`, `~/projects/ai-agents/Dockerfile.api`
+**Files**: `<llm-stack>/`, `<systemd-user>/`, `<ai-agents>/n8n-workflows/`, `<ai-agents>/Dockerfile.api`
 
 ---
 
 ## Inventory
 
-### Docker Compose (`~/llm-stack/docker-compose.yml`)
+### Docker Compose (`<llm-stack>/docker-compose.yml`)
 | Service | Image | Profile | Healthcheck | mem_limit | Ports |
 |---------|-------|---------|-------------|-----------|-------|
 | qdrant | qdrant/qdrant (sha256-pinned) | core | TCP :6333 | 4g | 6333, 6334 |
@@ -24,7 +24,7 @@
 | n8n | n8n (sha256-pinned) | full | wget /healthz | none | 5678 |
 | ntfy | ntfy:latest (NOT pinned) | full | wget /v1/health | 256m | 8090 |
 
-### Systemd User Units (`~/.config/systemd/user/`)
+### Systemd User Units (`<systemd-user>/`)
 
 **Always-running services:**
 | Unit | Type | Restart | MemoryMax | CPUQuota | OnFailure |
@@ -64,7 +64,7 @@
 |------|---------|
 | notify-failure@.service | Desktop notification on service failure |
 
-### n8n Workflows (`~/projects/ai-agents/n8n-workflows/`)
+### n8n Workflows (`<ai-agents>/n8n-workflows/`)
 | Workflow | Trigger | Nodes | Purpose |
 |----------|---------|-------|---------|
 | briefing-push.json | Schedule 07:15 | 4 | Read briefing.md, format, send Telegram |
@@ -100,7 +100,7 @@
 | R-8.6 | Recommendation | Timer Scheduling | Sunday window has potential backup/manifest overlap |
 | R-8.7 | Recommendation | Health Watchdog | Degraded status exits 1, triggers OnFailure notification |
 | R-8.8 | Recommendation | Backup | profile-facts Qdrant collection not included in backup |
-| R-8.9 | Recommendation | Backup | n8n backup checks host `~/.n8n` but data is in Docker volume |
+| R-8.9 | Recommendation | Backup | n8n backup checks host `<n8n-data>` but data is in Docker volume |
 | R-8.10 | Recommendation | n8n Workflows | All 4 workflows have CONFIGURE_ME credential placeholders |
 | R-8.11 | Recommendation | n8n Security | quick-capture `/info` command has path traversal risk |
 | R-8.12 | Recommendation | n8n Missing Dir | quick-capture `/note` writes to non-existent captures directory |
@@ -123,7 +123,7 @@
 
 ### C-8.1: Plaintext API Keys in `.env` File (Critical)
 
-**File**: `~/llm-stack/.env`
+**File**: `<llm-stack>/.env`
 
 The `.env` file contains plaintext API keys for Anthropic, Google, LiteLLM, Langfuse, ClickHouse, Redis, MinIO, and n8n:
 
@@ -133,9 +133,9 @@ GOOGLE_API_KEY=AIzaSyD48x...
 LITELLM_MASTER_KEY=sk-litellm-81d949...
 ```
 
-The `.envrc` in `~/projects/ai-agents/` correctly uses `pass show` to retrieve secrets at runtime. The `.env` file does not — it was "Generated 2026-02-28" and contains static plaintext values. This contradicts the stated convention that all secrets go through `pass`.
+The `.envrc` in `<ai-agents>/` correctly uses `pass show` to retrieve secrets at runtime. The `.env` file does not — it was "Generated 2026-02-28" and contains static plaintext values. This contradicts the stated convention that all secrets go through `pass`.
 
-**Risk**: Any process or user that can read `~/llm-stack/.env` has all API keys. The file is not encrypted at rest.
+**Risk**: Any process or user that can read `<llm-stack>/.env` has all API keys. The file is not encrypted at rest.
 
 **Fix**: Replace `.env` values with a startup script that populates from `pass`, or use Docker Compose `environment` with a wrapper that injects from `pass` at compose-up time. An `.envrc` approach like the ai-agents project uses would be consistent.
 
@@ -143,7 +143,7 @@ The `.envrc` in `~/projects/ai-agents/` correctly uses `pass show` to retrieve s
 
 ### C-8.2: WEBUI_SECRET_KEY Placeholder (Critical)
 
-**File**: `~/llm-stack/.env`
+**File**: `<llm-stack>/.env`
 
 ```
 WEBUI_SECRET_KEY=CHANGE_ME_GENERATE_WITH_openssl_rand_hex_32
@@ -157,7 +157,7 @@ Open WebUI is running with a placeholder secret key. This means session tokens a
 
 ### C-8.3: TELEGRAM_CHAT_ID Placeholder (Critical)
 
-**File**: `~/llm-stack/.env`
+**File**: `<llm-stack>/.env`
 
 ```
 TELEGRAM_CHAT_ID=CHANGE_ME_GET_FROM_TELEGRAM_BOT
@@ -175,14 +175,14 @@ Three locations define the Obsidian vault path with conflicting values:
 
 | Source | Path |
 |--------|------|
-| `~/llm-stack/.env` | `/home/hapaxlegomenon/obsidian-vault` (WRONG) |
-| `~/projects/ai-agents/.envrc` | `$HOME/Documents/Personal` (CORRECT) |
+| `<llm-stack>/.env` | `<home>/obsidian-vault` (WRONG) |
+| `<ai-agents>/.envrc` | `$HOME/Documents/Personal` (CORRECT) |
 | `vault_writer.py` default | `~/Documents/Personal` (CORRECT) |
-| Actual vault location | `~/Documents/Personal/` (exists, 10 folders) |
+| Actual vault location | `<personal-vault>/` (exists, 10 folders) |
 
-The `.env` file's `OBSIDIAN_VAULT_PATH` points to a non-existent `/home/hapaxlegomenon/obsidian-vault`. Since the agent services load `.envrc` (which overrides with the correct path), this is not currently causing failures. However, any service that loads from `.env` instead (e.g., if Docker services needed the path) would get the wrong value.
+The `.env` file's `OBSIDIAN_VAULT_PATH` points to a non-existent `<home>/obsidian-vault`. Since the agent services load `.envrc` (which overrides with the correct path), this is not currently causing failures. However, any service that loads from `.env` instead (e.g., if Docker services needed the path) would get the wrong value.
 
-**Fix**: Update `.env` to `OBSIDIAN_VAULT_PATH=/home/hapaxlegomenon/Documents/Personal`.
+**Fix**: Update `.env` to `OBSIDIAN_VAULT_PATH=<home>/Documents/Personal`.
 
 ---
 
@@ -239,7 +239,7 @@ binwiederhier/ntfy:latest                 # latest = anything
 
 ### R-8.3: Langfuse Web and Worker Missing Healthchecks (Recommendation)
 
-**File**: `~/llm-stack/docker-compose.yml`
+**File**: `<llm-stack>/docker-compose.yml`
 
 Both `langfuse` (web) and `langfuse-worker` lack healthcheck definitions. Every other service in the compose file has one.
 
@@ -260,10 +260,10 @@ Most services are oneshot scripts that read from known paths and write to known 
 PrivateTmp=true
 NoNewPrivileges=true
 ProtectSystem=strict
-ReadWritePaths=/home/hapaxlegomenon/projects/ai-agents/profiles
+ReadWritePaths=<project-root>/profiles
 ```
 
-Note: `ProtectHome` cannot be `read-only` for services that write to `~/projects/ai-agents/profiles/`. Use `ReadWritePaths` to allowlist specific directories.
+Note: `ProtectHome` cannot be `read-only` for services that write to `<ai-agents>/profiles/`. Use `ReadWritePaths` to allowlist specific directories.
 
 ---
 
@@ -313,7 +313,7 @@ The Sunday maintenance window schedules:
 
 ### R-8.7: Health Watchdog Triggers False OnFailure Notifications (Recommendation)
 
-**File**: `~/.local/bin/health-watchdog`
+**File**: `<local-bin>/health-watchdog`
 
 The script exits with code 1 on degraded status:
 ```bash
@@ -363,9 +363,9 @@ if [[ -d "$HOME/.n8n" ]]; then
     cp -r "$HOME/.n8n/"*.json "$BACKUP_DIR/n8n/" 2>/dev/null || true
 ```
 
-n8n data is stored in the Docker volume `n8n_data` mounted at `/home/node/.n8n` inside the container. The host path `~/.n8n` does not exist. This backup section silently succeeds (due to `|| true`) while backing up nothing.
+n8n data is stored in the Docker volume `n8n_data` mounted at `/home/node/.n8n` inside the container. The host path `<n8n-data>` does not exist. This backup section silently succeeds (due to `|| true`) while backing up nothing.
 
-n8n workflow definitions are imported via the UI and stored in the container's SQLite database inside the volume, not as individual JSON files. The JSON files in `~/projects/ai-agents/n8n-workflows/` are templates for import, not the live state.
+n8n workflow definitions are imported via the UI and stored in the container's SQLite database inside the volume, not as individual JSON files. The JSON files in `<ai-agents>/n8n-workflows/` are templates for import, not the live state.
 
 **Fix**: Either:
 1. Use `docker compose exec n8n n8n export:workflow --all --output=/tmp/workflows.json` to export live workflows, or
@@ -401,7 +401,7 @@ These are template files meant to be imported into n8n. After import, credential
 
 ### R-8.11: Quick Capture `/info` Command Path Traversal Risk (Recommendation)
 
-**File**: `~/projects/ai-agents/n8n-workflows/quick-capture.json`
+**File**: `<ai-agents>/n8n-workflows/quick-capture.json`
 
 The "Pick Info File" node constrains the file to either `operator.json` or `briefing.md`:
 ```javascript
@@ -422,7 +422,7 @@ If a future developer adds more commands to the switch without constraining the 
 
 ### R-8.12: Quick Capture Missing Captures Directory (Recommendation)
 
-**File**: `~/projects/ai-agents/n8n-workflows/quick-capture.json`
+**File**: `<ai-agents>/n8n-workflows/quick-capture.json`
 
 The `/note` command writes captured notes to:
 ```
@@ -443,7 +443,7 @@ The n8n `writeFile` node will fail when attempting to write to a non-existent di
 
 ### R-8.13: Dockerfile.api Copies Profiles at Build Time (Recommendation)
 
-**File**: `~/projects/ai-agents/Dockerfile.api`
+**File**: `<ai-agents>/Dockerfile.api`
 
 ```dockerfile
 COPY profiles/ profiles/
@@ -480,7 +480,7 @@ Additionally, the n8n `briefing-push` workflow fires at 07:15, giving only 15 mi
 
 ### R-8.15: Hardcoded Postgres Password (Recommendation)
 
-**File**: `~/llm-stack/docker-compose.yml`
+**File**: `<llm-stack>/docker-compose.yml`
 
 ```yaml
 # postgres service

@@ -62,7 +62,7 @@ axioms:
   - id: single_user
     text: >
       This system is developed for a single user and by that single user,
-      Ryan Kleeberger (Hapax). This will always be the case. All decisions
+      the operator (Hapax). This will always be the case. All decisions
       must be made respecting and leveraging that fact.
     weight: 100
     type: hardcoded

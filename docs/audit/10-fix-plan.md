@@ -20,27 +20,27 @@ Total findings: 162 actionable (excluding 9 bonuses from Domain 8, 1 retracted f
 
 ### Fix 1: Replace plaintext API keys in .env with pass-backed retrieval
 **Findings:** C-8.1
-**Files:** `~/llm-stack/.env`, `~/llm-stack/docker-compose.yml`
-**Action:** Replace all plaintext API keys (ANTHROPIC_API_KEY, GOOGLE_API_KEY, LITELLM_MASTER_KEY, LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, CLICKHOUSE_PASSWORD, REDIS_PASSWORD, MINIO_ROOT_PASSWORD, N8N_ENCRYPTION_KEY) in `.env` with a startup script that populates from `pass`, or convert `.env` to an `.envrc` that uses `pass show` -- matching the pattern already used in `~/projects/ai-agents/.envrc`. The Docker Compose file should reference `${VAR}` from the shell environment rather than a static `.env` file.
-**Verification:** `grep -c 'sk-ant\|AIza\|sk-litellm\|pk-lf\|sk-lf' ~/llm-stack/.env` returns 0. Services start successfully with `docker compose up -d`.
+**Files:** `<llm-stack>/.env`, `<llm-stack>/docker-compose.yml`
+**Action:** Replace all plaintext API keys (ANTHROPIC_API_KEY, GOOGLE_API_KEY, LITELLM_MASTER_KEY, LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, CLICKHOUSE_PASSWORD, REDIS_PASSWORD, MINIO_ROOT_PASSWORD, N8N_ENCRYPTION_KEY) in `.env` with a startup script that populates from `pass`, or convert `.env` to an `.envrc` that uses `pass show` -- matching the pattern already used in `<ai-agents>/.envrc`. The Docker Compose file should reference `${VAR}` from the shell environment rather than a static `.env` file.
+**Verification:** `grep -c 'sk-ant\|AIza\|sk-litellm\|pk-lf\|sk-lf' <llm-stack>/.env` returns 0. Services start successfully with `docker compose up -d`.
 
 ### Fix 2: Generate real WEBUI_SECRET_KEY
 **Findings:** C-8.2
-**Files:** `~/llm-stack/.env`
+**Files:** `<llm-stack>/.env`
 **Action:** Generate a cryptographic secret with `openssl rand -hex 32` and replace the `CHANGE_ME_GENERATE_WITH_openssl_rand_hex_32` placeholder. Store in `pass` and reference from the `.envrc` approach in Fix 1. Restart Open WebUI.
-**Verification:** `grep CHANGE_ME ~/llm-stack/.env` returns no matches. Open WebUI at localhost:3080 accepts login and issues a signed session cookie.
+**Verification:** `grep CHANGE_ME <llm-stack>/.env` returns no matches. Open WebUI at localhost:3080 accepts login and issues a signed session cookie.
 
 ### Fix 3: Configure Telegram chat ID
 **Findings:** C-8.3
-**Files:** `~/llm-stack/.env`
+**Files:** `<llm-stack>/.env`
 **Action:** Obtain the Telegram chat ID from the BotFather flow (send `/start` to the bot, then query `https://api.telegram.org/bot<TOKEN>/getUpdates` to extract the chat ID). Replace `CHANGE_ME_GET_FROM_TELEGRAM_BOT` with the actual value. Store in `pass`.
-**Verification:** `grep CHANGE_ME ~/llm-stack/.env` returns no matches. The n8n health-relay workflow sends a test Telegram message successfully.
+**Verification:** `grep CHANGE_ME <llm-stack>/.env` returns no matches. The n8n health-relay workflow sends a test Telegram message successfully.
 
 ### Fix 4: Fix vault path in .env
 **Findings:** C-8.4
-**Files:** `~/llm-stack/.env`
-**Action:** Change `OBSIDIAN_VAULT_PATH=/home/hapaxlegomenon/obsidian-vault` to `OBSIDIAN_VAULT_PATH=/home/hapaxlegomenon/Documents/Personal`. This aligns with the correct path used in `.envrc` and `vault_writer.py` default.
-**Verification:** `source ~/llm-stack/.env && test -d "$OBSIDIAN_VAULT_PATH"` exits 0.
+**Files:** `<llm-stack>/.env`
+**Action:** Change `OBSIDIAN_VAULT_PATH=<home>/obsidian-vault` to `OBSIDIAN_VAULT_PATH=<home>/Documents/Personal`. This aligns with the correct path used in `.envrc` and `vault_writer.py` default.
+**Verification:** `source <llm-stack>/.env && test -d "$OBSIDIAN_VAULT_PATH"` exits 0.
 
 ---
 
@@ -119,7 +119,7 @@ for _tool_fn in get_context_tools():
 
 ### Fix 16: Add health history file rotation
 **Findings:** B-4.1, R-4.1
-**Files:** `~/.local/bin/health-watchdog`, `agents/activity_analyzer.py`, `agents/health_monitor.py`
+**Files:** `<local-bin>/health-watchdog`, `agents/activity_analyzer.py`, `agents/health_monitor.py`
 **Action:** Add a rotation mechanism to the health-watchdog script: after appending, check line count. If exceeding a threshold (e.g., 10,000 lines / ~100 days), truncate to the most recent 5,000 lines. Alternatively, switch to date-based files (`health-history-YYYY-MM.jsonl`) and update all readers (`collect_health_trend`, `format_history`, `collect_health_history`) to glob and merge files within the requested time window.
 **Verification:** Create a health-history.jsonl with 15,000 lines. Run the watchdog. Verify the file is pruned to the configured limit.
 
@@ -207,8 +207,8 @@ for _tool_fn in get_context_tools():
 
 ### Fix 30: Add auto-fix backoff to health watchdog
 **Findings:** B-4.2
-**Files:** `~/.local/bin/health-watchdog`
-**Action:** Track fix attempts in a state file (e.g., `~/.cache/health-watchdog-fix-attempts.json`). Increment on each failed fix attempt. After 3 consecutive failures for the same check, skip the fix and log a warning. Reset the counter when the check passes. This prevents noisy 15-minute retry loops for persistent issues.
+**Files:** `<local-bin>/health-watchdog`
+**Action:** Track fix attempts in a state file (e.g., `<cache>/health-watchdog-fix-attempts.json`). Increment on each failed fix attempt. After 3 consecutive failures for the same check, skip the fix and log a warning. Reset the counter when the check passes. This prevents noisy 15-minute retry loops for persistent issues.
 **Verification:** Mock a remediation command to always fail. Run the watchdog 4 times. Verify the fix is attempted 3 times, then skipped on the 4th with a "giving up" log message.
 
 ### Fix 31: Improve knowledge_maint error reporting
@@ -286,7 +286,7 @@ for _tool_fn in get_context_tools():
 ### Fix 43: Add interview stuck-state escape with fact backup
 **Findings:** B-6.3
 **Files:** `cockpit/screens/chat.py`, `cockpit/chat_agent.py`
-**Action:** When `end_interview()` fails due to `flush_interview_facts` error, save accumulated facts and insights to a backup file (`~/.cache/cockpit/interview-backup-{timestamp}.json`) before presenting the error. This gives the operator a path to recover accumulated facts even if `/clear` is used.
+**Action:** When `end_interview()` fails due to `flush_interview_facts` error, save accumulated facts and insights to a backup file (`<cache>/cockpit/interview-backup-{timestamp}.json`) before presenting the error. This gives the operator a path to recover accumulated facts even if `/clear` is used.
 **Verification:** Mock `flush_interview_facts` to raise. Run `/interview end`. Verify backup file is created with facts and insights.
 
 ### Fix 44: Add TypeScript interfaces for remaining API endpoints
@@ -297,45 +297,45 @@ for _tool_fn in get_context_tools():
 
 ### Fix 45: Add Docker resource limits to all services
 **Findings:** R-8.1
-**Files:** `~/llm-stack/docker-compose.yml`
+**Files:** `<llm-stack>/docker-compose.yml`
 **Action:** Add `mem_limit` to all services: ollama 16g, postgres 4g, litellm 2g, clickhouse 4g, open-webui 2g, n8n 1g, langfuse 2g, langfuse-worker 2g, redis 512m, minio 1g.
 **Verification:** `docker compose config | grep -c mem_limit` returns 12 (one per service including the 2 already configured).
 
 ### Fix 46: Pin remaining Docker images to sha256 digests
 **Findings:** R-8.2
-**Files:** `~/llm-stack/docker-compose.yml`
+**Files:** `<llm-stack>/docker-compose.yml`
 **Action:** For the 6 unpinned images (pgvector, litellm, redis, langfuse-worker, langfuse, ntfy), pull the current image, note the digest with `docker inspect --format='{{.RepoDigests}}' <image>`, and update the compose file to use `image@sha256:...` format.
-**Verification:** `grep -c '@sha256:' ~/llm-stack/docker-compose.yml` returns 12.
+**Verification:** `grep -c '@sha256:' <llm-stack>/docker-compose.yml` returns 12.
 
 ### Fix 47: Add Langfuse healthchecks to Docker Compose
 **Findings:** R-8.3
-**Files:** `~/llm-stack/docker-compose.yml`
+**Files:** `<llm-stack>/docker-compose.yml`
 **Action:** Add healthcheck directives for langfuse (web): `test: wget --no-verbose --tries=1 --spider http://localhost:3000/api/public/health || exit 1`. For langfuse-worker: TCP check on port 3030 or a custom script.
 **Verification:** `docker compose ps` shows `healthy` status for both langfuse services.
 
 ### Fix 48: Add systemd resource limits to LLM-calling services
 **Findings:** R-8.5
-**Files:** `~/.config/systemd/user/daily-briefing.service`, `digest.service`, `drift-detector.service`, `scout.service`, `manifest-snapshot.service`, `knowledge-maint.service`
+**Files:** `<systemd-user>/daily-briefing.service`, `digest.service`, `drift-detector.service`, `scout.service`, `manifest-snapshot.service`, `knowledge-maint.service`
 **Action:** Add `MemoryMax=2G` and `CPUQuota=60%` to briefing, digest, drift-detector, and scout services. Add `MemoryMax=1G` and `CPUQuota=30%` to manifest-snapshot and knowledge-maint. Run `systemctl --user daemon-reload`.
 **Verification:** `systemctl --user show daily-briefing.service -p MemoryMax` returns `MemoryMax=2147483648`.
 
 ### Fix 49: Fix health watchdog false OnFailure notifications
 **Findings:** R-8.7
-**Files:** `~/.config/systemd/user/health-monitor.service`
+**Files:** `<systemd-user>/health-monitor.service`
 **Action:** Add `SuccessExitStatus=1` to the service definition so that exit code 1 (degraded) is treated as success by systemd. The watchdog already sends its own nuanced notification for degraded status; the OnFailure template should only fire on unexpected crashes (exit code 2+).
 **Verification:** Trigger a degraded health status. Verify no "Service Failed" notification from the template (only the watchdog's own notification).
 
 ### Fix 50: Add Dockerfile.api HEALTHCHECK and document runtime deps
 **Findings:** 7.13, 7.14, R-8.13
-**Files:** `~/projects/ai-agents/Dockerfile.api`
+**Files:** `<ai-agents>/Dockerfile.api`
 **Action:** Add `HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8050/')"`. Remove `COPY profiles/ profiles/` (profiles should be volume-mounted at runtime). Add a comment block documenting required volume mounts and env vars.
 **Verification:** `docker build` succeeds. Docker reports container as healthy after startup.
 
 ### Fix 51: Configure digest/briefing timer ordering
 **Findings:** R-8.14
-**Files:** `~/.config/systemd/user/daily-briefing.service`
+**Files:** `<systemd-user>/daily-briefing.service`
 **Action:** Add `After=digest.service` to the `[Unit]` section of `daily-briefing.service`. This ensures the briefing waits for the digest to complete before starting, eliminating the risk of reading a stale digest.
-**Verification:** Run `systemd-analyze verify ~/.config/systemd/user/daily-briefing.service`. Check that `After=` includes `digest.service`.
+**Verification:** Run `systemd-analyze verify <systemd-user>/daily-briefing.service`. Check that `After=` includes `digest.service`.
 
 ### Fix 52: Consolidate PROFILES_DIR imports
 **Findings:** H-2.2
@@ -381,7 +381,7 @@ for _tool_fn in get_context_tools():
 
 ### Fix 59: Quote n8n quick-capture file path
 **Findings:** R-8.11
-**Files:** `~/projects/ai-agents/n8n-workflows/quick-capture.json`
+**Files:** `<ai-agents>/n8n-workflows/quick-capture.json`
 **Action:** In the "Read Info File" node, change `cat {{ $json.file }}` to `cat "{{ $json.file }}"` to prevent shell injection if the file path ever contains spaces or metacharacters.
 **Verification:** Review the workflow JSON. Verify quotes are present around the interpolated file path.
 
@@ -393,9 +393,9 @@ for _tool_fn in get_context_tools():
 
 ### Fix 61: Move Postgres password to .env variable reference
 **Findings:** R-8.15
-**Files:** `~/llm-stack/docker-compose.yml`, `~/llm-stack/.env`
+**Files:** `<llm-stack>/docker-compose.yml`, `<llm-stack>/.env`
 **Action:** Add `POSTGRES_PASSWORD` to `.env` (or the `.envrc` replacement from Fix 1). Update docker-compose.yml to use `${POSTGRES_PASSWORD}` in the postgres service and all connection strings.
-**Verification:** `grep -c 'localdev' ~/llm-stack/docker-compose.yml` returns 0.
+**Verification:** `grep -c 'localdev' <llm-stack>/docker-compose.yml` returns 0.
 
 ### Fix 62: Fix profiler_bridge "streaming" to use incremental aggregation
 **Findings:** R-2.1
@@ -411,19 +411,19 @@ for _tool_fn in get_context_tools():
 
 ### Fix 64: Fix Obsidian plugin default system prompt
 **Findings:** H-1.4
-**Files:** `~/projects/obsidian-hapax/src/types.ts`
+**Files:** `<obsidian-hapax>/src/types.ts`
 **Action:** Update the `DEFAULT_SETTINGS.systemPrompt` to include the neurocognitive model framing from `SYSTEM_CONTEXT`. The base prompt should mention ADHD, autism, and executive function support to maintain coherence with the Python system's identity. The "Hapax" name can remain as the Obsidian-specific identity, but the operational context should align.
 **Verification:** Build the plugin (`pnpm run build`). Open Obsidian, check default prompt in settings. Verify it mentions ADHD/autism.
 
 ### Fix 65: Document channel capability matrix
 **Findings:** H-5.3
-**Files:** `~/projects/hapaxromana/docs/` or CLAUDE.md
+**Files:** `<hapaxromana>/docs/` or CLAUDE.md
 **Action:** Create a capability matrix documenting which features are available in each operator channel (TUI, Web, Obsidian, Mobile/Telegram). Include the intentional design rationale for each channel's scope: "TUI for full control, Web for ambient monitoring, Obsidian for knowledge work, Mobile for alerts and quick capture."
 **Verification:** The document exists and covers all documented channels.
 
 ### Fix 66: Add n8n workflow credential configuration documentation
 **Findings:** R-8.10
-**Files:** `~/projects/ai-agents/n8n-workflows/README.md` (new)
+**Files:** `<ai-agents>/n8n-workflows/README.md` (new)
 **Action:** Document the import + credential configuration process for all 4 n8n workflows. Include: how to import JSON, which credentials need configuration, how to obtain Telegram bot token, and how to verify workflows are active.
 **Verification:** README exists in `n8n-workflows/` with setup instructions.
 

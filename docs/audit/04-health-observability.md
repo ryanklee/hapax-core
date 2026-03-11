@@ -13,8 +13,8 @@
 
 Supporting files examined:
 - `shared/langfuse_client.py` (59 LOC) -- consolidated Langfuse API client
-- `~/.local/bin/health-watchdog` (105 LOC) -- bash wrapper for systemd timer
-- `~/.config/systemd/user/health-monitor.service` -- systemd unit file
+- `<local-bin>/health-watchdog` (105 LOC) -- bash wrapper for systemd timer
+- `<systemd-user>/health-monitor.service` -- systemd unit file
 
 ---
 
@@ -36,7 +36,7 @@ Supporting files examined:
 | 8 | `qdrant` | `check_qdrant_health` | 1 (healthz endpoint) | |
 | 9 | `qdrant` | `check_qdrant_collections` | 3 (documents, samples, claude-memory) | |
 | | | | **qdrant subtotal** | **4** |
-| 10 | `profiles` | `check_profile_files` | 3 (.state.json, operator.json, ryan.json) | |
+| 10 | `profiles` | `check_profile_files` | 3 (.state.json, operator.json, operator-profile.json) | |
 | 11 | `profiles` | `check_profile_staleness` | 1 (last_run age) | |
 | | | | **profiles subtotal** | **4** |
 | 12 | `endpoints` | `check_service_endpoints` | 4 (litellm, ollama, langfuse, open-webui) | **4** |
@@ -299,7 +299,7 @@ The `langfuse_get` function returns `{}` on any error (line 48-50 of `langfuse_c
 
 ### Where It's Written
 
-The `health-watchdog` bash script appends one JSON line per run to `profiles/health-history.jsonl` (line 80-97 of `~/.local/bin/health-watchdog`).
+The `health-watchdog` bash script appends one JSON line per run to `profiles/health-history.jsonl` (line 80-97 of `<local-bin>/health-watchdog`).
 
 ### Growth Rate
 
@@ -400,7 +400,7 @@ The condition `health in ("healthy", "", "starting")` treats empty health field 
 
 ### B-4.1: Health history file is unbounded -- no rotation or pruning [high]
 
-**File:** `~/.local/bin/health-watchdog:80-97`
+**File:** `<local-bin>/health-watchdog:80-97`
 
 The watchdog appends to `profiles/health-history.jsonl` every 15 minutes with no size limit, rotation, or pruning mechanism. At current rates:
 - 6 months: ~4-7 MB, ~17,500 lines
@@ -413,7 +413,7 @@ Functions that read this file (`collect_health_trend`, `format_history`, `collec
 
 ### B-4.2: Auto-fix watchdog runs `--fix --yes` with no backoff on repeated failures [medium]
 
-**File:** `~/.local/bin/health-watchdog:31`
+**File:** `<local-bin>/health-watchdog:31`
 
 The watchdog runs `--fix --yes` on every invocation when status is not healthy. If a remediation command fails (e.g., Docker daemon won't start), the same fix is retried every 15 minutes indefinitely. There is no:
 - Exponential backoff

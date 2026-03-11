@@ -71,7 +71,7 @@ All parsers tested collectively in `tests/test_takeout_parsers.py` (830 LOC, 44 
 ### Fix 25: RAG ingest dedup tracking — VERIFIED
 **v1 finding:** C-2.1 (medium)
 **Status:** ✅ Complete and correct.
-`ingest.py` uses `~/.cache/rag-ingest/processed.json` as a dedup tracker. On startup, loads existing hashes. On each file ingest, checks content hash before embedding. Writes updated tracker to disk after each file. 52 tests in `test_ingest.py` cover the tracker (including corruption recovery).
+`ingest.py` uses `<cache>/rag-ingest/processed.json` as a dedup tracker. On startup, loads existing hashes. On each file ingest, checks content hash before embedding. Writes updated tracker to disk after each file. 52 tests in `test_ingest.py` cover the tracker (including corruption recovery).
 **Quality note:** The tracker file is written after each single file — not atomic write but acceptable since it's a cache that can be rebuilt.
 
 ### Fix 26: RAG ingest tests — VERIFIED

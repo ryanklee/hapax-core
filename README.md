@@ -1,53 +1,40 @@
-# hapaxromana
+# hapax-constitution
 
-Architectural specification and coordination space for a three-tier autonomous agent system. Contains design documents, axiom governance, domain lattice definitions, and sufficiency models. No runnable code — agent implementations live in separate repos.
+Architectural pattern documentation for axiom-governed reactive agent platforms.
+
+hapax-constitution defines the reference architecture — a constitutional governance framework where LLM agents operate under explicit axioms, communicate through a filesystem-as-bus, and react to state changes through a phased execution engine.
 
 ## Contents
 
-```
-axioms/               Constitutional and domain axiom definitions
-  registry.yaml       4 axioms with scope, weight, and type
-  implications/       Per-axiom derived implications (72 total, 16 T0 blocks)
-  precedents/seed/    Seed precedent definitions for Qdrant
-domains/
-  registry.yaml       4 life domains with relationships and person extensions
-knowledge/
-  management-sufficiency.yaml   27 requirements across 3 tiers
-  music-sufficiency.yaml        6 requirements (stub)
-  personal-sufficiency.yaml     4 requirements (stub)
-  technical-sufficiency.yaml    5 requirements (stub)
-research/             Management theory deep dives (Larson, Team Topologies, Scaling People)
-docs/
-  plans/              Design docs and implementation plans (dated)
-  audit/              System audit reports (v1 and v2)
-agent-architecture.md 13 implemented agents, 3 planned
-operations-manual.md  First day / week / month operational guide
-```
+- `pattern-guide.md` — **Start here.** Generalized architectural pattern with annotated code examples
+- `agent-architecture.md` — Three-tier agent system design (interactive, on-demand, autonomous)
+- `operations-manual.md` — Operational reference for running the platform
+- `axioms/` — Axiom definitions (`registry.yaml`), derived implications, and precedent seeds
+- `domains/` — Domain-specific extensions and life-domain registry
+- `knowledge/` — Sufficiency models (management, music, personal, technical)
+- `research/` — Management theory deep dives (Larson, Team Topologies, Scaling People)
+- `docs/` — Design documents, audit reports, and implementation plans
 
-## Related Repos
+## The Pattern
 
-| Repo | Purpose |
-|------|---------|
-| [ai-agents](~/projects/ai-agents/) | Pydantic AI agents (Tier 2) + cockpit API backend |
-| [cockpit-web](~/projects/cockpit-web/) | React SPA web dashboard (cockpit frontend) |
-| [hapax-vscode](~/projects/hapax-vscode/) | VS Code extension — chat sidebar, RAG search, management commands |
-| [rag-pipeline](~/projects/rag-pipeline/) | Docling RAG ingestion (Tier 3) |
-| [llm-stack](~/llm-stack/) | Docker Compose infrastructure |
-| [hapax-system](~/projects/hapax-system/) | Claude Code skills, agents, rules, hooks |
+Four interlocking patterns form the architecture:
 
-## Axiom Governance
+1. **Filesystem-as-Bus** — Markdown files with YAML frontmatter are the state bus. Directories are collections. Agents read and write the bus; the reactive engine watches for changes.
+2. **Agent Architecture** — Three tiers: interactive (Claude Code), on-demand (Pydantic AI agents), autonomous (systemd timers). Flat orchestration, no agent-to-agent calls.
+3. **Axiom Governance** — Constitutional constraints defined in YAML, enforced through compatibility/sufficiency implications, with a common-law precedent system for edge cases.
+4. **Reactive Engine** — inotify watcher triggers rule evaluation, which produces phased actions: deterministic work first (unlimited), then LLM work (semaphore-bounded).
 
-| Axiom | Weight | Scope | Core Principle |
-|-------|--------|-------|---------------|
-| single_user | 100 | constitutional | No auth, no multi-user, no collaboration |
-| executive_function | 95 | constitutional | Zero-config, automated routines, actionable errors |
-| corporate_boundary | 90 | domain | Plugin works across Zscaler boundary, graceful degradation |
-| management_governance | 85 | domain | LLMs prepare, humans deliver — never generate feedback language |
+See `pattern-guide.md` for detailed explanations with annotated code examples.
 
-## Document Authority
+## Existence Proofs
 
-1. Source code (ground truth)
-2. CLAUDE.md (canonical reference)
-3. operations-manual.md (operational how-to)
-4. agent-architecture.md (design reference)
-5. README.md (this file — summary)
+Two systems implement this pattern:
+
+- **[hapax-council](https://github.com/ryanklee/hapax-council)** — Full operational implementation: reactive cockpit, voice daemon, sync pipeline, Claude Code integration. Instantiates all five axioms including executive function accommodation.
+- **[hapax-officium](https://github.com/ryanklee/hapax-officium)** — Management domain instantiation: decision support, team health tracking, management profiling. Instantiates a subset of axioms (single_operator, decision_support, management_safety).
+
+The two systems share an architectural pattern, not code. Each owns its full stack. See the [pattern guide](pattern-guide.md#existence-proofs) for the rationale.
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE).

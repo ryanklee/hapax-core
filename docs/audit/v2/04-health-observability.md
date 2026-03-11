@@ -149,7 +149,7 @@ Multiple layers of protection:
 ## Robustness Findings
 
 ### B2-4.1: Auto-fix watchdog runs `--fix --yes` with no backoff
-**File:** `~/.local/bin/health-watchdog`
+**File:** `<local-bin>/health-watchdog`
 **Severity:** medium
 **Finding:** The watchdog passes `--fix --yes` on every invocation when status is not healthy. If a remediation fails (e.g., Docker daemon won't start), the same fix is retried every 15 minutes indefinitely. No exponential backoff, no attempt counter, no circuit breaker.
 **Impact:** Medium. Mostly noise (repeated journal entries, repeated notifications). For `docker system prune -f` (disk remediation), repeated execution has diminishing returns. For `sudo systemctl start docker`, the sudo will fail unattended anyway.

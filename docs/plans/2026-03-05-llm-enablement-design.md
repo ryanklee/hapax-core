@@ -3,7 +3,7 @@
 **Date:** 2026-03-05
 **Status:** Approved
 **Scope:** Tier 1 Interactive surface expansion
-**Implementation repo:** `~/projects/distro-work/`
+**Implementation repo:** `<distro-work>/`
 
 ## Motivation
 

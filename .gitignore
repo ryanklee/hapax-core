@@ -1,9 +1,4 @@
-# Editor / OS
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Claude Code session state
-.claude/settings.local.json
-.claude/agent-memory/
+__pycache__/
+.claude/
+.playwright-mcp/
+*.pyc

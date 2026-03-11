@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.12 (pydantic, pyyaml, pytest), TypeScript (Obsidian API, esbuild), YAML
 
-**Repos:** `~/projects/hapaxromana/`, `~/projects/ai-agents/`, `~/projects/obsidian-hapax/`
+**Repos:** `<hapaxromana>/`, `<ai-agents>/`, `<obsidian-hapax>/`
 
 **Design doc:** `docs/plans/2026-03-04-knowledge-sufficiency-design.md`
 
@@ -16,7 +16,7 @@
 
 ## Task 1: Create Knowledge Model YAML
 
-**Repo:** `~/projects/hapaxromana/`
+**Repo:** `<hapaxromana>/`
 
 **Files:**
 - Create: `knowledge/management-sufficiency.yaml`
@@ -24,12 +24,12 @@
 **Step 1: Create the knowledge directory**
 
 ```bash
-mkdir -p ~/projects/hapaxromana/knowledge
+mkdir -p <hapaxromana>/knowledge
 ```
 
 **Step 2: Write the knowledge model**
 
-Create `~/projects/hapaxromana/knowledge/management-sufficiency.yaml` with all 27 requirements. Each entry has: `id`, `category`, `description`, `source`, `check` (type + params), `acquisition` (method, question, extraction_schema, output), `priority`, `depends_on`.
+Create `<hapaxromana>/knowledge/management-sufficiency.yaml` with all 27 requirements. Each entry has: `id`, `category`, `description`, `source`, `check` (type + params), `acquisition` (method, question, extraction_schema, output), `priority`, `depends_on`.
 
 ```yaml
 # Knowledge Sufficiency Model
@@ -599,7 +599,7 @@ requirements:
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add knowledge/management-sufficiency.yaml
 git commit -m "feat: knowledge sufficiency model — 27 requirements across 3 tiers
 
@@ -613,7 +613,7 @@ priority, and dependency chain."
 
 ## Task 2: Sufficiency Audit — Check Functions (TDD)
 
-**Repo:** `~/projects/ai-agents/`
+**Repo:** `<ai-agents>/`
 
 **Files:**
 - Create: `cockpit/data/knowledge_sufficiency.py`
@@ -843,7 +843,7 @@ class TestCheckAnyContent:
 **Step 2: Run tests to verify they fail**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py -v
 ```
 
@@ -1021,7 +1021,7 @@ def check_any_content(vault_path: Path, rel_path: str) -> bool:
 **Step 4: Run tests to verify they pass**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py -v
 ```
 
@@ -1030,7 +1030,7 @@ Expected: All 15 tests PASS.
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/knowledge_sufficiency.py tests/test_knowledge_sufficiency.py
 git commit -m "feat(sufficiency): knowledge audit check functions — 5 check types, 15 tests
 
@@ -1043,7 +1043,7 @@ real vault frontmatter via shared.vault_utils."
 
 ## Task 3: Sufficiency Audit — Orchestrator (TDD)
 
-**Repo:** `~/projects/ai-agents/`
+**Repo:** `<ai-agents>/`
 
 **Files:**
 - Modify: `cockpit/data/knowledge_sufficiency.py`
@@ -1228,7 +1228,7 @@ class TestCollectKnowledgeGaps:
 **Step 2: Run tests to verify they fail**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestRunAudit -v
 uv run pytest tests/test_knowledge_sufficiency.py::TestCollectKnowledgeGaps -v
 ```
@@ -1358,7 +1358,7 @@ def collect_knowledge_gaps(vault_path: Path | None = None) -> SufficiencyReport:
 **Step 4: Run tests to verify they pass**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py -v
 ```
 
@@ -1367,7 +1367,7 @@ Expected: All 22 tests PASS.
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/knowledge_sufficiency.py tests/test_knowledge_sufficiency.py
 git commit -m "feat(sufficiency): audit orchestrator — load YAML model, run checks, produce report
 
@@ -1380,7 +1380,7 @@ with gap list, scores, and foundational/structural completion flags."
 
 ## Task 4: Nudge Integration (TDD)
 
-**Repo:** `~/projects/ai-agents/`
+**Repo:** `<ai-agents>/`
 
 **Files:**
 - Modify: `cockpit/data/nudges.py` (lines 29, 574-575)
@@ -1496,7 +1496,7 @@ class TestSufficiencyNudges:
 **Step 2: Run tests to verify they fail**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py::TestSufficiencyNudges -v
 ```
 
@@ -1585,7 +1585,7 @@ Update the Nudge docstring category list (line 29) to include `"knowledge"`:
 **Step 5: Run tests to verify they pass**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest tests/test_knowledge_sufficiency.py -v
 ```
 
@@ -1594,7 +1594,7 @@ Expected: All 27 tests PASS.
 **Step 6: Run full test suite**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest --tb=short -q
 ```
 
@@ -1603,7 +1603,7 @@ Expected: All existing tests still pass (no regressions). The new knowledge suff
 **Step 7: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add cockpit/data/knowledge_sufficiency.py cockpit/data/nudges.py tests/test_knowledge_sufficiency.py
 git commit -m "feat(sufficiency): knowledge gap nudge integration — priority-ordered, dependency-aware
 
@@ -1617,7 +1617,7 @@ structural=medium, enrichment=low."
 
 ## Task 5: Interview Question Templates (Obsidian Plugin)
 
-**Repo:** `~/projects/obsidian-hapax/`
+**Repo:** `<obsidian-hapax>/`
 
 **Files:**
 - Create: `src/interview/knowledge-model.ts`
@@ -1628,7 +1628,7 @@ No test framework in this repo — verify via `pnpm run build`.
 **Step 1: Create the interview directory**
 
 ```bash
-mkdir -p ~/projects/obsidian-hapax/src/interview
+mkdir -p <obsidian-hapax>/src/interview
 ```
 
 **Step 2: Create the knowledge model TypeScript module**
@@ -2103,7 +2103,7 @@ export function getNextQuestion(
 **Step 4: Verify build**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 
@@ -2112,7 +2112,7 @@ Expected: Build succeeds (unused modules are tree-shaken but must compile).
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git add src/interview/knowledge-model.ts src/interview/questions.ts
 git commit -m "feat(interview): knowledge model + question templates
 
@@ -2125,7 +2125,7 @@ LLM extraction prompts. Dependency-aware next-question selection."
 
 ## Task 6: Interview Vault Writer (Obsidian Plugin)
 
-**Repo:** `~/projects/obsidian-hapax/`
+**Repo:** `<obsidian-hapax>/`
 
 **Files:**
 - Create: `src/interview/vault-writer.ts`
@@ -2304,7 +2304,7 @@ export async function updateFrontmatter(
 **Step 2: Verify build**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 
@@ -2313,7 +2313,7 @@ Expected: Build succeeds.
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git add src/interview/vault-writer.ts
 git commit -m "feat(interview): vault writer — person notes, reference docs, frontmatter updates
 
@@ -2326,7 +2326,7 @@ frontmatter_update. Respects mg-boundary-001/002."
 
 ## Task 7: Interview Extractor (Obsidian Plugin)
 
-**Repo:** `~/projects/obsidian-hapax/`
+**Repo:** `<obsidian-hapax>/`
 
 **Files:**
 - Create: `src/interview/extractor.ts`
@@ -2420,7 +2420,7 @@ CRITICAL RULES:
 **Step 2: Verify build**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 
@@ -2429,7 +2429,7 @@ Expected: Build succeeds.
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git add src/interview/extractor.ts
 git commit -m "feat(interview): LLM structured extractor — JSON extraction from natural language
 
@@ -2442,7 +2442,7 @@ Respects mg-boundary-001/002 — extraction only, no advice."
 
 ## Task 8: Interview Engine State Machine (Obsidian Plugin)
 
-**Repo:** `~/projects/obsidian-hapax/`
+**Repo:** `<obsidian-hapax>/`
 
 **Files:**
 - Create: `src/interview/engine.ts`
@@ -2847,7 +2847,7 @@ export class InterviewEngine {
 **Step 2: Verify build**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 
@@ -2856,7 +2856,7 @@ Expected: Build succeeds.
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git add src/interview/engine.ts
 git commit -m "feat(interview): engine state machine — gap detection, answer processing, vault writing
 
@@ -2869,7 +2869,7 @@ progress tracking. State persists in data.json via Obsidian Sync."
 
 ## Task 9: Chat Integration — /setup Commands + Banner
 
-**Repo:** `~/projects/obsidian-hapax/`
+**Repo:** `<obsidian-hapax>/`
 
 **Files:**
 - Modify: `src/slash-commands.ts`
@@ -3112,7 +3112,7 @@ In the `sendMessage()` method, add an intercept at the very beginning (before th
 **Step 3: Verify build**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 
@@ -3121,7 +3121,7 @@ Expected: Build succeeds.
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git add src/slash-commands.ts src/chat-view.ts
 git commit -m "feat(interview): /setup commands + banner + chat integration
 
@@ -3135,14 +3135,14 @@ answer. Banner removed when foundational requirements met."
 
 ## Task 10: Interview CSS Styles
 
-**Repo:** `~/projects/obsidian-hapax/`
+**Repo:** `<obsidian-hapax>/`
 
 **Files:**
 - Modify: `styles.css`
 
 **Step 1: Append interview styles to `styles.css`**
 
-Add at the end of `~/projects/obsidian-hapax/styles.css`:
+Add at the end of `<obsidian-hapax>/styles.css`:
 
 ```css
 /* Interview setup banner */
@@ -3176,7 +3176,7 @@ Add at the end of `~/projects/obsidian-hapax/styles.css`:
 **Step 2: Verify build**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 
@@ -3185,7 +3185,7 @@ Expected: Build succeeds.
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git add styles.css
 git commit -m "feat(interview): setup banner CSS styles
 
@@ -3200,7 +3200,7 @@ Uses Obsidian CSS custom properties for theme compatibility."
 **Step 1: Build obsidian-hapax plugin**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 
@@ -3209,7 +3209,7 @@ Expected: Build succeeds with no errors.
 **Step 2: Verify TypeScript compiles**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 npx -y tsc --noEmit
 ```
 
@@ -3218,7 +3218,7 @@ Expected: No type errors.
 **Step 3: Run ai-agents full test suite**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run pytest --tb=short -q
 ```
 
@@ -3227,7 +3227,7 @@ Expected: All tests pass including the ~27 new knowledge sufficiency tests.
 **Step 4: Validate YAML model**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 python3 -c "import yaml; d = yaml.safe_load(open('knowledge/management-sufficiency.yaml')); print(f'{len(d[\"requirements\"])} requirements loaded')"
 ```
 
@@ -3246,12 +3246,12 @@ Expected: No error.
 If any files were missed, add and commit them. Then tag:
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add -A
 git status  # verify only expected files
 # commit if needed
 
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add -A
 git status
 # commit if needed
@@ -3265,7 +3265,7 @@ git status
 2. **Test /setup**: Open chat sidebar, type `/setup` → should show progress + first question
 3. **Test banner**: If no person notes exist in `10-work/people/`, banner should appear
 4. **Test extraction**: Answer the first question with team member names → verify person notes created
-5. **Verify nudges**: Run `uv run cockpit --once` from `~/projects/ai-agents/` → should show knowledge gaps in nudges
+5. **Verify nudges**: Run `uv run cockpit --once` from `<ai-agents>/` → should show knowledge gaps in nudges
 
 ---
 

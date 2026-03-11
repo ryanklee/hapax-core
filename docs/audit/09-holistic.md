@@ -2,7 +2,7 @@
 
 **Audited**: 2026-03-02
 **Scope**: Entire three-tier agent system examined through 5 cross-cutting lenses
-**Inputs**: 8 domain audit findings (01-08), all source files in `~/projects/ai-agents/`, `~/projects/cockpit-web/`, `~/projects/obsidian-hapax/`, `~/llm-stack/`
+**Inputs**: 8 domain audit findings (01-08), all source files in `<ai-agents>/`, `<cockpit-web>/`, `<obsidian-hapax>/`, `<llm-stack>/`
 
 ---
 
@@ -130,7 +130,7 @@ The briefing agent does register context tools (line 110), so it *could* query `
 
 ### H-1.4 — MEDIUM: Obsidian plugin has separate identity model
 
-**File**: `~/projects/obsidian-hapax/src/types.ts` (DEFAULT_SETTINGS.systemPrompt)
+**File**: `<obsidian-hapax>/src/types.ts` (DEFAULT_SETTINGS.systemPrompt)
 
 ```typescript
 systemPrompt: `You are Hapax, an assistant embedded in the operator's Obsidian vault...`
@@ -333,7 +333,7 @@ Every operator action requires switching to the TUI or command line. For an oper
 
 The `MicroProbeEngine` tracks a `_last_probe_time` using `time.monotonic()` (a relative clock). The cooldown (600 seconds) prevents re-probing too soon. But `time.monotonic()` resets on process restart, so the cooldown is lost whenever the TUI is restarted.
 
-The `asked_topics` set *is* persisted to `~/.cache/cockpit/probe-state.json`, so a topic won't be re-asked forever. But the time-based cooldown between any probes is ephemeral.
+The `asked_topics` set *is* persisted to `<cache>/cockpit/probe-state.json`, so a topic won't be re-asked forever. But the time-based cooldown between any probes is ephemeral.
 
 For the operator: frequent TUI restarts (which happen during development or after crashes) will cause probes to fire immediately on startup, adding cognitive load at exactly the moment the operator is trying to get oriented.
 
@@ -382,7 +382,7 @@ The following 7 flows were traced through source code to verify end-to-end opera
 
 Traced through 3 codebases:
 
-1. `ingest.py:33-37` — Config watches `~/Documents/Personal/31-system-inbox` (third entry in `watch_dirs`). Watchdog fires on file create/modify, debounces 2s, then calls `ingest_file()` which parses, chunks, embeds via Ollama, upserts to Qdrant `documents` collection. Frontmatter parsing enriches payloads.
+1. `ingest.py:33-37` — Config watches `<personal-vault>/31-system-inbox` (third entry in `watch_dirs`). Watchdog fires on file create/modify, debounces 2s, then calls `ingest_file()` which parses, chunks, embeds via Ollama, upserts to Qdrant `documents` collection. Frontmatter parsing enriches payloads.
 2. `profiler_sources.py:58-60` — `VAULT_INBOX_DIR` reads same `OBSIDIAN_VAULT_PATH` env var, resolves to `31-system-inbox`. `discover_sources()` globs `*.md` files there (line 182-184). `read_vault_inbox()` chunks them as source type `vault-inbox` with a cap of 50 chunks.
 3. `profiler.py` — `read_all_sources()` includes vault-inbox chunks in extraction. The profiler runs extraction via LLM, producing `ProfileFact` objects that are merged into the profile and saved.
 
@@ -390,7 +390,7 @@ Traced through 3 codebases:
 
 **2. Chat observation (record_observation) -> pending-facts.jsonl -> profiler reads -> profile updated?**
 
-1. `chat_agent.py:313-352` — `record_observation` tool writes a JSON entry to `~/.cache/cockpit/pending-facts.jsonl` with dimension, key, value, confidence 0.6, evidence, source "conversation:cockpit", and ISO timestamp.
+1. `chat_agent.py:313-352` — `record_observation` tool writes a JSON entry to `<cache>/cockpit/pending-facts.jsonl` with dimension, key, value, confidence 0.6, evidence, source "conversation:cockpit", and ISO timestamp.
 2. `profiler_sources.py:157-159` — `discover_sources()` checks for `pending-facts.jsonl` at exactly that path. Sets `sources.pending_facts = pending_path`.
 3. `profiler_sources.py:520-553` — `read_pending_facts()` reads the JSONL, formats each entry as `"- [{dim}] {key}: {value}"` with evidence, wraps in a `SourceChunk` with source type "conversation" and cap of 10 chunks.
 4. During profiler extraction, the LLM processes these chunks and produces `ProfileFact` objects that are merged into the profile.
@@ -434,7 +434,7 @@ Traced through 3 codebases:
 1. `daily-briefing.timer` — Fires at `07:00` daily (`OnCalendar=*-*-* 07:00:00`, Persistent=true so missed runs catch up).
 2. `briefing-watchdog` (bash script) — Runs `briefing --hours 24 --save --json`. The `--save` flag triggers two writes:
    - `profiles/briefing.md` (local file, read by cockpit)
-   - `vault_writer.write_briefing_to_vault()` -> `~/Documents/Personal/30-system/briefings/YYYY-MM-DD.md` (Obsidian Sync picks this up)
+   - `vault_writer.write_briefing_to_vault()` -> `<personal-vault>/30-system/briefings/YYYY-MM-DD.md` (Obsidian Sync picks this up)
 3. The watchdog script extracts headline + high-priority count, then sends desktop notification via raw `notify-send`.
 4. n8n `briefing-push.json` workflow triggers at 07:15 (15 min later), reads `profiles/briefing.md`, formats for mobile, sends via Telegram.
 
@@ -639,7 +639,7 @@ For ADHD-appropriate mobile attention:
 
 ### Vault (Obsidian) — cognitive overhead assessment
 
-**Files**: `~/Documents/Personal/` folder structure, `50-templates/`
+**Files**: `<personal-vault>/` folder structure, `50-templates/`
 
 The vault has a clear hierarchical structure (00-inbox through 90-attachments) with numbered prefixes that provide spatial consistency — the folders always appear in the same visual order. This is good for an operator with ADHD.
 

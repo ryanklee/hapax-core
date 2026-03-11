@@ -3,8 +3,8 @@
 This document defines the relationship between the wider hapax system and the
 containerized management cockpit. It must be byte-identical in both repos:
 
-- `~/projects/hapaxromana/docs/cross-project-boundary.md`
-- `~/projects/hapax-mgmt/docs/cross-project-boundary.md`
+- `<hapaxromana>/docs/cross-project-boundary.md`
+- `<hapax-mgmt>/docs/cross-project-boundary.md`
 
 Any divergence is a high-severity drift item detected by the wider system's
 drift-detector agent (weekly Sunday 03:00).
@@ -132,7 +132,7 @@ Changes in one repo that may affect the other:
   both systems' governance.
 - **Qdrant collection schemas**: Field names, vector dimensions, payload
   structure changes affect both readers.
-- **Vault structure**: Path changes in ~/Documents/Work/ that
+- **Vault structure**: Path changes in <work-vault>/ that
   management_bridge.py reads.
 - **Profile dimensions**: The 6 management dimensions in profile_store.py
   are used by both systems' profilers.

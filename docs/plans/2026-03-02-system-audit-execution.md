@@ -18,18 +18,18 @@ Before starting:
 
 ```bash
 # Ensure you're in the hapaxromana repo
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 
 # Create output directory
 mkdir -p docs/audit
 
 # Verify access to all repos
-ls ~/projects/ai-agents/shared/config.py
-ls ~/projects/rag-pipeline/ingest.py
-ls ~/projects/cockpit-web/src/App.tsx
-ls ~/projects/obsidian-hapax/src/main.ts
-ls ~/llm-stack/docker-compose.yml
-ls ~/.config/systemd/user/
+ls <ai-agents>/shared/config.py
+ls <rag-pipeline>/ingest.py
+ls <cockpit-web>/src/App.tsx
+ls <obsidian-hapax>/src/main.ts
+ls <llm-stack>/docker-compose.yml
+ls <systemd-user>/
 ```
 
 ## Findings Document Template
@@ -98,7 +98,7 @@ Finding IDs follow the pattern: `C-N.X` (completeness), `R-N.X` (correctness), `
 
 **Scope:** The shared utilities that every other component depends on. Bugs here propagate everywhere.
 
-**Files to read** (all paths relative to `~/projects/ai-agents/`):
+**Files to read** (all paths relative to `<ai-agents>/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -155,7 +155,7 @@ Write findings to `docs/audit/01-shared-foundation.md` using the template.
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/01-shared-foundation.md
 git commit -m "audit: domain 1 — shared foundation findings"
 ```
@@ -168,7 +168,7 @@ git commit -m "audit: domain 1 — shared foundation findings"
 
 **Files to read:**
 
-**Takeout** (`~/projects/ai-agents/shared/takeout/`):
+**Takeout** (`<ai-agents>/shared/takeout/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -190,7 +190,7 @@ git commit -m "audit: domain 1 — shared foundation findings"
 | `parsers/tasks.py` | 133 | (in parsers tests) | — |
 | `profiler_bridge.py` | — | `tests/test_takeout_profiler_bridge.py` | 449 |
 
-**Proton** (`~/projects/ai-agents/shared/proton/`):
+**Proton** (`<ai-agents>/shared/proton/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -204,7 +204,7 @@ git commit -m "audit: domain 1 — shared foundation findings"
 |-------------|-----|-----------|----------|
 | `shared/llm_export_converter.py` | 386 | `tests/test_llm_export_converter.py` | 557 |
 
-**RAG Pipeline** (`~/projects/rag-pipeline/`):
+**RAG Pipeline** (`<rag-pipeline>/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -246,7 +246,7 @@ Read all 6 test files. Note coverage gaps — especially for parsers that handle
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/02-data-ingestion.md
 git commit -m "audit: domain 2 — data ingestion findings"
 ```
@@ -257,7 +257,7 @@ git commit -m "audit: domain 2 — data ingestion findings"
 
 **Scope:** The profiler, its sources, the profile store (Qdrant), context tools, and management bridge.
 
-**Files to read** (all paths relative to `~/projects/ai-agents/`):
+**Files to read** (all paths relative to `<ai-agents>/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -291,7 +291,7 @@ The profiler is the largest single file (1,862 LOC). Read carefully. Map the `ru
 
 6. **Structured fact loading** (`load_structured_facts()`): Loads from `takeout-structured-facts.json`, `proton-structured-facts.json`, `management-structured-facts.json`. What if one is missing? What if one is corrupt?
 
-7. **Context tools error handling**: When Qdrant is down, `search_profile()` should fail gracefully. When `ryan-digest.json` is missing, `get_profile_summary()` should fail gracefully. Verify.
+7. **Context tools error handling**: When Qdrant is down, `search_profile()` should fail gracefully. When `operator-digest.json` is missing, `get_profile_summary()` should fail gracefully. Verify.
 
 8. **Management bridge vault scanning** (`management_bridge.py`): What happens with missing vault files? Malformed frontmatter? Empty properties? Check all `_extract_*` functions.
 
@@ -300,7 +300,7 @@ The profiler is the largest single file (1,862 LOC). Read carefully. Map the `ru
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/03-operator-profile.md
 git commit -m "audit: domain 3 — operator profile system findings"
 ```
@@ -311,7 +311,7 @@ git commit -m "audit: domain 3 — operator profile system findings"
 
 **Scope:** Health monitoring, infrastructure introspection, drift detection, activity analysis, knowledge maintenance.
 
-**Files to read** (all paths relative to `~/projects/ai-agents/`):
+**Files to read** (all paths relative to `<ai-agents>/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -356,7 +356,7 @@ All 5 agents have dedicated test files. Check: are all 49 health checks tested? 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/04-health-observability.md
 git commit -m "audit: domain 4 — health & observability findings"
 ```
@@ -367,7 +367,7 @@ git commit -m "audit: domain 4 — health & observability findings"
 
 **Scope:** LLM-using agents that produce analysis, content, or recommendations.
 
-**Files to read** (all paths relative to `~/projects/ai-agents/`):
+**Files to read** (all paths relative to `<ai-agents>/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -417,7 +417,7 @@ Only 3 of 6 agents have test files. For the untested ones (research, code_review
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/05-intelligence-agents.md
 git commit -m "audit: domain 5 — intelligence agents findings"
 ```
@@ -428,7 +428,7 @@ git commit -m "audit: domain 5 — intelligence agents findings"
 
 **Scope:** The TUI application — dashboard, chat, interview, copilot, accommodations, data collectors, all screens and widgets. Largest domain.
 
-**Files to read** (all paths relative to `~/projects/ai-agents/`):
+**Files to read** (all paths relative to `<ai-agents>/`):
 
 **Core:**
 
@@ -530,7 +530,7 @@ This is the largest domain. Prioritize:
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/06-cockpit.md
 git commit -m "audit: domain 6 — cockpit findings"
 ```
@@ -543,7 +543,7 @@ git commit -m "audit: domain 6 — cockpit findings"
 
 **Files to read:**
 
-**Backend** (`~/projects/ai-agents/cockpit/api/`):
+**Backend** (`<ai-agents>/cockpit/api/`):
 
 | Source File | LOC | Test File | Test LOC |
 |-------------|-----|-----------|----------|
@@ -554,7 +554,7 @@ git commit -m "audit: domain 6 — cockpit findings"
 | `__init__.py` | 1 | — | — |
 | `routes/__init__.py` | 1 | — | — |
 
-**Frontend** (`~/projects/cockpit-web/src/`):
+**Frontend** (`<cockpit-web>/src/`):
 
 | Source File | LOC |
 |-------------|-----|
@@ -567,7 +567,7 @@ git commit -m "audit: domain 6 — cockpit findings"
 | `App.tsx` | 15 |
 | `main.tsx` | 19 |
 
-**Also:** `~/projects/ai-agents/Dockerfile.api` (20 LOC)
+**Also:** `<ai-agents>/Dockerfile.api` (20 LOC)
 
 **Total:** ~722 source LOC, ~150 test LOC.
 
@@ -606,7 +606,7 @@ Only 2 test files (150 LOC for 722 source LOC). Note coverage gaps.
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/07-web-layer.md
 git commit -m "audit: domain 7 — web layer findings"
 ```
@@ -621,20 +621,20 @@ git commit -m "audit: domain 7 — web layer findings"
 
 | Source File | LOC |
 |-------------|-----|
-| `~/llm-stack/docker-compose.yml` | 350 |
-| `~/.config/systemd/user/*.service` (14 files) | ~240 |
-| `~/.config/systemd/user/*.timer` (8 files) | ~79 |
-| `~/projects/ai-agents/n8n-workflows/briefing-push.json` | 109 |
-| `~/projects/ai-agents/n8n-workflows/health-relay.json` | 106 |
-| `~/projects/ai-agents/n8n-workflows/nudge-digest.json` | 80 |
-| `~/projects/ai-agents/n8n-workflows/quick-capture.json` | 249 |
-| `~/projects/ai-agents/Dockerfile.api` | 20 |
-| `~/projects/ai-agents/.envrc` | 20 |
+| `<llm-stack>/docker-compose.yml` | 350 |
+| `<systemd-user>/*.service` (14 files) | ~240 |
+| `<systemd-user>/*.timer` (8 files) | ~79 |
+| `<ai-agents>/n8n-workflows/briefing-push.json` | 109 |
+| `<ai-agents>/n8n-workflows/health-relay.json` | 106 |
+| `<ai-agents>/n8n-workflows/nudge-digest.json` | 80 |
+| `<ai-agents>/n8n-workflows/quick-capture.json` | 249 |
+| `<ai-agents>/Dockerfile.api` | 20 |
+| `<ai-agents>/.envrc` | 20 |
 
 **Also inspect live state:**
 
 ```bash
-docker compose -f ~/llm-stack/docker-compose.yml ps
+docker compose -f <llm-stack>/docker-compose.yml ps
 systemctl --user list-timers
 systemctl --user list-units --type=service --state=running
 ```
@@ -669,11 +669,11 @@ Check for plaintext secrets in: `.envrc` files, `docker-compose.yml` env section
 
 5. **n8n workflow correctness**: For each workflow (briefing-push, health-relay, nudge-digest, quick-capture/Telegram bot): Is the trigger correct? Are credentials valid? What happens on failure?
 
-6. **Secret management**: Search for plaintext API keys, passwords, tokens in all config files. Check `.env` files in `~/llm-stack/`. Are all secrets coming from `pass` via `direnv`?
+6. **Secret management**: Search for plaintext API keys, passwords, tokens in all config files. Check `.env` files in `<llm-stack>/`. Are all secrets coming from `pass` via `direnv`?
 
-7. **Vault folder structure**: Compare what `vault_writer.py` expects (30-system/briefings, 30-system/nudges, etc.) with what actually exists in `~/Documents/Personal/`. Any mismatches?
+7. **Vault folder structure**: Compare what `vault_writer.py` expects (30-system/briefings, 30-system/nudges, etc.) with what actually exists in `<personal-vault>/`. Any mismatches?
 
-8. **Dockerfile.api build**: Can it actually build? Run `docker build -f ~/projects/ai-agents/Dockerfile.api ~/projects/ai-agents/` mentally — are all COPY sources present? Does `uv sync --frozen --no-dev` succeed?
+8. **Dockerfile.api build**: Can it actually build? Run `docker build -f <ai-agents>/Dockerfile.api <ai-agents>/` mentally — are all COPY sources present? Does `uv sync --frozen --no-dev` succeed?
 
 9. **Docker socket mount**: The cockpit-api container mounts `/var/run/docker.sock:ro`. What can it do with this? Is read-only sufficient protection?
 
@@ -690,7 +690,7 @@ Check for plaintext secrets in: `.envrc` files, `docker-compose.yml` env section
 **Step 7: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/08-infrastructure.md
 git commit -m "audit: domain 8 — infrastructure findings"
 ```
@@ -723,8 +723,8 @@ Also re-read the design doc for the holistic methodology: `docs/plans/2026-03-02
 > Do the parts agree on what the system is and who the operator is?
 
 Trace the operator model across all touchpoints:
-- **Profiler** (`agents/profiler.py`): 13-dimension profile → `profiles/ryan.json`
-- **Context tools** (`shared/context_tools.py`): reads `profiles/ryan-digest.json`
+- **Profiler** (`agents/profiler.py`): 13-dimension profile → `profiles/operator-profile.json`
+- **Context tools** (`shared/context_tools.py`): reads `profiles/operator-digest.json`
 - **System prompts** (`shared/operator.py`): `SYSTEM_CONTEXT` + `get_system_prompt_fragment()`
 - **Accommodations** (`cockpit/accommodations.py`): `profiles/accommodations.json`
 - **Nudge priorities** (`cockpit/data/nudges.py`): priority scoring for ADHD operator
@@ -738,12 +738,12 @@ Question: When the system prompt says "ADHD and autism — task initiation and s
 > One operator model or several? One way to do things or parallel approaches?
 
 Map all representations of operator state:
-- `profiles/ryan.json` — profiler output
-- `profiles/ryan-digest.json` — digest for context tools
+- `profiles/operator-profile.json` — profiler output
+- `profiles/operator-digest.json` — digest for context tools
 - `profiles/accommodations.json` — negotiated system behavior changes
-- `~/.cache/cockpit/probe-state.json` — micro-probe cooldowns
-- `~/.cache/cockpit/pending-facts.jsonl` — unconfirmed observations
-- `~/.cache/cockpit/decisions.jsonl` — nudge action history
+- `<cache>/cockpit/probe-state.json` — micro-probe cooldowns
+- `<cache>/cockpit/pending-facts.jsonl` — unconfirmed observations
+- `<cache>/cockpit/decisions.jsonl` — nudge action history
 
 Do these inform each other, or are they parallel silos?
 
@@ -833,7 +833,7 @@ Use this structure:
 **Step 8: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/09-holistic.md
 git commit -m "audit: holistic findings — coherence, unity, flow, purpose, interface"
 ```
@@ -918,7 +918,7 @@ Write to `docs/audit/10-fix-plan.md` using this structure:
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add docs/audit/10-fix-plan.md
 git commit -m "audit: consolidated fix plan — prioritized findings and work streams"
 ```

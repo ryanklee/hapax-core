@@ -55,7 +55,7 @@ precedents:
 
   - id: sp-mgmt-004
     axiom_id: management_governance
-    situation: "Bridge zone (32-bridge/) separates work-specific ChatGPT Enterprise prompts from home system"
+    situation: "Bridge zone (32-bridge/) separates work-specific employer-provided LLM tools prompts from home system"
     decision: compliant
     reasoning: >
       Work data requiring corporate LLM tools stays in the bridge zone.

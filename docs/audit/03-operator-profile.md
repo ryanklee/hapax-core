@@ -94,7 +94,7 @@ The `merge_facts()` function uses a `(dimension, key)` tuple as the dedup key. S
 
 ### Authority sources
 
-Defined at line 77: `AUTHORITY_SOURCES = frozenset({"interview", "config", "memory", "operator"})`. The `_source_prefix()` function (line 284-286) splits on both `/` and `:` to extract the prefix, correctly handling sources like `"interview:2024-01-15"`, `"config:~/.claude/CLAUDE.md"`, and `"operator:correction"`.
+Defined at line 77: `AUTHORITY_SOURCES = frozenset({"interview", "config", "memory", "operator"})`. The `_source_prefix()` function (line 284-286) splits on both `/` and `:` to extract the prefix, correctly handling sources like `"interview:2024-01-15"`, `"config:<claude-config>/CLAUDE.md"`, and `"operator:correction"`.
 
 ---
 

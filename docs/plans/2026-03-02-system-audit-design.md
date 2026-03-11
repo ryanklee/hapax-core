@@ -13,18 +13,18 @@ Audit the entire system for completeness, correctness, and robustness at the par
 
 | Component | Location | LOC | Type |
 |-----------|----------|-----|------|
-| Agents (13) | `~/projects/ai-agents/agents/` | 8,418 | Python |
-| Cockpit TUI + API | `~/projects/ai-agents/cockpit/` | 7,896 | Python |
-| Shared utilities | `~/projects/ai-agents/shared/` | 6,088 | Python |
-| Tests | `~/projects/ai-agents/tests/` | 14,292 | Python |
-| RAG pipeline | `~/projects/rag-pipeline/` | 651 | Python |
-| Obsidian plugin | `~/projects/obsidian-hapax/` | 1,264 | TypeScript |
-| Cockpit web | `~/projects/cockpit-web/` | 457 | TypeScript |
-| Architecture spec | `~/projects/hapaxromana/` | — | Markdown |
-| Docker infrastructure | `~/llm-stack/` | — | YAML/config |
-| Systemd services | `~/.config/systemd/user/` | — | Unit files |
-| n8n workflows | `~/projects/ai-agents/n8n-workflows/` | — | JSON |
-| Obsidian vault | `~/Documents/Personal/` | — | Markdown/YAML |
+| Agents (13) | `<ai-agents>/agents/` | 8,418 | Python |
+| Cockpit TUI + API | `<ai-agents>/cockpit/` | 7,896 | Python |
+| Shared utilities | `<ai-agents>/shared/` | 6,088 | Python |
+| Tests | `<ai-agents>/tests/` | 14,292 | Python |
+| RAG pipeline | `<rag-pipeline>/` | 651 | Python |
+| Obsidian plugin | `<obsidian-hapax>/` | 1,264 | TypeScript |
+| Cockpit web | `<cockpit-web>/` | 457 | TypeScript |
+| Architecture spec | `<hapaxromana>/` | — | Markdown |
+| Docker infrastructure | `<llm-stack>/` | — | YAML/config |
+| Systemd services | `<systemd-user>/` | — | Unit files |
+| n8n workflows | `<ai-agents>/n8n-workflows/` | — | JSON |
+| Obsidian vault | `<personal-vault>/` | — | Markdown/YAML |
 
 **Total:** ~39K LOC code, 1,024 tests, 12 Docker containers, 20 systemd units, 4 n8n workflows, 3 Qdrant collections.
 
@@ -49,7 +49,7 @@ Ordered from foundation upward — earlier domains inform later ones.
 
 ### Domain 2: Data Ingestion
 
-**Files:** `shared/takeout/` (1,536 LOC, 13 parsers), `shared/proton/` (513 LOC), `shared/llm_export_converter.py` (386 LOC), `~/projects/rag-pipeline/` (651 LOC)
+**Files:** `shared/takeout/` (1,536 LOC, 13 parsers), `shared/proton/` (513 LOC), `shared/llm_export_converter.py` (386 LOC), `<rag-pipeline>/` (651 LOC)
 
 **~3,086 LOC.**
 
@@ -136,7 +136,7 @@ Ordered from foundation upward — earlier domains inform later ones.
 
 ### Domain 7: Web Layer
 
-**Files:** `cockpit/api/` (320 LOC), `~/projects/cockpit-web/` (457 LOC)
+**Files:** `cockpit/api/` (320 LOC), `<cockpit-web>/` (457 LOC)
 
 **~777 LOC.** Brand new code.
 
@@ -153,7 +153,7 @@ Ordered from foundation upward — earlier domains inform later ones.
 
 ### Domain 8: Infrastructure
 
-**Files:** `~/llm-stack/docker-compose.yml`, systemd units (20), n8n workflows (4), `.envrc` files, Obsidian vault structure, `Dockerfile.api`
+**Files:** `<llm-stack>/docker-compose.yml`, systemd units (20), n8n workflows (4), `.envrc` files, Obsidian vault structure, `Dockerfile.api`
 
 **Specific focus:**
 - Docker resource limits — are MemoryMax/CPUQuota set? Are they sensible?
@@ -194,7 +194,7 @@ Do the parts agree on what the system is and who the operator is? Does the opera
 
 ### Unity
 
-One operator model or several? The profiler writes `ryan.json`. Context tools read `profiles/ryan-digest.json`. The chat agent has `record_observation`. Accommodations live in `profiles/accommodations.json`. Micro-probe state lives in `~/.cache/cockpit/probe-state.json`. Pending facts in `~/.cache/cockpit/pending-facts.jsonl`. Decisions in `~/.cache/cockpit/decisions.jsonl`. Are these fragments of one coherent operator model, or have they drifted into parallel representations that don't inform each other?
+One operator model or several? The profiler writes `operator-profile.json`. Context tools read `profiles/operator-digest.json`. The chat agent has `record_observation`. Accommodations live in `profiles/accommodations.json`. Micro-probe state lives in `<cache>/cockpit/probe-state.json`. Pending facts in `<cache>/cockpit/pending-facts.jsonl`. Decisions in `<cache>/cockpit/decisions.jsonl`. Are these fragments of one coherent operator model, or have they drifted into parallel representations that don't inform each other?
 
 Is there one way to do things across the system, or have parallel approaches accumulated? One notification path or three? One embedding strategy or drift between modules? Consistent naming conventions?
 

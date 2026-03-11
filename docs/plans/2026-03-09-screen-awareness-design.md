@@ -66,7 +66,7 @@ The screen analyzer LLM needs deep Hapax system knowledge to make intelligent ob
 
 ### Static Core Prompt (~500 tokens)
 
-Embedded in the analyzer, loaded from `~/.local/share/hapax-voice/screen_context.md`:
+Embedded in the analyzer, loaded from `<local-share>/hapax-voice/screen_context.md`:
 
 - Service topology (service → port → purpose)
 - Agent roster (name → function → invocation)
@@ -85,7 +85,7 @@ Embedded in the analyzer, loaded from `~/.local/share/hapax-voice/screen_context
 The drift-detector agent (runs weekly) gets a new dimension: `screen_analyzer_context`.
 
 - Compares static core prompt against live state: `docker compose ps`, `systemctl --user list-units`, port scan, agent directory listing
-- If drift detected → auto-generates updated static core → writes to `~/.local/share/hapax-voice/screen_context.md`
+- If drift detected → auto-generates updated static core → writes to `<local-share>/hapax-voice/screen_context.md`
 - Screen analyzer reloads on SIGHUP or next startup
 - Drift corrections also update all relevant documentation across Hapax repos (hapaxromana/agent-architecture.md, ai-agents/README.md, component registry, etc.)
 

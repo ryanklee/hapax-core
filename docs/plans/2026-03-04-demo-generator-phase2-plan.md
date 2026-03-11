@@ -16,7 +16,7 @@
 ### Task 1: Add Phase 2 Dependencies
 
 **Files:**
-- Modify: `~/projects/ai-agents/pyproject.toml`
+- Modify: `<ai-agents>/pyproject.toml`
 
 **Step 1: Add moviepy, Pillow, httpx to dependencies**
 
@@ -33,7 +33,7 @@ Note: `httpx` is already a dependency (used by pydantic-ai). Verify with `grep h
 
 Run:
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv sync
 # ffmpeg should already be installed on this system
 ffmpeg -version 2>/dev/null | head -1 || echo "Install ffmpeg: sudo apt install ffmpeg"
@@ -43,7 +43,7 @@ ffmpeg -version 2>/dev/null | head -1 || echo "Install ffmpeg: sudo apt install 
 
 Run:
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 uv run python -c "from moviepy import ImageClip; print('moviepy ok')"
 uv run python -c "from PIL import Image; print('pillow ok')"
 ```
@@ -51,7 +51,7 @@ uv run python -c "from PIL import Image; print('pillow ok')"
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add pyproject.toml uv.lock
 git commit -m "chore: add moviepy and Pillow dependencies for Phase 2"
 ```
@@ -61,7 +61,7 @@ git commit -m "chore: add moviepy and Pillow dependencies for Phase 2"
 ### Task 2: Chatterbox TTS Docker Service
 
 **Files:**
-- Modify: `~/llm-stack/docker-compose.yml`
+- Modify: `<llm-stack>/docker-compose.yml`
 
 **Step 1: Check existing docker-compose profiles**
 
@@ -122,8 +122,8 @@ git commit -m "feat: add Chatterbox TTS service under tts profile"
 ### Task 3: VRAM Manager Module
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_pipeline/vram.py`
-- Create: `~/projects/ai-agents/tests/test_demo_vram.py`
+- Create: `<ai-agents>/agents/demo_pipeline/vram.py`
+- Create: `<ai-agents>/tests/test_demo_vram.py`
 
 **Step 1: Write tests**
 
@@ -202,7 +202,7 @@ class TestEnsureVramAvailable:
 
 **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_vram.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_vram.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Write implementation**
@@ -293,13 +293,13 @@ def ensure_vram_available(required_mb: int = TTS_VRAM_MB, timeout: int = 30) -> 
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_vram.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_vram.py -v`
 Expected: All PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_pipeline/vram.py tests/test_demo_vram.py
 git commit -m "feat(demo): VRAM manager — check free GPU memory, unload Ollama models"
 ```
@@ -309,8 +309,8 @@ git commit -m "feat(demo): VRAM manager — check free GPU memory, unload Ollama
 ### Task 4: Voice Generation Pipeline
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_pipeline/voice.py`
-- Create: `~/projects/ai-agents/tests/test_demo_voice.py`
+- Create: `<ai-agents>/agents/demo_pipeline/voice.py`
+- Create: `<ai-agents>/tests/test_demo_voice.py`
 
 **Step 1: Write tests**
 
@@ -372,7 +372,7 @@ class TestGenerateAllSegments:
 
 **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_voice.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_voice.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Write implementation**
@@ -473,13 +473,13 @@ def generate_all_voice_segments(
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_voice.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_voice.py -v`
 Expected: All PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_pipeline/voice.py tests/test_demo_voice.py
 git commit -m "feat(demo): voice generation pipeline via Chatterbox TTS API"
 ```
@@ -489,8 +489,8 @@ git commit -m "feat(demo): voice generation pipeline via Chatterbox TTS API"
 ### Task 5: Title Card Generator (Pillow)
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_pipeline/title_cards.py`
-- Create: `~/projects/ai-agents/tests/test_demo_title_cards.py`
+- Create: `<ai-agents>/agents/demo_pipeline/title_cards.py`
+- Create: `<ai-agents>/tests/test_demo_title_cards.py`
 
 **Step 1: Write tests**
 
@@ -514,7 +514,7 @@ class TestGenerateTitleCard:
 
     def test_custom_subtitle(self, tmp_path):
         path = generate_title_card(
-            "Demo Title", tmp_path / "title.png", subtitle="For my wife"
+            "Demo Title", tmp_path / "title.png", subtitle="For a friend"
         )
         assert path.exists()
 
@@ -528,7 +528,7 @@ class TestGenerateTitleCard:
 
 **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_title_cards.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_title_cards.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Write implementation**
@@ -611,13 +611,13 @@ def generate_title_card(
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_title_cards.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_title_cards.py -v`
 Expected: All PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_pipeline/title_cards.py tests/test_demo_title_cards.py
 git commit -m "feat(demo): Gruvbox-styled title card generator with Pillow"
 ```
@@ -627,8 +627,8 @@ git commit -m "feat(demo): Gruvbox-styled title card generator with Pillow"
 ### Task 6: Video Assembly Pipeline
 
 **Files:**
-- Create: `~/projects/ai-agents/agents/demo_pipeline/video.py`
-- Create: `~/projects/ai-agents/tests/test_demo_video.py`
+- Create: `<ai-agents>/agents/demo_pipeline/video.py`
+- Create: `<ai-agents>/tests/test_demo_video.py`
 
 **Step 1: Write tests**
 
@@ -687,7 +687,7 @@ class TestAssembleVideo:
 
 **Step 2: Run tests to verify they fail**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_video.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_video.py -v`
 Expected: FAIL — `ModuleNotFoundError`
 
 **Step 3: Write implementation**
@@ -810,13 +810,13 @@ async def assemble_video(
 
 **Step 4: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_video.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_video.py -v`
 Expected: All PASS.
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo_pipeline/video.py tests/test_demo_video.py
 git commit -m "feat(demo): video assembly pipeline — screenshots + audio → MP4"
 ```
@@ -826,8 +826,8 @@ git commit -m "feat(demo): video assembly pipeline — screenshots + audio → M
 ### Task 7: Wire Phase 2 into Demo Agent
 
 **Files:**
-- Modify: `~/projects/ai-agents/agents/demo.py`
-- Modify: `~/projects/ai-agents/agents/demo_models.py`
+- Modify: `<ai-agents>/agents/demo.py`
+- Modify: `<ai-agents>/agents/demo_models.py`
 
 **Step 1: Add "video" format to CLI**
 
@@ -918,13 +918,13 @@ AgentFlag("--format", "Output format", flag_type="value",
 
 **Step 4: Run all demo tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo*.py -v`
 Expected: All PASS (existing tests still work, video path not triggered).
 
 **Step 5: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo.py cockpit/data/agents.py
 git commit -m "feat(demo): wire Phase 2 video pipeline into demo agent"
 ```
@@ -934,7 +934,7 @@ git commit -m "feat(demo): wire Phase 2 video pipeline into demo agent"
 ### Task 8: Phase 2 Integration Test
 
 **Files:**
-- Create: `~/projects/ai-agents/tests/test_demo_video_integration.py`
+- Create: `<ai-agents>/tests/test_demo_video_integration.py`
 
 **Step 1: Write integration test**
 
@@ -1004,18 +1004,18 @@ class TestVideoIntegration:
 
 **Step 2: Run test**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo_video_integration.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo_video_integration.py -v`
 Expected: PASS.
 
 **Step 3: Run full demo test suite**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo*.py -v`
 Expected: All PASS.
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add tests/test_demo_video_integration.py
 git commit -m "test(demo): Phase 2 video integration tests"
 ```
@@ -1025,7 +1025,7 @@ git commit -m "test(demo): Phase 2 video integration tests"
 ### Task 9: Write Metadata JSON
 
 **Files:**
-- Modify: `~/projects/ai-agents/agents/demo.py`
+- Modify: `<ai-agents>/agents/demo.py`
 
 **Step 1: Add metadata output after pipeline completes**
 
@@ -1063,13 +1063,13 @@ class TestMetadata:
 
 **Step 3: Run tests**
 
-Run: `cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v`
+Run: `cd <ai-agents> && uv run pytest tests/test_demo*.py -v`
 Expected: All PASS.
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add agents/demo.py tests/test_demo_agent.py
 git commit -m "feat(demo): write metadata.json with demo output"
 ```
@@ -1093,25 +1093,25 @@ Recommended: 1 → 2 (parallel) → 3,4,5 (parallel) → 6 → 7 → 8,9 (parall
 After all tasks:
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 
 # All tests pass
 uv run pytest tests/test_demo*.py -v
 
 # Slides-only still works (no TTS needed)
 # Requires: cockpit API + cockpit-web running
-uv run python -m agents.demo "the entire system for my wife" --format slides
+uv run python -m agents.demo "the entire system for a non-technical friend" --format slides
 
 # Video mode (requires: cockpit-web + Chatterbox TTS + voice sample)
-# Terminal 1: cd ~/projects/cockpit-web && pnpm dev
+# Terminal 1: cd <cockpit-web> && pnpm dev
 # Terminal 2: cd ~/llm-stack && docker compose --profile tts up -d chatterbox
 # Terminal 3:
-uv run python -m agents.demo "the entire system for my wife" --format video
+uv run python -m agents.demo "the entire system for a non-technical friend" --format video
 ```
 
 ## One-Time Setup Required
 
 Before first video generation:
-1. Record voice sample: 10-30 seconds speaking naturally, save to `~/projects/ai-agents/profiles/voice-sample.wav`
+1. Record voice sample: 10-30 seconds speaking naturally, save to `<ai-agents>/profiles/voice-sample.wav`
 2. Start Chatterbox: `cd ~/llm-stack && docker compose --profile tts up -d chatterbox`
 3. Register voice (optional): `curl -X POST http://localhost:4123/voices -F "voice_file=@profiles/voice-sample.wav" -F "voice_name=operator"`

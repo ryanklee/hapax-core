@@ -330,7 +330,7 @@ Ingest enrichment copies: `platform` (→ `source_platform`), `service` (→ `so
 
 ### 7. process_batch Aggregation
 
-- **Progress trackers:** Each ZIP gets its own `ProgressTracker` with a unique `run_id` derived from `sha256(path:size)[:12]` (`processor.py:53-57`). Tracker files are stored as `{run_id}.json` in `~/.cache/takeout-ingest/`. No interference.
+- **Progress trackers:** Each ZIP gets its own `ProgressTracker` with a unique `run_id` derived from `sha256(path:size)[:12]` (`processor.py:53-57`). Tracker files are stored as `{run_id}.json` in `<cache>/takeout-ingest/`. No interference.
 - **Output directories:** All ZIPs share the same `output_dir` and `structured_path`. For structured JSONL, records are appended (file opened in append mode). For unstructured markdown, files are keyed by `record_id`, so duplicate records from overlapping ZIPs would overwrite each other. This is safe because Google splits Takeout across ZIPs by service, not by time — so overlapping records are rare.
 - **Fact generation:** Correctly deferred. `_skip_facts=True` is passed to each individual `process_takeout` call (line 234). Facts are generated once at the end (line 253-260). Tested at `test_takeout_processor.py:392-406`.
 

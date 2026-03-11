@@ -94,35 +94,35 @@ repos:
 # "For every CI of type X, there must be a reference in document Y."
 coverage_rules:
   - ci_type: agent
-    reference_doc: "~/projects/hapax-system/rules/system-context.md"
+    reference_doc: "<hapax-system>/rules/system-context.md"
     reference_section: "## Management Agents"
     match_by: name
     severity: medium
     description: "Every agent module must have a row in system-context.md"
   - ci_type: agent
-    reference_doc: "~/projects/hapaxromana/agent-architecture.md"
+    reference_doc: "<hapaxromana>/agent-architecture.md"
     match_by: name_in_heading
     severity: low
     description: "Every agent should have a section in agent-architecture.md"
   - ci_type: timer
-    reference_doc: "~/projects/hapax-system/rules/system-context.md"
+    reference_doc: "<hapax-system>/rules/system-context.md"
     reference_section: "## Management Timers"
     match_by: name
     severity: medium
     description: "Every systemd timer must have a row in system-context.md"
   - ci_type: service
-    reference_doc: "~/.claude/rules/environment.md"
+    reference_doc: "<claude-config>/rules/environment.md"
     match_by: name
     severity: medium
     description: "Every Docker service must be documented in environment.md"
   - ci_type: repo
-    reference_doc: "~/projects/hapaxromana/CLAUDE.md"
+    reference_doc: "<hapaxromana>/CLAUDE.md"
     reference_section: "## Related Repos"
     match_by: name
     severity: medium
     description: "Every hapax repo must appear in hapaxromana's Related Repos"
   - ci_type: mcp_server
-    reference_doc: "~/.claude/CLAUDE.md"
+    reference_doc: "<claude-config>/CLAUDE.md"
     reference_section: "## MCP Servers"
     match_by: name
     severity: low
@@ -132,7 +132,7 @@ coverage_rules:
 mutual_awareness:
   - type: repo_registry
     description: "All hapax repos must appear in hapaxromana's Related Repos"
-    registry_doc: "~/projects/hapaxromana/CLAUDE.md"
+    registry_doc: "<hapaxromana>/CLAUDE.md"
     registry_section: "## Related Repos"
     severity: medium
   - type: spec_reference

@@ -9,7 +9,7 @@ How do we enforce arbitrary axioms defined in plain language — broad, high-lev
 principles that should govern all decisions in a system?
 
 Example axiom: *"This system is developed for a single user and by that single
-user, Ryan Kleeberger (Hapax). This will always be the case. All decisions must
+user, the operator (Hapax). This will always be the case. All decisions must
 be made respecting and leveraging that fact."*
 
 ## Core Challenge

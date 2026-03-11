@@ -285,7 +285,7 @@ closing: Land on impact or next step. No ceremony.
 
 ```bash
 uv run python -m agents.demo "health monitoring for leadership" --duration 10m --format video
-uv run python -m agents.demo "the system for my wife" --duration 3m
+uv run python -m agents.demo "the system for a non-technical friend" --duration 3m
 uv run python -m agents.demo "agent architecture for peers" --duration 15m --format slides
 ```
 

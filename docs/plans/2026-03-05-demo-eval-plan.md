@@ -49,7 +49,7 @@ output/demos/20260305-123456-the-system/
 
 ### Running Tests
 
-All test commands from `~/projects/ai-agents/`:
+All test commands from `<ai-agents>/`:
 ```bash
 uv run pytest tests/test_demo_eval.py -v           # just eval tests
 uv run pytest tests/test_demo*.py -v                # all demo tests
@@ -163,7 +163,7 @@ class TestDemoEvalResult:
             dimensions=[], overall_pass=True, overall_score=0.9, iteration=1,
         )
         result = DemoEvalResult(
-            scenario="the system for my wife", passed=True, iterations=1,
+            scenario="the system for a non-technical friend", passed=True, iterations=1,
             final_report=report, demo_dir="/tmp/demo",
             total_duration_seconds=45.0,
         )
@@ -1080,7 +1080,7 @@ from agents.demo_models import DemoEvalDimension, DemoEvalReport, DemoEvalResult
 
 log = logging.getLogger(__name__)
 
-DEFAULT_SCENARIO = "the system for my wife"
+DEFAULT_SCENARIO = "the system for a non-technical friend"
 DEFAULT_FORMAT = "slides"
 DEFAULT_DURATION = "3m"
 DEFAULT_MAX_ITERATIONS = 3
@@ -1410,7 +1410,7 @@ class TestRunEvalLoop:
 
         with patch("agents.demo_eval.generate_demo", new_callable=AsyncMock, return_value=Path("/tmp/fake")), \
              patch("agents.demo_eval.evaluate_demo_output", new_callable=AsyncMock, return_value=passing_report), \
-             patch("agents.demo_eval.parse_request", return_value=("the system", "my wife")), \
+             patch("agents.demo_eval.parse_request", return_value=("the system", "a non-technical friend")), \
              patch("agents.demo_eval.resolve_audience", return_value=("family", "")), \
              patch("agents.demo_eval.load_personas", return_value={}), \
              patch("agents.demo_eval.parse_duration", return_value=180), \
@@ -1456,7 +1456,7 @@ class TestRunEvalLoop:
         with patch("agents.demo_eval.generate_demo", new_callable=AsyncMock, return_value=Path("/tmp/fake")), \
              patch("agents.demo_eval.evaluate_demo_output", side_effect=mock_evaluate), \
              patch("agents.demo_eval.diagnose_failures", new_callable=AsyncMock, return_value=mock_diagnosis), \
-             patch("agents.demo_eval.parse_request", return_value=("the system", "my wife")), \
+             patch("agents.demo_eval.parse_request", return_value=("the system", "a non-technical friend")), \
              patch("agents.demo_eval.resolve_audience", return_value=("family", "")), \
              patch("agents.demo_eval.load_personas", return_value={}), \
              patch("agents.demo_eval.parse_duration", return_value=180), \
@@ -1538,7 +1538,7 @@ class TestBuildPrompt:
 ## Task 8: Full Test Suite Verification + CLAUDE.md Update
 
 **Files:**
-- Modify: `~/projects/hapaxromana/CLAUDE.md` — add `demo_eval` to agent table
+- Modify: `<hapaxromana>/CLAUDE.md` — add `demo_eval` to agent table
 
 **What:** Run the full test suite, verify everything passes, update documentation.
 
@@ -1546,15 +1546,15 @@ class TestBuildPrompt:
 
 1. Run all demo tests:
    ```bash
-   cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v
+   cd <ai-agents> && uv run pytest tests/test_demo*.py -v
    ```
 
 2. Run full test suite:
    ```bash
-   cd ~/projects/ai-agents && uv run pytest --tb=short -q
+   cd <ai-agents> && uv run pytest --tb=short -q
    ```
 
-3. Update `~/projects/hapaxromana/CLAUDE.md` agent table — add row:
+3. Update `<hapaxromana>/CLAUDE.md` agent table — add row:
    ```
    | `demo_eval` | Yes | Demo output evaluator — LLM-as-judge with self-healing loop |
    ```
@@ -1579,13 +1579,13 @@ All tasks are sequential — each builds on the previous.
 
 ```bash
 # All demo eval tests pass
-cd ~/projects/ai-agents && uv run pytest tests/test_demo_eval*.py -v
+cd <ai-agents> && uv run pytest tests/test_demo_eval*.py -v
 
 # All demo tests pass (no regressions)
-cd ~/projects/ai-agents && uv run pytest tests/test_demo*.py -v
+cd <ai-agents> && uv run pytest tests/test_demo*.py -v
 
 # Full suite
-cd ~/projects/ai-agents && uv run pytest --tb=short -q
+cd <ai-agents> && uv run pytest --tb=short -q
 
 # Manual smoke test (requires running services):
 # uv run python -m agents.demo_eval

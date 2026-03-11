@@ -2,13 +2,13 @@
 
 **Audited**: 2026-03-02
 **Scope**: ~722 LOC source, ~150 LOC tests across 2 repos
-**Files**: `cockpit/api/` in `~/projects/ai-agents/`, `src/` in `~/projects/cockpit-web/`
+**Files**: `cockpit/api/` in `<ai-agents>/`, `src/` in `<cockpit-web>/`
 
 ---
 
 ## Inventory
 
-### Backend — FastAPI (`~/projects/ai-agents/cockpit/api/`)
+### Backend — FastAPI (`<ai-agents>/cockpit/api/`)
 | File | LOC | Purpose |
 |------|-----|---------|
 | `app.py` | 48 | FastAPI app, CORS middleware, lifespan hook |
@@ -18,7 +18,7 @@
 | `__init__.py` | 1 | Package marker |
 | `routes/__init__.py` | 1 | Package marker |
 
-### Frontend — React SPA (`~/projects/cockpit-web/src/`)
+### Frontend — React SPA (`<cockpit-web>/src/`)
 | File | LOC | Purpose |
 |------|-----|---------|
 | `api/types.ts` | 142 | TypeScript interfaces for API responses |
@@ -36,7 +36,7 @@
 | `Dockerfile.api` | 20 | Python 3.12-slim + uv, exposes 8050 |
 | `vite.config.ts` | 12 | Vite dev server with proxy to :8050 |
 
-### Tests (`~/projects/ai-agents/tests/`)
+### Tests (`<ai-agents>/tests/`)
 | File | LOC | Purpose |
 |------|-----|---------|
 | `test_api.py` | 104 | Endpoint tests (root, CORS, health, GPU, infra) |

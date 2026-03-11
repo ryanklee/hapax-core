@@ -10,7 +10,7 @@
 
 **Design doc:** `docs/plans/2026-03-09-workspace-vision-design.md`
 
-**Working directory:** `~/projects/ai-agents/` (all file paths relative to this root unless noted)
+**Working directory:** `<ai-agents>/` (all file paths relative to this root unless noted)
 
 **Existing test baseline:** 40 tests passing in `tests/hapax_voice/`
 
@@ -426,7 +426,7 @@ In `agents/hapax_voice/config.py`, after the screen monitor fields (after line 5
     timelapse_enabled: bool = False
     timelapse_interval_s: float = 60.0
     timelapse_retention_days: int = 7
-    timelapse_path: str = "~/.local/share/hapax-voice/timelapse"
+    timelapse_path: str = "<local-share>/hapax-voice/timelapse"
 ```
 
 **Step 4: Run tests to verify they pass**
@@ -1952,7 +1952,7 @@ git commit -m "feat: add /api/workspace cockpit endpoint + workspace state persi
 ### Task 14: Update Cross-Repo Documentation
 
 **Files:**
-- Modify: `~/projects/hapaxromana/agent-architecture.md` (voice daemon section)
+- Modify: `<hapaxromana>/agent-architecture.md` (voice daemon section)
 - Modify: `profiles/component-registry.yaml` (update voice-screen-monitor entry)
 - Modify: `scripts/generate_screen_context.py` (add webcam device info)
 
@@ -1990,7 +1990,7 @@ Add this to the static sections of the generated context file.
 
 ```bash
 git add profiles/component-registry.yaml scripts/generate_screen_context.py
-cd ~/projects/hapaxromana && git add agent-architecture.md
+cd <hapaxromana> && git add agent-architecture.md
 git commit -m "docs: update architecture + registry for workspace vision system"
 ```
 
@@ -2000,8 +2000,8 @@ git commit -m "docs: update architecture + registry for workspace vision system"
 
 **Files:**
 - Create: `scripts/webcam_timelapse.py`
-- Create: `~/.config/systemd/user/webcam-timelapse.service`
-- Create: `~/.config/systemd/user/webcam-timelapse.timer`
+- Create: `<systemd-user>/webcam-timelapse.service`
+- Create: `<systemd-user>/webcam-timelapse.timer`
 
 **Context:** A lightweight systemd service that captures one frame per minute from each camera. Stores JPEG files with timestamped names. Handles cleanup of files older than the retention period.
 
@@ -2110,7 +2110,7 @@ systemctl --user enable --now webcam-timelapse.timer
 
 ```bash
 systemctl --user status webcam-timelapse.timer
-ls -la ~/.local/share/hapax-voice/timelapse/
+ls -la <local-share>/hapax-voice/timelapse/
 ```
 
 **Step 5: Commit**

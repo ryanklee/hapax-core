@@ -4,7 +4,7 @@
 
 **Goal:** Create a private Claude Code plugin that consolidates all project-specific configuration (hooks, skills, agents, rules) into a single portable, version-controlled package.
 
-**Architecture:** Plugin source lives at `~/projects/hapax-system/` as a git repo. Registered directly in `~/.claude/plugins/installed_plugins.json` with `installPath` pointing to the source directory. Rules (not a plugin primitive) are symlinked from plugin source to `~/.claude/rules/` via an install script.
+**Architecture:** Plugin source lives at `<hapax-system>/` as a git repo. Registered directly in `<claude-config>/plugins/installed_plugins.json` with `installPath` pointing to the source directory. Rules (not a plugin primitive) are symlinked from plugin source to `<claude-config>/rules/` via an install script.
 
 **Tech Stack:** Bash (hooks), Markdown (skills/agents/rules), JSON (plugin manifest, hooks config), jq (hook scripts)
 
@@ -13,19 +13,19 @@
 ### Task 1: Create plugin repo and manifest
 
 **Files:**
-- Create: `~/projects/hapax-system/.claude-plugin/plugin.json`
-- Create: `~/projects/hapax-system/.gitignore`
+- Create: `<hapax-system>/.claude-plugin/plugin.json`
+- Create: `<hapax-system>/.gitignore`
 
 **Step 1: Initialize repo**
 
 ```bash
-mkdir -p ~/projects/hapax-system/.claude-plugin
-cd ~/projects/hapax-system && git init
+mkdir -p <hapax-system>/.claude-plugin
+cd <hapax-system> && git init
 ```
 
 **Step 2: Write plugin manifest**
 
-Create `~/projects/hapax-system/.claude-plugin/plugin.json`:
+Create `<hapax-system>/.claude-plugin/plugin.json`:
 
 ```json
 {
@@ -33,14 +33,14 @@ Create `~/projects/hapax-system/.claude-plugin/plugin.json`:
   "description": "System-aware Claude Code configuration for the hapax three-tier agent stack. Provides axiom governance, operator-aligned workflows, and infrastructure awareness.",
   "version": "1.0.0",
   "author": {
-    "name": "Ryan Kleeberger"
+    "name": "the operator"
   }
 }
 ```
 
 **Step 3: Write .gitignore**
 
-Create `~/projects/hapax-system/.gitignore`:
+Create `<hapax-system>/.gitignore`:
 
 ```
 *.swp
@@ -51,7 +51,7 @@ Create `~/projects/hapax-system/.gitignore`:
 **Step 4: Create directory scaffold**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 mkdir -p skills/{status,briefing,studio,vram,ingest,axiom-check,axiom-review,deploy-check,weekly-review}
 mkdir -p agents
 mkdir -p hooks/scripts
@@ -72,34 +72,34 @@ git commit -m "feat: plugin scaffold with manifest"
 Copy the 3 existing axiom hook scripts from ai-agents into the plugin, adapting paths to use `${CLAUDE_PLUGIN_ROOT}`.
 
 **Files:**
-- Create: `~/projects/hapax-system/hooks/scripts/axiom-scan.sh`
-- Create: `~/projects/hapax-system/hooks/scripts/axiom-audit.sh`
-- Create: `~/projects/hapax-system/hooks/scripts/axiom-commit-scan.sh`
+- Create: `<hapax-system>/hooks/scripts/axiom-scan.sh`
+- Create: `<hapax-system>/hooks/scripts/axiom-audit.sh`
+- Create: `<hapax-system>/hooks/scripts/axiom-commit-scan.sh`
 
 **Step 1: Copy axiom-scan.sh**
 
-Copy verbatim from `~/projects/ai-agents/.claude/hooks/axiom-scan.sh` to `~/projects/hapax-system/hooks/scripts/axiom-scan.sh`. No changes needed — script reads from stdin and uses no path references.
+Copy verbatim from `<ai-agents>/.claude/hooks/axiom-scan.sh` to `<hapax-system>/hooks/scripts/axiom-scan.sh`. No changes needed — script reads from stdin and uses no path references.
 
 **Step 2: Copy axiom-audit.sh**
 
-Copy verbatim from `~/projects/ai-agents/.claude/hooks/axiom-audit.sh` to `~/projects/hapax-system/hooks/scripts/axiom-audit.sh`. No changes needed.
+Copy verbatim from `<ai-agents>/.claude/hooks/axiom-audit.sh` to `<hapax-system>/hooks/scripts/axiom-audit.sh`. No changes needed.
 
 **Step 3: Copy axiom-commit-scan.sh**
 
-Copy verbatim from `~/projects/ai-agents/.claude/hooks/axiom-commit-scan.sh` to `~/projects/hapax-system/hooks/scripts/axiom-commit-scan.sh`. No changes needed.
+Copy verbatim from `<ai-agents>/.claude/hooks/axiom-commit-scan.sh` to `<hapax-system>/hooks/scripts/axiom-commit-scan.sh`. No changes needed.
 
 **Step 4: Make executable**
 
 ```bash
-chmod +x ~/projects/hapax-system/hooks/scripts/*.sh
+chmod +x <hapax-system>/hooks/scripts/*.sh
 ```
 
 **Step 5: Verify scripts parse cleanly**
 
 ```bash
-bash -n ~/projects/hapax-system/hooks/scripts/axiom-scan.sh && echo OK
-bash -n ~/projects/hapax-system/hooks/scripts/axiom-audit.sh && echo OK
-bash -n ~/projects/hapax-system/hooks/scripts/axiom-commit-scan.sh && echo OK
+bash -n <hapax-system>/hooks/scripts/axiom-scan.sh && echo OK
+bash -n <hapax-system>/hooks/scripts/axiom-audit.sh && echo OK
+bash -n <hapax-system>/hooks/scripts/axiom-commit-scan.sh && echo OK
 ```
 
 Expected: three `OK` lines.
@@ -107,7 +107,7 @@ Expected: three `OK` lines.
 **Step 6: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add hooks/scripts/
 git commit -m "feat: migrate axiom hook scripts from ai-agents"
 ```
@@ -119,11 +119,11 @@ git commit -m "feat: migrate axiom hook scripts from ai-agents"
 New SessionStart hook that outputs system state summary. Replaces both the ai-agents SessionStart hook (axiom status) and the global compact SessionStart hook (branch/docker/GPU).
 
 **Files:**
-- Create: `~/projects/hapax-system/hooks/scripts/session-context.sh`
+- Create: `<hapax-system>/hooks/scripts/session-context.sh`
 
 **Step 1: Write session-context.sh**
 
-Create `~/projects/hapax-system/hooks/scripts/session-context.sh`:
+Create `<hapax-system>/hooks/scripts/session-context.sh`:
 
 ```bash
 #!/usr/bin/env bash
@@ -184,13 +184,13 @@ fi
 **Step 2: Make executable**
 
 ```bash
-chmod +x ~/projects/hapax-system/hooks/scripts/session-context.sh
+chmod +x <hapax-system>/hooks/scripts/session-context.sh
 ```
 
 **Step 3: Test locally**
 
 ```bash
-bash ~/projects/hapax-system/hooks/scripts/session-context.sh
+bash <hapax-system>/hooks/scripts/session-context.sh
 ```
 
 Expected: Multi-line output starting with `## System Context`.
@@ -198,7 +198,7 @@ Expected: Multi-line output starting with `## System Context`.
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add hooks/scripts/session-context.sh
 git commit -m "feat: session-context.sh — unified SessionStart hook"
 ```
@@ -210,11 +210,11 @@ git commit -m "feat: session-context.sh — unified SessionStart hook"
 Wire all hook scripts into the plugin hook manifest.
 
 **Files:**
-- Create: `~/projects/hapax-system/hooks/hooks.json`
+- Create: `<hapax-system>/hooks/hooks.json`
 
 **Step 1: Write hooks.json**
 
-Create `~/projects/hapax-system/hooks/hooks.json`:
+Create `<hapax-system>/hooks/hooks.json`:
 
 ```json
 {
@@ -279,7 +279,7 @@ Create `~/projects/hapax-system/hooks/hooks.json`:
 **Step 2: Validate JSON**
 
 ```bash
-jq . ~/projects/hapax-system/hooks/hooks.json > /dev/null && echo "Valid JSON"
+jq . <hapax-system>/hooks/hooks.json > /dev/null && echo "Valid JSON"
 ```
 
 Expected: `Valid JSON`
@@ -287,7 +287,7 @@ Expected: `Valid JSON`
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add hooks/hooks.json
 git commit -m "feat: hooks.json — axiom governance + session context pipeline"
 ```
@@ -296,19 +296,19 @@ git commit -m "feat: hooks.json — axiom governance + session context pipeline"
 
 ### Task 5: Create rules files
 
-Rules are NOT a plugin primitive — they must be symlinked to `~/.claude/rules/` by the install script (Task 10). For now, create them in the plugin source.
+Rules are NOT a plugin primitive — they must be symlinked to `<claude-config>/rules/` by the install script (Task 10). For now, create them in the plugin source.
 
 **Files:**
-- Create: `~/projects/hapax-system/rules/axioms.md`
-- Create: `~/projects/hapax-system/rules/system-context.md`
+- Create: `<hapax-system>/rules/axioms.md`
+- Create: `<hapax-system>/rules/system-context.md`
 
 **Step 1: Copy axioms.md**
 
-Copy verbatim from `~/projects/ai-agents/.claude/rules/axioms.md` to `~/projects/hapax-system/rules/axioms.md`. No changes needed.
+Copy verbatim from `<ai-agents>/.claude/rules/axioms.md` to `<hapax-system>/rules/axioms.md`. No changes needed.
 
 **Step 2: Write system-context.md**
 
-Create `~/projects/hapax-system/rules/system-context.md`. This is the "aggressive awareness" file — live system topology that Claude Code always has in context.
+Create `<hapax-system>/rules/system-context.md`. This is the "aggressive awareness" file — live system topology that Claude Code always has in context.
 
 ```markdown
 # System Topology
@@ -330,9 +330,9 @@ Create `~/projects/hapax-system/rules/system-context.md`. This is the "aggressiv
 | n8n | n8n | 5678 | Workflow automation |
 | ntfy | ntfy | 8090 | Push notifications |
 
-## Tier 2 Agents (~/projects/ai-agents/)
+## Tier 2 Agents (<ai-agents>/)
 
-Invoke: `cd ~/projects/ai-agents && uv run python -m agents.<name> [flags]`
+Invoke: `cd <ai-agents> && uv run python -m agents.<name> [flags]`
 
 | Agent | LLM? | Key Flags |
 |-------|------|-----------|
@@ -389,20 +389,20 @@ VRAM: RTX 3090 = 24GB. One large Ollama model at a time.
 
 | Path | Purpose |
 |------|---------|
-| ~/llm-stack/ | Docker compose + service configs |
-| ~/projects/ai-agents/ | Tier 2 agent implementations |
-| ~/projects/hapaxromana/ | Architecture specs + axioms |
-| ~/projects/rag-pipeline/ | RAG ingestion service |
-| ~/projects/obsidian-hapax/ | Obsidian plugin |
-| ~/Documents/Personal/ | Obsidian vault |
-| ~/.cache/axiom-audit/ | Axiom audit trail (JSONL) |
-| ~/.cache/cockpit/ | Cockpit state (probes, decisions, facts) |
+| <llm-stack>/ | Docker compose + service configs |
+| <ai-agents>/ | Tier 2 agent implementations |
+| <hapaxromana>/ | Architecture specs + axioms |
+| <rag-pipeline>/ | RAG ingestion service |
+| <obsidian-hapax>/ | Obsidian plugin |
+| <personal-vault>/ | Obsidian vault |
+| <cache>/axiom-audit/ | Axiom audit trail (JSONL) |
+| <cache>/cockpit/ | Cockpit state (probes, decisions, facts) |
 ```
 
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add rules/
 git commit -m "feat: rules — axiom governance + system topology context"
 ```
@@ -411,16 +411,16 @@ git commit -m "feat: rules — axiom governance + system topology context"
 
 ### Task 6: Migrate 7 commands to skills
 
-Convert each `~/.claude/commands/*.md` to a plugin skill at `skills/<name>/SKILL.md` with proper YAML frontmatter.
+Convert each `<claude-config>/commands/*.md` to a plugin skill at `skills/<name>/SKILL.md` with proper YAML frontmatter.
 
 **Files:**
-- Create: `~/projects/hapax-system/skills/status/SKILL.md`
-- Create: `~/projects/hapax-system/skills/briefing/SKILL.md`
-- Create: `~/projects/hapax-system/skills/studio/SKILL.md`
-- Create: `~/projects/hapax-system/skills/vram/SKILL.md`
-- Create: `~/projects/hapax-system/skills/ingest/SKILL.md`
-- Create: `~/projects/hapax-system/skills/axiom-check/SKILL.md`
-- Create: `~/projects/hapax-system/skills/axiom-review/SKILL.md`
+- Create: `<hapax-system>/skills/status/SKILL.md`
+- Create: `<hapax-system>/skills/briefing/SKILL.md`
+- Create: `<hapax-system>/skills/studio/SKILL.md`
+- Create: `<hapax-system>/skills/vram/SKILL.md`
+- Create: `<hapax-system>/skills/ingest/SKILL.md`
+- Create: `<hapax-system>/skills/axiom-check/SKILL.md`
+- Create: `<hapax-system>/skills/axiom-review/SKILL.md`
 
 **Step 1: Write skills/status/SKILL.md**
 
@@ -433,7 +433,7 @@ description: Run the health monitor and report results. Use when the user asks a
 Run the health monitor and report results:
 
 ```bash
-cd ~/projects/ai-agents && uv run python -m agents.health_monitor
+cd <ai-agents> && uv run python -m agents.health_monitor
 ```
 
 If checks show FAILED, suggest: `uv run python -m agents.health_monitor --fix`
@@ -450,11 +450,11 @@ description: Generate a system briefing covering the last 24 hours. Use when the
 Generate a system briefing covering the last 24 hours:
 
 ```bash
-cd ~/projects/ai-agents && eval "$(<.envrc)" && uv run python -m agents.briefing --hours 24 --save
+cd <ai-agents> && eval "$(<.envrc)" && uv run python -m agents.briefing --hours 24 --save
 ```
 
 If action items show high priority, suggest running the relevant fix commands.
-The latest briefing is always saved to `~/projects/ai-agents/profiles/briefing.md`.
+The latest briefing is always saved to `<ai-agents>/profiles/briefing.md`.
 ```
 
 **Step 3: Write skills/studio/SKILL.md**
@@ -523,7 +523,7 @@ Check axiom compliance of the current project.
 Run:
 
 ```bash
-cd ~/projects/ai-agents && eval "$(direnv export bash 2>/dev/null)" && uv run python -c "
+cd <ai-agents> && eval "$(direnv export bash 2>/dev/null)" && uv run python -c "
 import asyncio
 from shared.axiom_registry import load_axioms, load_implications
 from shared.axiom_precedents import PrecedentStore
@@ -568,7 +568,7 @@ Review pending axiom precedents that agents have created.
 Run:
 
 ```bash
-cd ~/projects/ai-agents && eval "$(direnv export bash 2>/dev/null)" && uv run python -c "
+cd <ai-agents> && eval "$(direnv export bash 2>/dev/null)" && uv run python -c "
 import asyncio
 from shared.axiom_precedents import PrecedentStore
 
@@ -599,7 +599,7 @@ For each precedent, ask the operator whether to CONFIRM (promote to operator aut
 **Step 8: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add skills/
 git commit -m "feat: migrate 7 commands to plugin skills"
 ```
@@ -609,8 +609,8 @@ git commit -m "feat: migrate 7 commands to plugin skills"
 ### Task 7: Create 2 new skills
 
 **Files:**
-- Create: `~/projects/hapax-system/skills/deploy-check/SKILL.md`
-- Create: `~/projects/hapax-system/skills/weekly-review/SKILL.md`
+- Create: `<hapax-system>/skills/deploy-check/SKILL.md`
+- Create: `<hapax-system>/skills/weekly-review/SKILL.md`
 
 **Step 1: Write skills/deploy-check/SKILL.md**
 
@@ -625,8 +625,8 @@ description: Pre-push readiness verification. Use before pushing code, when the 
 Run these checks before pushing to remote:
 
 1. **Uncommitted changes**: `git status` — flag any unstaged or untracked files
-2. **Tests pass**: `cd ~/projects/ai-agents && uv run pytest --tb=short -q`
-3. **Health check**: `cd ~/projects/ai-agents && uv run python -m agents.health_monitor`
+2. **Tests pass**: `cd <ai-agents> && uv run pytest --tb=short -q`
+3. **Health check**: `cd <ai-agents> && uv run python -m agents.health_monitor`
 4. **Axiom compliance of branch diff**:
    ```bash
    BASE=$(git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null)
@@ -649,11 +649,11 @@ description: Aggregate the week's system data into a structured review. Use on S
 
 Aggregate data from the past 7 days:
 
-1. **Audit trail**: `cat ~/.cache/axiom-audit/*.jsonl 2>/dev/null | wc -l` total edits, `grep -c '"blocked":true' ~/.cache/axiom-audit/*.jsonl 2>/dev/null || echo 0` blocked
-2. **Health history**: `cd ~/projects/ai-agents && uv run python -m agents.health_monitor --history`
-3. **Drift report** (if recent): `cat ~/projects/ai-agents/profiles/drift-report.json 2>/dev/null | jq '.drift_items | length'`
-4. **Scout report** (if recent): `cat ~/projects/ai-agents/profiles/scout-report.json 2>/dev/null | jq '.evaluations | length'`
-5. **Briefing** (latest): `head -30 ~/projects/ai-agents/profiles/briefing.md`
+1. **Audit trail**: `cat <cache>/axiom-audit/*.jsonl 2>/dev/null | wc -l` total edits, `grep -c '"blocked":true' <cache>/axiom-audit/*.jsonl 2>/dev/null || echo 0` blocked
+2. **Health history**: `cd <ai-agents> && uv run python -m agents.health_monitor --history`
+3. **Drift report** (if recent): `cat <ai-agents>/profiles/drift-report.json 2>/dev/null | jq '.drift_items | length'`
+4. **Scout report** (if recent): `cat <ai-agents>/profiles/scout-report.json 2>/dev/null | jq '.evaluations | length'`
+5. **Briefing** (latest): `head -30 <ai-agents>/profiles/briefing.md`
 6. **Timer status**: `systemctl --user list-timers --no-pager`
 
 Synthesize into a 5-line summary: overall health, notable incidents, drift status, axiom compliance, recommended actions for the coming week.
@@ -662,7 +662,7 @@ Synthesize into a 5-line summary: overall health, notable incidents, drift statu
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add skills/deploy-check/ skills/weekly-review/
 git commit -m "feat: deploy-check + weekly-review skills"
 ```
@@ -672,11 +672,11 @@ git commit -m "feat: deploy-check + weekly-review skills"
 ### Task 8: Migrate operator-voice agent
 
 **Files:**
-- Create: `~/projects/hapax-system/agents/operator-voice.md`
+- Create: `<hapax-system>/agents/operator-voice.md`
 
 **Step 1: Copy operator-voice.md**
 
-Copy from `~/projects/hapaxromana/.claude/agents/operator-voice.md` to `~/projects/hapax-system/agents/operator-voice.md`.
+Copy from `<hapaxromana>/.claude/agents/operator-voice.md` to `<hapax-system>/agents/operator-voice.md`.
 
 The file already has proper YAML frontmatter (name, description, model, color, memory). One change needed: the memory path reference at the bottom says `hapaxromana/.claude/agent-memory/operator-voice/`. This path stays the same — the agent memory directory persists independently of the agent definition file's location.
 
@@ -685,7 +685,7 @@ No content changes needed.
 **Step 2: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add agents/operator-voice.md
 git commit -m "feat: migrate operator-voice agent from hapaxromana"
 ```
@@ -695,8 +695,8 @@ git commit -m "feat: migrate operator-voice agent from hapaxromana"
 ### Task 9: Create infra-check and convention-guard agents
 
 **Files:**
-- Create: `~/projects/hapax-system/agents/infra-check.md`
-- Create: `~/projects/hapax-system/agents/convention-guard.md`
+- Create: `<hapax-system>/agents/infra-check.md`
+- Create: `<hapax-system>/agents/convention-guard.md`
 
 **Step 1: Write agents/infra-check.md**
 
@@ -841,7 +841,7 @@ You are a convention compliance reviewer for a single-user LLM-first development
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add agents/
 git commit -m "feat: infra-check + convention-guard agents"
 ```
@@ -851,8 +851,8 @@ git commit -m "feat: infra-check + convention-guard agents"
 ### Task 10: Write install and uninstall scripts
 
 **Files:**
-- Create: `~/projects/hapax-system/install.sh`
-- Create: `~/projects/hapax-system/uninstall.sh`
+- Create: `<hapax-system>/install.sh`
+- Create: `<hapax-system>/uninstall.sh`
 
 **Step 1: Write install.sh**
 
@@ -912,7 +912,7 @@ if [ -f "$SETTINGS" ]; then
   fi
 fi
 
-# 4. Symlink rules to ~/.claude/rules/
+# 4. Symlink rules to <claude-config>/rules/
 mkdir -p "$RULES_DIR"
 for rule_file in "$PLUGIN_SRC/rules/"*.md; do
   if [ -f "$rule_file" ]; then
@@ -988,13 +988,13 @@ echo "Done. Restart Claude Code to deactivate."
 **Step 3: Make executable**
 
 ```bash
-chmod +x ~/projects/hapax-system/install.sh ~/projects/hapax-system/uninstall.sh
+chmod +x <hapax-system>/install.sh <hapax-system>/uninstall.sh
 ```
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add install.sh uninstall.sh
 git commit -m "feat: install/uninstall scripts for plugin registration"
 ```
@@ -1006,7 +1006,7 @@ git commit -m "feat: install/uninstall scripts for plugin registration"
 **Step 1: Run install**
 
 ```bash
-cd ~/projects/hapax-system && ./install.sh
+cd <hapax-system> && ./install.sh
 ```
 
 Expected output: symlink created, registered, enabled, rules symlinked.
@@ -1014,10 +1014,10 @@ Expected output: symlink created, registered, enabled, rules symlinked.
 **Step 2: Verify file structure**
 
 ```bash
-ls -la ~/.claude/plugins/cache/hapax-local/hapax-system/1.0.0/
-ls -la ~/.claude/rules/hapax-*.md
-jq '.enabledPlugins["hapax-system@hapax-local"]' ~/.claude/settings.json
-jq '.plugins["hapax-system@hapax-local"]' ~/.claude/plugins/installed_plugins.json
+ls -la <claude-config>/plugins/cache/hapax-local/hapax-system/1.0.0/
+ls -la <claude-config>/rules/hapax-*.md
+jq '.enabledPlugins["hapax-system@hapax-local"]' <claude-config>/settings.json
+jq '.plugins["hapax-system@hapax-local"]' <claude-config>/plugins/installed_plugins.json
 ```
 
 Expected: symlink exists, rules symlinked, enabled=true, install entry present.
@@ -1025,14 +1025,14 @@ Expected: symlink exists, rules symlinked, enabled=true, install entry present.
 **Step 3: Verify hooks parse**
 
 ```bash
-jq . ~/.claude/plugins/cache/hapax-local/hapax-system/1.0.0/hooks/hooks.json > /dev/null && echo "hooks.json: OK"
+jq . <claude-config>/plugins/cache/hapax-local/hapax-system/1.0.0/hooks/hooks.json > /dev/null && echo "hooks.json: OK"
 ```
 
 **Step 4: Verify axiom-scan still blocks violations**
 
 ```bash
 echo '{"tool_input":{"new_string":"class UserManager:\n    pass","file_path":"test.py"}}' | \
-  bash ~/projects/hapax-system/hooks/scripts/axiom-scan.sh 2>&1; echo "Exit: $?"
+  bash <hapax-system>/hooks/scripts/axiom-scan.sh 2>&1; echo "Exit: $?"
 ```
 
 Expected: violation message on stderr, Exit: 2.
@@ -1041,7 +1041,7 @@ Expected: violation message on stderr, Exit: 2.
 
 ```bash
 printf '{"tool_input":{"new_string":"user_config = {}","file_path":"test.py"}}' | \
-  bash ~/projects/hapax-system/hooks/scripts/axiom-scan.sh 2>&1; echo "Exit: $?"
+  bash <hapax-system>/hooks/scripts/axiom-scan.sh 2>&1; echo "Exit: $?"
 ```
 
 Expected: no output, Exit: 0.
@@ -1049,7 +1049,7 @@ Expected: no output, Exit: 0.
 **Step 6: Verify session-context.sh runs**
 
 ```bash
-bash ~/projects/hapax-system/hooks/scripts/session-context.sh
+bash <hapax-system>/hooks/scripts/session-context.sh
 ```
 
 Expected: multi-line output with System Context header, axiom count, branch, health, docker, GPU.
@@ -1057,7 +1057,7 @@ Expected: multi-line output with System Context header, axiom count, branch, hea
 **Step 7: Commit (if any fixups needed)**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git status
 # Only commit if there were fixups
 ```
@@ -1071,19 +1071,19 @@ Remove the old configurations that are now handled by the plugin.
 **Step 1: Remove ai-agents axiom hooks and rules**
 
 ```bash
-rm ~/projects/ai-agents/.claude/hooks/axiom-scan.sh
-rm ~/projects/ai-agents/.claude/hooks/axiom-audit.sh
-rm ~/projects/ai-agents/.claude/hooks/axiom-commit-scan.sh
-rmdir ~/projects/ai-agents/.claude/hooks
-rm ~/projects/ai-agents/.claude/rules/axioms.md
-rmdir ~/projects/ai-agents/.claude/rules
-rm ~/projects/ai-agents/.claude/settings.json
+rm <ai-agents>/.claude/hooks/axiom-scan.sh
+rm <ai-agents>/.claude/hooks/axiom-audit.sh
+rm <ai-agents>/.claude/hooks/axiom-commit-scan.sh
+rmdir <ai-agents>/.claude/hooks
+rm <ai-agents>/.claude/rules/axioms.md
+rmdir <ai-agents>/.claude/rules
+rm <ai-agents>/.claude/settings.json
 ```
 
 **Step 2: Commit in ai-agents**
 
 ```bash
-cd ~/projects/ai-agents
+cd <ai-agents>
 git add -A .claude/
 git commit -m "chore: remove axiom hooks/rules migrated to hapax-system plugin"
 ```
@@ -1091,15 +1091,15 @@ git commit -m "chore: remove axiom hooks/rules migrated to hapax-system plugin"
 **Step 3: Remove hapaxromana operator-voice agent definition (keep memory)**
 
 ```bash
-rm ~/projects/hapaxromana/.claude/agents/operator-voice.md
+rm <hapaxromana>/.claude/agents/operator-voice.md
 ```
 
-Do NOT remove `~/projects/hapaxromana/.claude/agent-memory/operator-voice/` — the memory persists.
+Do NOT remove `<hapaxromana>/.claude/agent-memory/operator-voice/` — the memory persists.
 
 **Step 4: Commit in hapaxromana**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add -A .claude/agents/
 git commit -m "chore: remove operator-voice agent migrated to hapax-system plugin"
 ```
@@ -1107,18 +1107,18 @@ git commit -m "chore: remove operator-voice agent migrated to hapax-system plugi
 **Step 5: Remove global commands**
 
 ```bash
-rm ~/.claude/commands/status.md
-rm ~/.claude/commands/briefing.md
-rm ~/.claude/commands/studio.md
-rm ~/.claude/commands/vram.md
-rm ~/.claude/commands/ingest.md
-rm ~/.claude/commands/axiom-check.md
-rm ~/.claude/commands/axiom-review.md
+rm <claude-config>/commands/status.md
+rm <claude-config>/commands/briefing.md
+rm <claude-config>/commands/studio.md
+rm <claude-config>/commands/vram.md
+rm <claude-config>/commands/ingest.md
+rm <claude-config>/commands/axiom-check.md
+rm <claude-config>/commands/axiom-review.md
 ```
 
 **Step 6: Update global hooks.json — remove SessionStart compact hook**
 
-Read `~/.claude/hooks.json`. Remove the `SessionStart` entry (absorbed by plugin's session-context.sh). Keep PostToolUse prettier and Notification hooks.
+Read `<claude-config>/hooks.json`. Remove the `SessionStart` entry (absorbed by plugin's session-context.sh). Keep PostToolUse prettier and Notification hooks.
 
 New content:
 
@@ -1145,11 +1145,11 @@ New content:
 ### Task 13: Disable duplicate and irrelevant plugins
 
 **Files:**
-- Modify: `~/.claude/settings.json`
+- Modify: `<claude-config>/settings.json`
 
 **Step 1: Disable duplicates and irrelevant plugins**
 
-Use jq to set these to `false` in `~/.claude/settings.json`:
+Use jq to set these to `false` in `<claude-config>/settings.json`:
 
 ```bash
 cd ~
@@ -1165,19 +1165,19 @@ jq '
   .enabledPlugins["artifacts-builder@awesome-claude-plugins"] = false |
   .enabledPlugins["connect-apps@awesome-claude-plugins"] = false |
   .enabledPlugins["senior-frontend@awesome-claude-plugins"] = false
-' ~/.claude/settings.json > ~/.claude/settings.json.tmp && mv ~/.claude/settings.json.tmp ~/.claude/settings.json
+' <claude-config>/settings.json > <claude-config>/settings.json.tmp && mv <claude-config>/settings.json.tmp <claude-config>/settings.json
 ```
 
 **Step 2: Verify**
 
 ```bash
-jq '.enabledPlugins | to_entries | map(select(.value == true)) | length' ~/.claude/settings.json
+jq '.enabledPlugins | to_entries | map(select(.value == true)) | length' <claude-config>/settings.json
 ```
 
 Expected: ~24 (22 kept + hapax-system + any I missed).
 
 ```bash
-jq '.enabledPlugins | to_entries | map(select(.value == false)) | .[].key' ~/.claude/settings.json
+jq '.enabledPlugins | to_entries | map(select(.value == false)) | .[].key' <claude-config>/settings.json
 ```
 
 Expected: 11 disabled plugins listed.
@@ -1191,7 +1191,7 @@ Expected: 11 disabled plugins listed.
 Open a new terminal and start Claude Code in the ai-agents directory:
 
 ```bash
-cd ~/projects/ai-agents && claude
+cd <ai-agents> && claude
 ```
 
 **Step 2: Verify in the new session**
@@ -1208,7 +1208,7 @@ Check the following:
 **Step 3: Commit final state of hapax-system repo**
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git log --oneline
 ```
 
@@ -1253,10 +1253,10 @@ Verify all 8+ commits are present.
 | `ai-agents/.claude/settings.json` | 12 | Plugin hooks/hooks.json |
 | `ai-agents/.claude/rules/axioms.md` | 12 | Plugin rules/axioms.md |
 | `hapaxromana/.claude/agents/operator-voice.md` | 12 | Plugin agents/ |
-| `~/.claude/commands/status.md` | 12 | Plugin skills/status/ |
-| `~/.claude/commands/briefing.md` | 12 | Plugin skills/briefing/ |
-| `~/.claude/commands/studio.md` | 12 | Plugin skills/studio/ |
-| `~/.claude/commands/vram.md` | 12 | Plugin skills/vram/ |
-| `~/.claude/commands/ingest.md` | 12 | Plugin skills/ingest/ |
-| `~/.claude/commands/axiom-check.md` | 12 | Plugin skills/axiom-check/ |
-| `~/.claude/commands/axiom-review.md` | 12 | Plugin skills/axiom-review/ |
+| `<claude-config>/commands/status.md` | 12 | Plugin skills/status/ |
+| `<claude-config>/commands/briefing.md` | 12 | Plugin skills/briefing/ |
+| `<claude-config>/commands/studio.md` | 12 | Plugin skills/studio/ |
+| `<claude-config>/commands/vram.md` | 12 | Plugin skills/vram/ |
+| `<claude-config>/commands/ingest.md` | 12 | Plugin skills/ingest/ |
+| `<claude-config>/commands/axiom-check.md` | 12 | Plugin skills/axiom-check/ |
+| `<claude-config>/commands/axiom-review.md` | 12 | Plugin skills/axiom-review/ |

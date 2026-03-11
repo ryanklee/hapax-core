@@ -10,7 +10,7 @@ Enable the operator to say "produce a demo of X for Y" via Claude Code and recei
 ## Examples
 
 ```
-"Produce a demo of the entire system for my wife"
+"Produce a demo of the entire system for a non-technical friend"
 "Produce a demo of the context maintenance system for a Senior Enterprise Architect on my Platform Services Team"
 "Produce a demo of health monitoring" --audience family --format slides-only
 ```
@@ -62,7 +62,7 @@ Audience personas define what to show, what to skip, and how to talk about it. S
 ### Resolution
 
 The LLM resolves natural language audience descriptions to archetypes plus context:
-- "my wife" → `family` archetype + operator profile personalization
+- "a non-technical friend" → `family` archetype + operator profile personalization
 - "Senior EA on Platform Services" → `leadership` archetype + "Platform Services, enterprise architecture vocabulary"
 
 Operator profile facts from Qdrant (`profile-facts` collection) provide personal context the LLM weaves into narration.
@@ -71,11 +71,11 @@ Operator profile facts from Qdrant (`profile-facts` collection) provide personal
 
 ## Demo Agent
 
-**Location:** `~/projects/ai-agents/agents/demo.py`
+**Location:** `<ai-agents>/agents/demo.py`
 
 **Invocation:**
 ```bash
-uv run python -m agents.demo "the entire system for my wife"
+uv run python -m agents.demo "the entire system for a non-technical friend"
 uv run python -m agents.demo "health monitoring" --audience family --format slides-only
 ```
 
@@ -186,7 +186,7 @@ Each stage reports progress via callback. Claude Code / cockpit API see streamin
 
 ### New Docker Service: Chatterbox TTS
 
-Added to `~/llm-stack/docker-compose.yml` under `tts` profile (on-demand, not always-on):
+Added to `<llm-stack>/docker-compose.yml` under `tts` profile (on-demand, not always-on):
 
 ```yaml
 chatterbox:
@@ -217,11 +217,11 @@ Pipeline checks VRAM before voice stage and manages automatically.
 
 ### Voice Sample
 
-One-time setup: record 10-30 seconds speaking naturally, save to `~/projects/ai-agents/profiles/voice-sample.wav`. Demo agent checks for this file and prompts if missing.
+One-time setup: record 10-30 seconds speaking naturally, save to `<ai-agents>/profiles/voice-sample.wav`. Demo agent checks for this file and prompts if missing.
 
 ### Output Directory
 
-`~/projects/ai-agents/output/demos/{timestamp}-{slug}/`
+`<ai-agents>/output/demos/{timestamp}-{slug}/`
 - `screenshots/` — captured PNGs
 - `audio/` — WAV segments per scene
 - `demo.mp4` — final video

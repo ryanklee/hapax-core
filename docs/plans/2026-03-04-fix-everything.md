@@ -18,7 +18,7 @@
 **Step 1: Merge the branch**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git checkout master
 git merge fix/correctness-fixes -m "Merge fix/correctness-fixes: streaming throttle, error typing, async I/O, metadata cache"
 ```
@@ -53,7 +53,7 @@ Already committed via merge. Verify with `git log --oneline -3`.
 **Step 1: Merge the branch**
 
 ```bash
-cd ~/projects/cockpit-web
+cd <cockpit-web>
 git checkout master
 git merge feat/web-migration -m "Merge feat/web-migration: adaptive cockpit, correctness fixes, UX overhaul"
 ```
@@ -83,7 +83,7 @@ Already committed via merge. Verify with `git log --oneline -3`.
 ### Task 3: Fix stale documentation in hapaxromana CLAUDE.md
 
 **Files:**
-- Modify: `~/projects/hapaxromana/CLAUDE.md:155`
+- Modify: `<hapaxromana>/CLAUDE.md:155`
 
 **Step 1: Fix community plugins line**
 
@@ -104,13 +104,13 @@ Rationale: `jira-issue` is NOT installed (absent from `community-plugins.json`).
 Line 157 currently says "Home-only (requires localhost:4000)". Update to reflect provider abstraction:
 
 ```
-**Custom plugin:** `obsidian-hapax` (`~/projects/obsidian-hapax/`) — chat sidebar with streaming, Qdrant RAG search, 1:1 prep generation, team snapshots, provider abstraction (LiteLLM/OpenAI/Anthropic). RAG features home-only; chat works anywhere via direct provider APIs.
+**Custom plugin:** `obsidian-hapax` (`<obsidian-hapax>/`) — chat sidebar with streaming, Qdrant RAG search, 1:1 prep generation, team snapshots, provider abstraction (LiteLLM/OpenAI/Anthropic). RAG features home-only; chat works anywhere via direct provider APIs.
 ```
 
 **Step 3: Commit**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add CLAUDE.md
 git commit -m "docs: fix stale plugin list, update plugin description"
 ```
@@ -120,7 +120,7 @@ git commit -m "docs: fix stale plugin list, update plugin description"
 ### Task 4: Create goals.md in vault
 
 **Files:**
-- Create: `~/Documents/Personal/30-system/goals.md`
+- Create: `<personal-vault>/30-system/goals.md`
 
 **Step 1: Create the file**
 
@@ -158,7 +158,7 @@ This file lives in the vault (not a git repo), so no git commit. Document in pla
 ### Task 5: Document manual Obsidian plugin installs
 
 **Files:**
-- Create: `~/Documents/Personal/31-system-inbox/plugin-install-checklist.md`
+- Create: `<personal-vault>/31-system-inbox/plugin-install-checklist.md`
 
 **Step 1: Create the checklist note**
 
@@ -200,8 +200,8 @@ Vault file, not in a git repo. Will be picked up by RAG ingest and visible in Ob
 ### Task 6: Update hapaxromana documentation and memory
 
 **Files:**
-- Modify: `~/projects/hapaxromana/CLAUDE.md` (cockpit-web branch note)
-- Modify: `~/.claude/projects/-home-hapaxlegomenon-projects-hapaxromana/memory/MEMORY.md`
+- Modify: `<hapaxromana>/CLAUDE.md` (cockpit-web branch note)
+- Modify: `<claude-config>/projects/<project-memory>/memory/MEMORY.md`
 
 **Step 1: Add cockpit-web branch note to CLAUDE.md**
 
@@ -214,7 +214,7 @@ Update the obsidian-hapax section to note branches are merged and fix/correctnes
 **Step 3: Commit docs changes**
 
 ```bash
-cd ~/projects/hapaxromana
+cd <hapaxromana>
 git add CLAUDE.md
 git commit -m "docs: update plugin description and community plugins list"
 ```
@@ -230,9 +230,9 @@ Tasks 1-5 are independent and can run in parallel. Task 6 depends on Tasks 1-3 c
 ## Verification
 
 After all tasks:
-1. `cd ~/projects/obsidian-hapax && git log --oneline -3` — merge commit visible on master
-2. `cd ~/projects/cockpit-web && git log --oneline -3` — merge commit visible on master
-3. `grep "Hapax Chat" ~/projects/hapaxromana/CLAUDE.md` — stale jira-issue removed
-4. `cat ~/Documents/Personal/30-system/goals.md` — file exists with scaffold
-5. `cat ~/Documents/Personal/31-system-inbox/plugin-install-checklist.md` — checklist exists
-6. `cd ~/projects/obsidian-hapax && node main.js 2>&1 | head -1` — build artifact exists (will error outside Obsidian, that's fine)
+1. `cd <obsidian-hapax> && git log --oneline -3` — merge commit visible on master
+2. `cd <cockpit-web> && git log --oneline -3` — merge commit visible on master
+3. `grep "Hapax Chat" <hapaxromana>/CLAUDE.md` — stale jira-issue removed
+4. `cat <personal-vault>/30-system/goals.md` — file exists with scaffold
+5. `cat <personal-vault>/31-system-inbox/plugin-install-checklist.md` — checklist exists
+6. `cd <obsidian-hapax> && node main.js 2>&1 | head -1` — build artifact exists (will error outside Obsidian, that's fine)

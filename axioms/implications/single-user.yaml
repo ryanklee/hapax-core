@@ -13,7 +13,7 @@ implications:
   level: component
 - id: su-config-001
   tier: T1
-  text: Configuration files should hardcode Ryan's preferences rather than providing
+  text: Configuration files should hardcode the operator's preferences rather than providing
     generic defaults or multi-user options.
   enforcement: review
   canon: purposivist
@@ -37,7 +37,7 @@ implications:
   level: component
 - id: su-error-001
   tier: T2
-  text: Error messages can include sensitive debugging information since only Ryan
+  text: Error messages can include sensitive debugging information since only the operator
     will see them.
   enforcement: warn
   canon: purposivist
@@ -46,14 +46,14 @@ implications:
 - id: su-logging-001
   tier: T2
   text: Logging can be more verbose and include personal details since logs are private
-    to Ryan.
+    to the operator.
   enforcement: warn
   canon: purposivist
   mode: compatibility
   level: component
 - id: su-ui-001
   tier: T1
-  text: User interfaces should optimize for Ryan's specific workflows rather than
+  text: User interfaces should optimize for the operator's specific workflows rather than
     general usability patterns.
   enforcement: review
   canon: purposivist
@@ -61,7 +61,7 @@ implications:
   level: subsystem
 - id: su-naming-001
   tier: T3
-  text: Code comments and variable names can reference Ryan's personal context without
+  text: Code comments and variable names can reference the operator's personal context without
     explanation.
   enforcement: lint
   canon: purposivist
@@ -93,7 +93,7 @@ implications:
   level: component
 - id: su-storage-001
   tier: T2
-  text: File paths, database schemas, and data structures can use Ryan-specific identifiers
+  text: File paths, database schemas, and data structures can use operator-specific identifiers
     without generalization.
   enforcement: warn
   canon: purposivist
@@ -102,7 +102,7 @@ implications:
 - id: su-notification-001
   tier: T2
   text: All notifications, alerts, and communications can be addressed directly to
-    Ryan without user preference systems.
+    the operator without user preference systems.
   enforcement: warn
   canon: textualist
   mode: compatibility
@@ -126,7 +126,7 @@ implications:
 - id: su-audit-001
   tier: T2
   text: Audit logs and monitoring can omit user identification fields since all activity
-    is attributed to Ryan by definition.
+    is attributed to the operator by definition.
   enforcement: warn
   canon: purposivist
   mode: compatibility
@@ -150,7 +150,7 @@ implications:
 - id: su-decision-001
   tier: T1
   text: All architectural and design decisions must be evaluated primarily for how
-    they serve Ryan's specific needs rather than generalized user bases.
+    they serve the operator's specific needs rather than generalized user bases.
   enforcement: review
   canon: purposivist
   mode: sufficiency

@@ -15,7 +15,7 @@
 **Files:**
 - Modify: `axioms/registry.yaml:34-47` (append after management_governance)
 - Create: `axioms/implications/corporate-boundary.yaml`
-- Modify: `~/projects/hapax-system/rules/axioms.md` (append new axiom section)
+- Modify: `<hapax-system>/rules/axioms.md` (append new axiom section)
 
 **Step 1: Add axiom to registry**
 
@@ -105,7 +105,7 @@ implications:
 
 **Step 3: Add to hapax-system rules**
 
-Append to `~/projects/hapax-system/rules/axioms.md` before the `## Compliance` section:
+Append to `<hapax-system>/rules/axioms.md` before the `## Compliance` section:
 
 ```markdown
 ## Domain Axiom: corporate_boundary (weight: 90)
@@ -132,7 +132,7 @@ git commit -m "feat(axioms): add corporate_boundary domain axiom — 6 implicati
 And separately in hapax-system:
 
 ```bash
-cd ~/projects/hapax-system
+cd <hapax-system>
 git add rules/axioms.md
 git commit -m "feat: add corporate_boundary axiom to rules"
 ```
@@ -142,7 +142,7 @@ git commit -m "feat: add corporate_boundary axiom to rules"
 ### Task 2: Add LLMProvider Interface and Provider Type to Settings
 
 **Files:**
-- Modify: `~/projects/obsidian-hapax/src/types.ts`
+- Modify: `<obsidian-hapax>/src/types.ts`
 
 **Step 1: Add provider type and LLMProvider interface**
 
@@ -192,13 +192,13 @@ Add `provider: LLMProviderType;` to the interface and `provider: "litellm"` to D
 
 **Step 3: Build to verify no errors**
 
-Run: `cd ~/projects/obsidian-hapax && pnpm run build`
+Run: `cd <obsidian-hapax> && pnpm run build`
 Expected: Build succeeds (new types are unused but valid)
 
 **Step 4: Commit**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 git add src/types.ts
 git commit -m "feat: add LLMProvider interface and provider types"
 ```
@@ -208,7 +208,7 @@ git commit -m "feat: add LLMProvider interface and provider types"
 ### Task 3: Create OpenAI-Compatible Provider
 
 **Files:**
-- Create: `~/projects/obsidian-hapax/src/providers/openai-compatible.ts`
+- Create: `<obsidian-hapax>/src/providers/openai-compatible.ts`
 
 **Step 1: Write the provider**
 
@@ -287,7 +287,7 @@ export class OpenAICompatibleProvider implements LLMProvider {
 
 **Step 2: Build to verify**
 
-Run: `cd ~/projects/obsidian-hapax && pnpm run build`
+Run: `cd <obsidian-hapax> && pnpm run build`
 
 **Step 3: Commit**
 
@@ -301,7 +301,7 @@ git commit -m "feat: add OpenAI-compatible provider"
 ### Task 4: Create Anthropic Provider
 
 **Files:**
-- Create: `~/projects/obsidian-hapax/src/providers/anthropic.ts`
+- Create: `<obsidian-hapax>/src/providers/anthropic.ts`
 
 **Step 1: Write the provider**
 
@@ -406,7 +406,7 @@ export class AnthropicProvider implements LLMProvider {
 
 **Step 2: Build to verify**
 
-Run: `cd ~/projects/obsidian-hapax && pnpm run build`
+Run: `cd <obsidian-hapax> && pnpm run build`
 
 **Step 3: Commit**
 
@@ -420,8 +420,8 @@ git commit -m "feat: add Anthropic native API provider"
 ### Task 5: Create Provider Factory and Refactor LLMClient
 
 **Files:**
-- Create: `~/projects/obsidian-hapax/src/providers/index.ts`
-- Modify: `~/projects/obsidian-hapax/src/llm-client.ts` (full rewrite)
+- Create: `<obsidian-hapax>/src/providers/index.ts`
+- Modify: `<obsidian-hapax>/src/llm-client.ts` (full rewrite)
 
 **Step 1: Write the provider factory**
 
@@ -487,11 +487,11 @@ The `LLMClient` API surface is unchanged — `chat-view.ts` and all callers cont
 
 **Step 3: Build to verify**
 
-Run: `cd ~/projects/obsidian-hapax && pnpm run build`
+Run: `cd <obsidian-hapax> && pnpm run build`
 
 **Step 4: Verify type check**
 
-Run: `cd ~/projects/obsidian-hapax && npx -y tsc --noEmit`
+Run: `cd <obsidian-hapax> && npx -y tsc --noEmit`
 
 **Step 5: Commit**
 
@@ -505,7 +505,7 @@ git commit -m "feat: refactor LLMClient to use provider abstraction"
 ### Task 6: Update Settings UI for Provider Selection
 
 **Files:**
-- Modify: `~/projects/obsidian-hapax/src/settings.ts` (full rewrite of display())
+- Modify: `<obsidian-hapax>/src/settings.ts` (full rewrite of display())
 
 **Step 1: Rewrite settings.ts**
 
@@ -690,11 +690,11 @@ export class HapaxSettingTab extends PluginSettingTab {
 
 **Step 2: Build to verify**
 
-Run: `cd ~/projects/obsidian-hapax && pnpm run build`
+Run: `cd <obsidian-hapax> && pnpm run build`
 
 **Step 3: Verify type check**
 
-Run: `cd ~/projects/obsidian-hapax && npx -y tsc --noEmit`
+Run: `cd <obsidian-hapax> && npx -y tsc --noEmit`
 
 **Step 4: Commit**
 
@@ -708,7 +708,7 @@ git commit -m "feat: provider-aware settings UI with per-provider model lists"
 ### Task 7: Improve Knowledge Search Graceful Degradation
 
 **Files:**
-- Modify: `~/projects/obsidian-hapax/src/commands/search.ts:76-79`
+- Modify: `<obsidian-hapax>/src/commands/search.ts:76-79`
 
 **Step 1: Improve error message**
 
@@ -730,7 +730,7 @@ Replace lines 76-79:
 
 **Step 2: Build to verify**
 
-Run: `cd ~/projects/obsidian-hapax && pnpm run build`
+Run: `cd <obsidian-hapax> && pnpm run build`
 
 **Step 3: Commit**
 
@@ -746,7 +746,7 @@ git commit -m "fix: graceful degradation message for knowledge search off-networ
 **Step 1: Clean build**
 
 ```bash
-cd ~/projects/obsidian-hapax
+cd <obsidian-hapax>
 pnpm run build
 ```
 

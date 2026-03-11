@@ -214,7 +214,7 @@ Events attributed to domains via the registry's `vault_paths`, `profiler_dimensi
 
 ### Implementation
 
-New file: `cockpit/data/momentum.py`. Refresh: 5-minute slow cycle. Persists weekly snapshots to `~/.cache/cockpit/momentum-history.jsonl` for trend computation.
+New file: `cockpit/data/momentum.py`. Refresh: 5-minute slow cycle. Persists weekly snapshots to `<cache>/cockpit/momentum-history.jsonl` for trend computation.
 
 ---
 
@@ -264,7 +264,7 @@ Emergence also detects when activity in a declared domain drops to near-zero for
 
 ### Implementation
 
-New file: `cockpit/data/emergence.py`. Buffer persisted to `~/.cache/cockpit/undomained-activity.jsonl`. Candidates persisted to `~/.cache/cockpit/emergence-candidates.json`.
+New file: `cockpit/data/emergence.py`. Buffer persisted to `<cache>/cockpit/undomained-activity.jsonl`. Candidates persisted to `<cache>/cockpit/emergence-candidates.json`.
 
 ---
 
@@ -480,10 +480,10 @@ Each phase has a clear deliverable and can be verified independently. Phase 1 is
 
 | Repo | Changes |
 |------|---------|
-| `~/projects/hapaxromana/` | Domain registry YAML, sufficiency model YAMLs, person schema docs |
-| `~/projects/ai-agents/` | Multi-domain audit, momentum, emergence, dashboard, /domain commands |
-| `~/projects/obsidian-hapax/` | Multi-domain interview engine, /setup domain selection |
-| `~/Documents/Personal/` | tpl-person.md template update, new vault directories if needed |
+| `<hapaxromana>/` | Domain registry YAML, sufficiency model YAMLs, person schema docs |
+| `<ai-agents>/` | Multi-domain audit, momentum, emergence, dashboard, /domain commands |
+| `<obsidian-hapax>/` | Multi-domain interview engine, /setup domain selection |
+| `<personal-vault>/` | tpl-person.md template update, new vault directories if needed |
 
 ## Design Decisions
 
