@@ -281,3 +281,17 @@ implications:
   canon: purposivist
   mode: sufficiency
   level: component
+- id: ex-prose-001
+  tier: T0
+  text: >
+    All LLM-generated text outputs — agent reports, briefings, documentation,
+    status messages, demo scripts, and commit messages — must be direct and
+    informative. Generated prose must not contain rhetorical pivots ("This isn't
+    X — it's Y"), performative insight ("The question becomes..."), dramatic
+    restatement of known information, or contrast structures that exist for
+    rhythm rather than content. Every sentence must deliver information the
+    reader does not already have.
+  enforcement: block
+  canon: textualist
+  mode: compatibility
+  level: system
