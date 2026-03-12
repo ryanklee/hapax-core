@@ -598,7 +598,7 @@ def _extract_nodes_and_edges(d2_source: str) -> tuple[list[str], list[tuple[str,
 
 def _fallback_diagram(d2_source: str, output_path: Path, size: tuple[int, int]) -> Path:
     """Generate a Pillow diagram showing nodes and connections from D2 source."""
-    from agents.demo_pipeline.title_cards import _get_font
+    from demo.pipeline.title_cards import _get_font
 
     BG = (40, 40, 40)  # #282828
     FG = (235, 219, 178)  # #ebdbb2
