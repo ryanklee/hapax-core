@@ -24,7 +24,7 @@ from pydantic import BaseModel
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from shared.sdlc_github import (
+from sdlc.github import (
     add_pr_labels,
     fetch_pr_changed_files,
     fetch_pr_diff,
@@ -173,7 +173,7 @@ def run_review(pr_number: int, *, dry_run: bool = False) -> ReviewResult:
     _post_review_results(pr_number, result)
 
     try:
-        from shared.sdlc_log import log_sdlc_event
+        from sdlc.log import log_sdlc_event
 
         log_sdlc_event(
             "review",

@@ -21,7 +21,7 @@ wheels = [
 ]
 
 [[package]]
-name = "hapax-constitution"
+name = "hapax-sdlc"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

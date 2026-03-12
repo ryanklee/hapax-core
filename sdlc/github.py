@@ -52,8 +52,11 @@ def _run_gh(*args: str, input_text: str | None = None) -> str:
 def fetch_issue(number: int) -> Issue:
     """Fetch an issue by number."""
     raw = _run_gh(
-        "issue", "view", str(number),
-        "--json", "number,title,body,labels",
+        "issue",
+        "view",
+        str(number),
+        "--json",
+        "number,title,body,labels",
     )
     data = json.loads(raw)
     labels = [lb["name"] for lb in data.get("labels", [])]
@@ -86,13 +89,21 @@ def remove_issue_label(number: int, label: str) -> None:
 
 
 def search_closed_issues(query: str, limit: int = 5) -> list[dict]:
-    """Search closed issues/PRs matching query keywords."""
+    """Search closed issues/PRs matching query keywords.
+
+    Returns list of dicts with number, title, labels, state.
+    """
     raw = _run_gh(
-        "issue", "list",
-        "--state", "closed",
-        "--search", query,
-        "--limit", str(limit),
-        "--json", "number,title,labels,state",
+        "issue",
+        "list",
+        "--state",
+        "closed",
+        "--search",
+        query,
+        "--limit",
+        str(limit),
+        "--json",
+        "number,title,labels,state",
     )
     items = json.loads(raw)
     return [
@@ -114,8 +125,11 @@ def search_closed_issues(query: str, limit: int = 5) -> list[dict]:
 def fetch_pr(number: int) -> PullRequest:
     """Fetch a pull request by number."""
     raw = _run_gh(
-        "pr", "view", str(number),
-        "--json", "number,title,body,labels,headRefName",
+        "pr",
+        "view",
+        str(number),
+        "--json",
+        "number,title,body,labels,headRefName",
     )
     data = json.loads(raw)
     labels = [lb["name"] for lb in data.get("labels", [])]
@@ -136,8 +150,11 @@ def fetch_pr_diff(number: int) -> str:
 def fetch_pr_changed_files(number: int) -> list[str]:
     """Return list of file paths changed in a PR."""
     raw = _run_gh(
-        "pr", "view", str(number),
-        "--json", "files",
+        "pr",
+        "view",
+        str(number),
+        "--json",
+        "files",
     )
     data = json.loads(raw)
     return [f["path"] for f in data.get("files", [])]
@@ -171,18 +188,26 @@ def post_pr_review(
     """Submit a PR review (COMMENT, APPROVE, or REQUEST_CHANGES)."""
     _run_gh(
         "api",
-        f"repos/{{owner}}/{{repo}}/pulls/{number}/reviews",
-        "-X", "POST",
-        "-f", f"event={event}",
-        "-f", f"body={body}",
+        "repos/{owner}/{repo}/pulls/{number}/reviews".format(
+            owner="{owner}", repo="{repo}", number=number
+        ),
+        "-X",
+        "POST",
+        "-f",
+        f"event={event}",
+        "-f",
+        f"body={body}",
     )
 
 
 def fetch_pr_checks(number: int) -> list[dict]:
     """Fetch CI check statuses for a PR."""
     raw = _run_gh(
-        "pr", "checks", str(number),
-        "--json", "name,state,conclusion",
+        "pr",
+        "checks",
+        str(number),
+        "--json",
+        "name,state,conclusion",
     )
     return json.loads(raw)
 
@@ -190,8 +215,12 @@ def fetch_pr_checks(number: int) -> list[dict]:
 def dispatch_event(event_type: str, payload: dict) -> None:
     """Dispatch a repository_dispatch event."""
     _run_gh(
-        "api", "repos/{owner}/{repo}/dispatches",
-        "-X", "POST",
-        "-f", f"event_type={event_type}",
-        "-f", f"client_payload={json.dumps(payload)}",
+        "api",
+        "repos/{owner}/{repo}/dispatches",
+        "-X",
+        "POST",
+        "-f",
+        f"event_type={event_type}",
+        "-f",
+        f"client_payload={json.dumps(payload)}",
     )
