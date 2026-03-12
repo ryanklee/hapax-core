@@ -6,11 +6,13 @@ A governance architecture for LLM agent systems, specified as a pattern with two
 
 LLM agents that manage personal infrastructure — preparing meeting context, maintaining knowledge bases, monitoring system health, reacting to filesystem changes — accumulate autonomy without accumulating constraints. Prompt-level instructions are advisory. They degrade under context pressure, cannot be audited, and provide no mechanism for handling cases the author didn't anticipate.
 
-This project specifies a constitutional pattern for agent governance: formal axioms with weighted enforcement, derived implications at graduated tiers, an interpretive canon for ambiguous cases, and sufficiency probes that check obligations (what the system must do) rather than only prohibitions (what it must not).
+Adding more rules does not solve this. Rules cover anticipated cases and fail silently on everything else.
+
+This project specifies a governance architecture borrowed from constitutional law: weighted axioms (statutes), derived implications (case law), an interpretive canon (judicial reasoning methods), sufficiency probes (affirmative obligations, not only prohibitions), and a precedent store (stare decisis). The architecture is designed to handle unanticipated cases, not only anticipated ones.
 
 ## Design context
 
-The two systems that implement this pattern externalize executive function into infrastructure. Their operator has ADHD and autism, which makes the cognitive cost of tracking open loops, maintaining relational context, and noticing staleness patterns acute. But the underlying problem is general: knowledge workers perform substantial executive function work that produces no deliverables, scales poorly with attention, and compounds silently when neglected. The constitution exists because agents doing this work require constraints that are structural, not advisory.
+The two systems that implement this pattern externalize executive function into infrastructure. Their operator has ADHD and autism, which makes the cognitive cost of tracking open loops, maintaining relational context, and noticing staleness patterns acute. The underlying problem is general: knowledge workers perform executive function work that produces no deliverables, scales poorly with attention, and compounds when neglected. Agents doing this work require constraints that are structural, not advisory.
 
 ## The pattern
 
@@ -18,7 +20,11 @@ Four interlocking mechanisms compose the architecture.
 
 ### Filesystem-as-bus
 
-All state lives as markdown files with YAML frontmatter on disk. Directories are collections. Agents read files to gather context and write files to produce output. This yields human-readable state (open any file in a text editor), git-native history (every state transition is a diff), tool-agnostic interoperability (any language reads markdown), and graceful degradation (if the engine is down, the data is still there).
+Message queues, RPC, and shared databases each add infrastructure to operate, abstractions to debug through, and failure modes to handle. Filesystem-as-bus uses a different mechanism: all state lives as markdown files with YAML frontmatter on disk. Directories are collections. Agents read files to gather context and write files to produce output.
+
+This trades transactional consistency and ordered delivery for: human-readable state (open any file in a text editor), git-native history (every state transition is a diff), tool-agnostic interoperability (any language reads markdown), zero-infrastructure coordination (no broker to run or monitor), and graceful degradation (if the engine is down, the data is still there and can be edited manually).
+
+At single-operator scale with sequential or low-concurrency agent execution, the consistency trade-off has no practical cost.
 
 The pattern predates and is now validated by two independent formalizations: "From Everything-is-a-File to Files-Are-All-You-Need" (arXiv:2601.11672, January 2026) and "Everything is Context: Agentic File System Abstraction for Context Engineering" (arXiv:2512.05470, December 2025). Unlike the virtual filesystem abstractions those papers propose, this pattern uses literal files on disk — debuggable with `cat`, `grep`, `diff`, and `git log`.
 
@@ -30,7 +36,7 @@ Three tiers, differentiated by invocation model and autonomy:
 - **Tier 2 (On-demand):** Pydantic AI agents invoked by CLI, API, or Tier 1. Stateless per-invocation; all persistent state lives on the filesystem or in vector storage.
 - **Tier 3 (Autonomous):** systemd timers running Tier 2 agents on schedules. High-frequency agents (health monitoring, knowledge maintenance) are deterministic with zero LLM calls.
 
-Agents never invoke other agents. Orchestration is flat. They communicate through filesystem artifacts, which decouples them temporally and makes the coordination graph auditable through standard Unix tools.
+Agents never invoke other agents. There is no orchestrator, no DAG, no workflow engine. Orchestration is flat. Agents communicate through filesystem artifacts, which decouples them temporally (agent A doesn't need to know when agent B runs) and makes the coordination graph auditable through standard Unix tools (`ls -lt` shows what ran, `git log` shows what changed, `diff` shows what was produced).
 
 ### Axiom governance
 
@@ -51,9 +57,11 @@ Each implication carries an **interpretive canon** — a classification borrowed
 
 The interpretive canon addresses a problem that formal constraint systems share with legal codes: specification cannot anticipate every case. Rather than expanding the specification indefinitely, the canon provides a principled method for applying existing axioms to new situations.
 
-Each implication also carries a **mode** — either `prohibition` (the system must NOT do this) or `sufficiency` (the system MUST do this). Most governance systems check only for violations. Sufficiency probes check obligations: does the system provide actionable error messages? Does it persist state across restarts? Does it automate routine work? This inversion — checking what SHOULD exist, not just what SHOULDN'T — is absent from the agent governance literature (ArbiterOS, ABC, PCAS, GaaS) as of early 2026.
+Each implication also carries a **mode** — either `prohibition` (the system must NOT do this) or `sufficiency` (the system MUST do this). Most governance systems check only for violations — they scan for the presence of bad things. Sufficiency probes invert this: they check for the *absence* of required things.
 
-A **precedent store** records edge-case rulings, building a common-law layer that makes axiom interpretation consistent and auditable across time.
+Example: the `executive_function` axiom (weight 95) produces the sufficiency implication "error messages must include a concrete next action." A prohibition-only system checks that error messages don't contain jargon. The sufficiency probe checks that every error message contains something actionable — a command to run, a file to check, a person to contact. This inversion is absent from the agent governance literature (ArbiterOS, ABC, PCAS, GaaS) as of early 2026.
+
+A **precedent store** records operator rulings on edge cases, building a common-law layer over time. When an axiom implication produces a tension — e.g., a domain-specific T0 block appears to conflict with a constitutional T0 block — the operator records a precedent: the reasoning, the resolution, and the scope. Future evaluations query the precedent store (via semantic search over embeddings) before escalating. New cases are evaluated against prior rulings. Precedents can be promoted (widened scope) or superseded (overruled). Over time, the precedent corpus makes axiom interpretation consistent and reduces operator interrupts.
 
 ### Reactive engine
 
@@ -63,7 +71,9 @@ Actions execute in phases:
 - **Phase 0 (deterministic):** Cache refreshes, metric recalculation, file indexing. Unlimited concurrency. Zero cost.
 - **Phase 1+ (LLM):** Synthesis, summarization, evaluation. Semaphore-bounded to prevent GPU saturation or API cost runaway.
 
-Self-trigger prevention ensures that files written by the engine do not re-trigger evaluation. Notification delivery batches on a configurable interval to prevent storms.
+**Self-trigger prevention:** when the engine writes an output file, inotify fires again. Without prevention, the engine evaluates its own output in an infinite loop. The engine tracks which files it has written and skips events from its own writes.
+
+Notification delivery batches on a configurable interval to prevent storms.
 
 ## Axioms
 
@@ -80,11 +90,11 @@ The axioms produce 68+ derived implications across all tiers. See `axioms/implic
 
 ## Implementations
 
-Two systems implement this pattern. They share architecture, not code — each owns its full stack.
+Two systems implement this pattern. They share architecture, not code — each owns its full stack. They share infrastructure (Qdrant, LiteLLM, Ollama, PostgreSQL) but their agent pools, data directories, axiom registries, and reactive engines are independent. The constitution is the specification; the implementations are self-contained systems that happen to follow it.
 
-**[hapax-council](https://github.com/ryanklee/hapax-council)** — A personal operating environment. 26+ agents across management, knowledge, sync, voice, and system domains. Always-on voice daemon with ambient perception. RAG pipeline ingesting 7 external sources. Reactive cockpit with FastAPI API and React dashboard. Instantiates all four axioms.
+**[hapax-council](https://github.com/ryanklee/hapax-council)** — Personal operating environment. 26+ agents across management, knowledge, sync, voice, and system domains. Always-on voice daemon with ambient perception. RAG pipeline ingesting 7 external sources into Qdrant. Reactive cockpit with FastAPI API and React dashboard. Health monitoring, horizon scanning, documentation drift detection. Instantiates all four axioms.
 
-**[hapax-officium](https://github.com/ryanklee/hapax-officium)** — A management decision support system, designed to be forked. 16 agents for 1:1 preparation, team health tracking, management profiling, and briefings. Includes a self-demonstrating capability: bootstrap from synthetic seed data, and the system demos itself — to an audience it profiles — against live operational state. Instantiates three axioms (`single_operator`, `decision_support`, `management_safety`).
+**[hapax-officium](https://github.com/ryanklee/hapax-officium)** — Management-domain extraction, designed to be forked by other engineering managers. 16 agents for 1:1 preparation, team health tracking, management profiling, and briefings. Includes a self-demonstrating capability: bootstrap from synthetic seed data, and the system generates a demonstration — tailored to a profiled audience — against live operational state. Instantiates three axioms (`single_operator`, `decision_support`, `management_safety`). Officium was originally part of council and was extracted when the management agents proved usable without the rest of the system.
 
 ## Relationship to prior work
 
