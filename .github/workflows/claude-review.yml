@@ -1,0 +1,41 @@
+name: Claude Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@5d0cc745cd0cce4c0e9e0b3511de26c3bc285eb5
+        with:
+          model: claude-sonnet-4-6
+          max_turns: 3
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          timeout_minutes: 5
+          allowed_tools: "Read,Glob,Grep"
+          prompt: |
+            Review this PR to the hapax-constitution specification repository.
+
+            This repo defines the canonical axiom system used by hapax-council
+            and hapax-officium. Changes here affect governance across all projects.
+
+            Check for:
+            - YAML validity in axioms/, domains/, knowledge/ files
+            - Axiom weight consistency (higher weight = more restrictive)
+            - Implication tier correctness (T0 = existential block, T1 = review, T2 = warn)
+            - Cross-reference consistency (implications reference valid axiom IDs)
+            - Documentation accuracy (do docs match the YAML definitions?)
+            - Precedent seed quality (are seed precedents well-reasoned?)
+
+            Be specific about any inconsistencies found.
