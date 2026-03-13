@@ -1,0 +1,116 @@
+name: Auto-Fix CI Failures
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: auto-fix-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  auto-fix:
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_branch != 'main' &&
+      !contains(github.event.workflow_run.head_commit.message, '[auto-fix]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 20
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check auto-fix attempt count
+        id: guard
+        run: |
+          COUNT=$(git log --oneline --grep='\[auto-fix\]' origin/main..HEAD | wc -l)
+          echo "auto_fix_count=$COUNT" >> "$GITHUB_OUTPUT"
+          if [ "$COUNT" -ge 3 ]; then
+            echo "::warning::Auto-fix limit reached ($COUNT attempts). Labeling for human review."
+            echo "should_fix=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_fix=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Label PR for human review
+        if: steps.guard.outputs.should_fix == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --add-label "needs-human"
+          fi
+
+      - name: Download CI logs
+        if: steps.guard.outputs.should_fix == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh run view ${{ github.event.workflow_run.id }} --log-failed > /tmp/ci-failure.log 2>&1 || true
+
+      - name: Check failure scope
+        if: steps.guard.outputs.should_fix == 'true'
+        id: scope
+        run: |
+          LOG="/tmp/ci-failure.log"
+          FIXABLE=false
+          if grep -qE '(yamllint|ruff)' "$LOG" 2>/dev/null; then
+            FIXABLE=true
+          fi
+          echo "fixable=$FIXABLE" >> "$GITHUB_OUTPUT"
+
+      - name: Label unfixable PR
+        if: steps.guard.outputs.should_fix == 'true' && steps.scope.outputs.fixable == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" --add-label "needs-human"
+          fi
+
+      - name: Run Claude Code auto-fix
+        if: steps.guard.outputs.should_fix == 'true' && steps.scope.outputs.fixable == 'true'
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: "--model claude-sonnet-4-6 --max-turns 3 --allowedTools Bash,Read,Edit,Write"
+          prompt: |
+            The YAML lint check failed. Fix ONLY yamllint errors in axioms/, domains/, knowledge/.
+            Run `yamllint -d relaxed axioms/ domains/ knowledge/` to identify issues.
+            Do NOT modify axiom definitions in axioms/registry.yaml.
+            Make minimal changes.
+
+      - name: Commit auto-fix
+        if: steps.guard.outputs.should_fix == 'true' && steps.scope.outputs.fixable == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "claude-code[bot]"
+          git config user.email "claude-code[bot]@users.noreply.github.com"
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit — Claude could not fix the issue."
+            PR_NUMBER=$(gh pr list --head "${{ github.event.workflow_run.head_branch }}" --json number --jq '.[0].number')
+            if [ -n "$PR_NUMBER" ]; then
+              gh pr edit "$PR_NUMBER" --add-label "needs-human"
+            fi
+          else
+            git add -A
+            git commit -m "[auto-fix] resolve yamllint errors
+
+          Automated fix by Claude Code. See CI logs for details.
+
+          Co-Authored-By: Claude Sonnet <noreply@anthropic.com>"
+            git push
+          fi
