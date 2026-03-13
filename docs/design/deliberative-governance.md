@@ -431,6 +431,190 @@ The deliberative system inspects its own behavior through three mechanisms, cons
 
 **Update condition quality.** If agents rarely check their pre-committed update conditions as met (low concession rate despite multi-round exchange), the update conditions may be too narrow or too abstract to be actionable. Track `update_conditions_checked.met == true` rate. Persistent low rates signal that the disconfirmation mechanism is theatrical rather than functional — the agents commit to update conditions they never actually meet. This is the deliberation-specific anti-pattern detector.
 
+## Evaluation standard
+
+The deliberative process must be evaluated against criteria that determine whether it produces governance value or is performing deliberation theater. Three evaluation dimensions, each with computable metrics and diagnostic thresholds.
+
+### Dimension 1: Process fidelity
+
+Is the process structurally doing what the design specifies? These metrics detect whether the load-bearing features identified in the process analysis are functioning or theatrical.
+
+**Metric 1.1: Update condition activation rate**
+
+```
+activation_rate = count(update_conditions_checked where met == true) / count(update_conditions_checked)
+```
+
+This is the single most diagnostic metric. Pre-committed update conditions are the structural feature that distinguishes genuine deliberation from rationalized advocacy (Kahneman's adversarial collaboration). If agents commit to conditions but never find them met, the conditions are too narrow, too abstract, or the agents are not genuinely checking.
+
+| Rate | Interpretation | Action |
+|------|---------------|--------|
+| 0% | Theatrical. Conditions exist but never trigger. | Review condition specificity in agent prompts. Conditions must be concrete and testable against the other agent's actual claims. |
+| 1-15% | Low but functional. Some genuine checking. | Acceptable for early iterations. Monitor trend. |
+| 15-40% | Healthy. Conditions are specific enough to be triggered by real arguments. | Target range. |
+| >40% | Conditions may be too permissive, or agents are conceding too readily. | Review whether concessions are substantive or reflexive. |
+
+**Metric 1.2: Responsive reference rate**
+
+```
+reference_rate = count(rounds where claims_attacked reference specific text from prior round) / count(rounds after round 1)
+```
+
+Sequential responsive exchange is load-bearing. If round 2+ outputs do not reference specific claims from the prior round, the exchange is parallel argumentation with extra steps.
+
+| Rate | Interpretation |
+|------|---------------|
+| <50% | Agents are arguing past each other. System prompt needs strengthening on specificity obligation. |
+| 50-80% | Partial engagement. Some rounds are responsive, others restate. |
+| >80% | Healthy. Agents are engaging with each other's specific claims. |
+
+**Metric 1.3: Concession specificity**
+
+Qualitative check (sampled, not computed over all deliberations): are concessions specific governance artifacts ("su-auth-001's text is broader than its purpose") or vague acknowledgments ("Brutus raises a valid point")? Vague concessions do not contract the problem space. This metric requires periodic operator review of a sample of concession fields.
+
+### Dimension 2: Generative output
+
+Is the process producing insight that would not exist without the exchange? This is the fundamental justification for the process — if static parallel analysis produces equivalent output, the multi-round exchange is wasted computation.
+
+**Metric 2.1: Novel insight distinctiveness**
+
+The tension map's `novel_insight` field should contain considerations that are not present in either agent's round 1 output. This is testable:
+
+```
+distinctiveness = 1 - max(
+    semantic_similarity(novel_insight, publius_r1.position),
+    semantic_similarity(novel_insight, brutus_r1.position)
+)
+```
+
+Using the existing embedding infrastructure (nomic-embed-text via Ollama, Qdrant cosine similarity).
+
+| Score | Interpretation |
+|-------|---------------|
+| <0.2 | Novel insight is a restatement of round 1 positions. Process did not generate new insight. |
+| 0.2-0.5 | Partially novel. Some new considerations, but heavily derived from initial positions. |
+| >0.5 | Genuinely novel. The exchange produced considerations neither agent raised initially. |
+
+**Metric 2.2: Problem space contraction**
+
+Does the deliberation narrow the decision the operator must make? Measured by comparing the scope of round 1 positions to the scope of the final tension map:
+
+- **Convergence**: Both agents agree on a resolution. Maximum contraction — the operator confirms or overrides, but the decision space is a single point.
+- **Crux identification**: Disagreement narrowed to one specific question. The operator decides that question, not the full tension.
+- **Round limit with narrowing**: Positions moved but did not converge. Partial contraction — the operator's decision is smaller than the original tension.
+- **Round limit without narrowing**: Positions did not move. Zero contraction. The process failed.
+
+```
+contraction_rate = count(deliberations terminating in convergence or crux) / count(deliberations)
+```
+
+| Rate | Interpretation |
+|------|---------------|
+| <30% | Process is not narrowing. Agents are restating rather than engaging. |
+| 30-60% | Moderate. Some deliberations produce value; others do not. |
+| >60% | Healthy. Most deliberations produce a narrower decision for the operator. |
+
+**Metric 2.3: Failure mode novelty (pre-mortem)**
+
+The pre-mortem step should identify failure modes not anticipated by either agent's round 1 analysis. Computed similarly to novel insight distinctiveness but against both agents' refutation conditions:
+
+```
+premortem_novelty = fraction of failure_modes with low similarity to any refutation_condition in round 1
+```
+
+If the pre-mortem only restates refutation conditions, it adds no value.
+
+### Dimension 3: Governance impact
+
+Does the process improve governance decisions over time? These metrics require accumulated deliberation history and operator rulings.
+
+**Metric 3.1: Precedent durability**
+
+```
+durability = 1 - (count(deliberation-created precedents later superseded) / count(deliberation-created precedents))
+```
+
+Precedents created from deliberation + operator ruling should be more durable than precedents created without deliberation. If deliberation-sourced precedents are superseded at the same or higher rate as non-deliberation precedents, the process is not improving governance quality.
+
+Requires: ≥20 resolved deliberations with operator rulings to compute meaningfully.
+
+**Metric 3.2: Dissent prediction accuracy**
+
+When a deliberation identifies a potential future problem (via novel insight, failure modes, or minority position), does that problem materialize?
+
+```
+prediction_accuracy = count(deliberation-predicted issues that later appeared as dissents or new tensions) / count(deliberation predictions)
+```
+
+This requires retroactive correlation: when a new dissent or tension appears, check whether any prior deliberation's novel insight or failure modes anticipated it. Implemented as a semantic search over the deliberation `novel_insight` and `failure_modes` fields in Qdrant.
+
+High prediction accuracy validates that the process surfaces real future concerns. Low accuracy (with sufficient sample size) suggests the process generates speculative rather than grounded analysis.
+
+**Metric 3.3: Implication revision rate**
+
+```
+revision_rate = count(implications revised following deliberation) / count(deliberations identifying implication ambiguity)
+```
+
+Deliberations that identify ambiguity in implication text (e.g., "su-auth-001 does not distinguish user-to-system from system-to-service auth") should lead to implication revisions. If identified ambiguities persist without revision, the deliberation → governance improvement feedback loop is broken.
+
+This measures transmission (Dryzek): whether deliberation outputs actually influence the governance artifacts they analyze.
+
+**Metric 3.4: Operator engagement**
+
+```
+review_latency = median(days from deliberation creation to operator ruling)
+abandonment_rate = count(deliberations never ruled on) / count(deliberations)
+```
+
+If the operator does not engage with deliberation outputs, the process has no governance impact regardless of output quality. High review latency or abandonment signals either: (a) deliberation outputs are not useful enough to warrant review, (b) the surfacing mechanism (briefing, cockpit) is insufficient, or (c) deliberation volume exceeds operator capacity.
+
+| Review latency | Interpretation |
+|---------------|---------------|
+| <3 days | Healthy. Operator is engaging with deliberation output. |
+| 3-7 days | Acceptable. May indicate prioritization, not disengagement. |
+| >7 days | Deliberation debt accumulating. Health monitor flags this. |
+| >14 days | Process is not producing outputs the operator values enough to review. |
+
+### Composite evaluation
+
+No single metric is sufficient. The evaluation standard uses a composite assessment:
+
+**Process is healthy when:**
+- Update condition activation rate is 10-40%
+- Responsive reference rate is >70%
+- Contraction rate is >50%
+- Novel insight distinctiveness is >0.3 (mean)
+- Operator review latency is <7 days (median)
+- Precedent durability is >80% (when sample size ≥20)
+
+**Process is degraded when:**
+- Any two process fidelity metrics fall below threshold
+- Contraction rate drops below 30%
+- Operator abandonment rate exceeds 25%
+
+**Process is failing when:**
+- Update condition activation rate is 0% (theatrical)
+- Contraction rate is below 15% (parallel position statements with extra steps)
+- Operator abandonment rate exceeds 50% (no governance impact)
+
+### Evaluation cadence
+
+**Per-deliberation** (automated, immediate): Update condition activation, responsive reference, concession count, termination condition. Written to the JSONL index.
+
+**Rolling window** (automated, computed on query): Contraction rate, agent bias, canon drift, convergence trend. Computed from the index over the most recent 20 deliberations.
+
+**Periodic review** (operator, quarterly or at 20-deliberation milestone): Concession specificity (sampled), novel insight quality (sampled), precedent durability, implication revision rate. The operator reviews a sample of deliberation outputs and assesses whether the process is producing governance value.
+
+**Triggered** (automated): When rolling-window metrics cross degraded or failing thresholds, the health monitor flags it and the briefing surfaces it as a high-priority action item. The operator decides whether to adjust agent prompts, modify the process, or accept the current performance.
+
+### What the evaluation standard does not do
+
+- Does not evaluate whether operator rulings are correct. The operator's judgment is sovereign. The standard evaluates whether the process provides the operator with useful input, not whether the operator uses it well.
+- Does not optimize for convergence. Incompatibility is a valid termination condition. A high incompatibility rate may indicate genuinely irreconcilable axiom tensions, not process failure.
+- Does not penalize disagreement. The standard penalizes *unproductive* disagreement (round limit without narrowing) but not disagreement itself. Persistent disagreement that identifies a crux is a successful outcome.
+- Does not require a minimum deliberation volume. The standard applies to whatever volume the governance system produces. Metrics that require sample size (precedent durability, dissent prediction) are flagged as not-yet-computable until the threshold is met.
+
 ### What observability does not do
 
 - Does not add latency to enforcement. Tracing is fire-and-forget (OTel BatchSpanProcessor). Enforcement remains synchronous and unblocked.
