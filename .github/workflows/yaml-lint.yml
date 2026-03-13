@@ -8,11 +8,28 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
       - name: Install yamllint
-        run: pip install yamllint
+        run: pip install yamllint pyyaml
       - name: Lint YAML files
         run: |
           yamllint -d relaxed axioms/ domains/ knowledge/
+      - name: Deontic consistency check (E-3)
+        run: python sdlc/consistency_check.py
+      - name: Capability coverage check (E-2)
+        run: |
+          python -c "
+          import yaml
+          from pathlib import Path
+          data = yaml.safe_load(Path('axioms/capability-coverage.yaml').read_text())
+          caps = data.get('capabilities', [])
+          uncovered = [c['id'] for c in caps if not c.get('required_probes')]
+          print(f'{len(caps)} capabilities, {len(caps) - len(uncovered)} covered')
+          if uncovered:
+              print(f'Uncovered: {uncovered}')
+          "

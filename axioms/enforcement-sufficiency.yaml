@@ -1,0 +1,58 @@
+# Enforcement Self-Sufficiency Registry (E-4)
+#
+# Tracks the completeness of the enforcement architecture itself.
+# Each entry maps a governance-contract.md requirement to its implementation status.
+
+requirements:
+  - id: enf-audit-logging
+    description: Structured audit logging for automated actions
+    implementation: sdlc/audit.py
+    status: wired  # was dead code, wired into sdlc-implement.yml
+    wired_in:
+      - .github/workflows/sdlc-implement.yml
+
+  - id: enf-circuit-breaker
+    description: Prevent runaway fix loops by limiting attempts per check
+    implementation: sdlc/circuit_breaker.py
+    status: wired  # was dead code, wired into auto-fix.yml
+    wired_in:
+      - .github/workflows/auto-fix.yml
+
+  - id: enf-sufficiency-probes
+    description: Behavioral probes checking system supports axiom requirements
+    implementation: hapax-council/shared/sufficiency_probes.py
+    status: active
+    probe_count: 18  # as of 2026-03-13
+
+  - id: enf-precedent-store
+    description: Qdrant-backed precedent database for case law
+    implementation: hapax-council/shared/axiom_precedents.py
+    status: active
+
+  - id: enf-axiom-registry
+    description: Load and query axiom definitions and implications
+    implementation: hapax-council/shared/axiom_registry.py
+    status: active
+
+  - id: enf-capability-coverage
+    description: Maps capabilities to required probes
+    implementation: axioms/capability-coverage.yaml
+    status: active
+
+  - id: enf-consistency-checker
+    description: Deontic consistency checking for obligation/prohibition conflicts
+    implementation: sdlc/consistency_check.py
+    status: active
+
+  - id: enf-supremacy-validation
+    description: Domain T0 blocks checked against constitutional T0 blocks
+    implementation: hapax-council/shared/axiom_registry.py (validate_supremacy)
+    status: active
+
+dead_code_resolved:
+  - file: sdlc/audit.py
+    resolution: Wired into sdlc-implement.yml as audit logging step
+    date: "2026-03-13"
+  - file: sdlc/circuit_breaker.py
+    resolution: Wired into auto-fix.yml as fix attempt guard
+    date: "2026-03-13"
