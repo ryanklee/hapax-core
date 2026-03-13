@@ -61,6 +61,8 @@ Each implication also carries a **mode** — either `prohibition` (the system mu
 
 Example: the `executive_function` axiom (weight 95) produces the sufficiency implication "error messages must include a concrete next action." A prohibition-only system checks that error messages don't contain jargon. The sufficiency probe checks that every error message contains something actionable — a command to run, a file to check, a person to contact. This inversion is absent from the agent governance literature (ArbiterOS, ABC, PCAS, GaaS) as of early 2026.
 
+The governance system also governs itself. The deliberative process — adversarial multi-round debates between agents over axiom tensions — is evaluated by sufficiency probes under `executive_function`. Four implications (ex-delib-001 through ex-delib-004) require that deliberations pass process-tracing hoop tests, maintain activation rates above threshold, avoid concession asymmetry, and show no sustained trend degradation. The evaluation mechanism is the same one used for all other governance concerns: implications define requirements, probes check compliance deterministically. No separate meta-governance layer was needed.
+
 A **precedent store** records operator rulings on edge cases, building a common-law layer over time. When an axiom implication produces a tension — e.g., a domain-specific T0 block appears to conflict with a constitutional T0 block — the operator records a precedent: the reasoning, the resolution, and the scope. Future evaluations query the precedent store (via semantic search over embeddings) before escalating. New cases are evaluated against prior rulings. Precedents can be promoted (widened scope) or superseded (overruled). Over time, the precedent corpus makes axiom interpretation consistent and reduces operator interrupts.
 
 ### Reactive engine
@@ -86,13 +88,13 @@ Four axioms are defined in the registry. Two are constitutional (scope: all impl
 | `management_governance` | 85 | Domain: management | LLMs prepare context; humans deliver words to other humans. Never generate feedback language or coaching recommendations about individuals. |
 | `corporate_boundary` | 90 | Domain: infrastructure | Work data stays in employer-controlled systems. Graceful degradation when home-only services are unreachable. |
 
-The axioms produce 68+ derived implications across all tiers. See `axioms/implications/` for the full set.
+The axioms produce 74+ derived implications across all tiers. See `axioms/implications/` for the full set.
 
 ## Implementations
 
 Two systems implement this pattern. They share architecture, not code — each owns its full stack. They share infrastructure (Qdrant, LiteLLM, Ollama, PostgreSQL) but their agent pools, data directories, axiom registries, and reactive engines are independent. The constitution is the specification; the implementations are self-contained systems that happen to follow it.
 
-**[hapax-council](https://github.com/ryanklee/hapax-council)** — Personal operating environment. 26+ agents across management, knowledge, sync, voice, and system domains. Always-on voice daemon with ambient perception. RAG pipeline ingesting 7 external sources into Qdrant. Natural language query subsystem with three specialized agents (development archaeology, system operations, knowledge search) auto-routed and served as SSE streams. Reactive cockpit with FastAPI API and React dashboard. Health monitoring, horizon scanning, documentation drift detection. Instantiates all four axioms.
+**[hapax-council](https://github.com/ryanklee/hapax-council)** — Personal operating environment. 26+ agents across management, knowledge, sync, voice, and system domains. Always-on voice daemon with ambient perception. RAG pipeline ingesting 7 external sources into Qdrant. Natural language query subsystem with three specialized agents (development archaeology, system operations, knowledge search) auto-routed and served as SSE streams. Reactive cockpit with FastAPI API and React dashboard. Health monitoring, horizon scanning, documentation drift detection. Deliberation evaluation with metrics extraction and governance probes. Instantiates all four axioms.
 
 **[hapax-officium](https://github.com/ryanklee/hapax-officium)** — Management-domain extraction, designed to be forked by other engineering managers. 16 agents for 1:1 preparation, team health tracking, management profiling, and briefings. Includes a self-demonstrating capability: bootstrap from synthetic seed data, and the system generates a demonstration — tailored to a profiled audience — against live operational state. Instantiates three axioms (`single_operator`, `decision_support`, `management_safety`). Officium was originally part of council and was extracted when the management agents proved usable without the rest of the system.
 
@@ -117,8 +119,9 @@ The 1st Workshop on Operating Systems Design for AI Agents (AgenticOS, co-locate
 | [`agent-architecture.md`](agent-architecture.md) | Three-tier agent system design |
 | [`operations-manual.md`](operations-manual.md) | Operational reference for running implementations |
 | [`axioms/registry.yaml`](axioms/registry.yaml) | Axiom definitions (weights, scopes, types) |
-| [`axioms/implications/`](axioms/implications/) | Derived implications per axiom (68+ total) |
+| [`axioms/implications/`](axioms/implications/) | Derived implications per axiom (74+ total) |
 | [`axioms/precedents/`](axioms/precedents/) | Precedent seeds for common-law interpretation |
+| [`docs/design/`](docs/design/) | Design documents (deliberative governance, perception interface, governance primitives) |
 | [`knowledge/`](knowledge/) | Sufficiency models (management, music, personal, technical) |
 | [`domains/`](domains/) | Domain-specific extensions and life-domain registry |
 | [`research/`](research/) | Management theory synthesis (Larson, Team Topologies, Scaling People) |
