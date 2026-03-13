@@ -9,6 +9,10 @@ permissions:
   pull-requests: write
   id-token: write
 
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   review:
     if: github.event.pull_request.draft == false
@@ -18,7 +22,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: anthropics/claude-code-action@beta
+        id: claude
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -38,3 +44,25 @@ jobs:
             - Precedent seed quality (are seed precedents well-reasoned?)
 
             Be specific about any inconsistencies found.
+
+            At the END of your review, you MUST output exactly one of these lines:
+            VERDICT: APPROVE
+            VERDICT: REQUEST_CHANGES
+
+            Use APPROVE if there are no HIGH findings. Use REQUEST_CHANGES only for HIGH findings.
+
+      - name: Submit review verdict
+        if: always() && steps.claude.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.REVIEW_TOKEN }}
+        run: |
+          COMMENTS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+            --jq '[.[] | select(.user.login == "github-actions[bot]" or .user.type == "Bot")] | last | .body // ""')
+
+          if echo "$COMMENTS" | grep -q "VERDICT: REQUEST_CHANGES"; then
+            gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
+              -X POST -f event=REQUEST_CHANGES -f body="Claude review found issues requiring changes."
+          else
+            gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
+              -X POST -f event=APPROVE -f body="Claude review passed — no high-severity findings."
+          fi
