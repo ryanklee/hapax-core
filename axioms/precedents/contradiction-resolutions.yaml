@@ -1,0 +1,25 @@
+# Contradiction Resolutions Registry
+#
+# Maps known deontic conflicts (obligation vs prohibition pairs) to precedent
+# resolutions. Used by consistency_check.py --check-resolutions to distinguish
+# "resolved contradictions" from "unresolved conflicts".
+#
+# Each entry records:
+#   - The conflicting pair (obligation_id + prohibition_id)
+#   - The precedent that resolves it
+#   - The resolution rationale
+#
+# As of 2026-03-13, the consistency checker finds 0 conflicts across 77
+# implications. This file is pre-populated as infrastructure for when
+# contradictions do arise (e.g., from new domain axioms or implication growth).
+
+resolutions: []
+# Example entry:
+#   - obligation_id: ex-routine-007
+#     prohibition_id: cb-network-001
+#     precedent_id: P-example
+#     resolution: >
+#       The obligation to automate recurring tasks does not conflict with
+#       the prohibition on unsanctioned network calls because local automation
+#       (systemd timers) does not require network access.
+#     resolved_at: "2026-03-13"

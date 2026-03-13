@@ -29,6 +29,13 @@ implications:
   canon: purposivist
   mode: sufficiency
   level: subsystem
+  scope:
+    type: enumerated
+    rule: Each people-management data source with a cadence field
+    items:
+      - 1:1 meeting frontmatter (last_meeting date)
+      - coaching log frontmatter (last_session date)
+      - feedback cycle frontmatter (last_review date)
 
 - id: mg-selfreport-001
   tier: T1
@@ -47,6 +54,14 @@ implications:
   canon: purposivist
   mode: sufficiency
   level: subsystem
+  scope:
+    type: enumerated
+    rule: Each management state collection pipeline
+    items:
+      - people state (frontmatter parsing)
+      - meeting state (calendar + frontmatter)
+      - coaching state (log file parsing)
+      - feedback state (cycle frontmatter)
 
 - id: mg-prep-001
   tier: T2
