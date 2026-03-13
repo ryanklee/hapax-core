@@ -192,6 +192,9 @@ implications:
   enforcement: review
   canon: textualist
   mode: sufficiency
+  scope:
+    type: derived
+    rule: Every data source with a failure mode must have an alert route to an external channel
   level: component
 - id: ex-batch-001
   tier: T2
@@ -216,6 +219,9 @@ implications:
   enforcement: block
   canon: textualist
   mode: sufficiency
+  scope:
+    type: derived
+    rule: Every health check group must have an alert path to ntfy or equivalent push channel
   level: system
 - id: ex-config-005
   tier: T1
@@ -240,6 +246,9 @@ implications:
   enforcement: block
   canon: textualist
   mode: sufficiency
+  scope:
+    type: derived
+    rule: Every recurring agent must have a corresponding systemd timer or equivalent scheduler
   level: system
 - id: ex-feedback-008
   tier: T2

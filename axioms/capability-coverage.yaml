@@ -1,0 +1,51 @@
+# Capability-Coverage Registry (E-2)
+#
+# Maps deployed observability/infrastructure capabilities to their required
+# sufficiency probes. A meta-probe reads this file and verifies that all
+# listed probes exist and pass.
+#
+# Adding a new capability here creates an obligation to also create the
+# listed probes (per precedent P-2: enforcement completeness).
+
+capabilities:
+  - id: prometheus-metrics
+    description: Prometheus scrapes 6 targets for infrastructure metrics
+    deployed: "2026-03-12"
+    required_probes:
+      - probe-runtime-005  # Prometheus scraping successfully
+
+  - id: grafana-alerting
+    description: Grafana provisioned alert rules with ntfy contact point
+    deployed: "2026-03-13"
+    required_probes:
+      - probe-alert-001    # ntfy + notify.py chain exists
+      - probe-alert-004    # health_monitor proactively pushes alerts
+
+  - id: structured-logging
+    description: JSON logs to journald with trace IDs
+    deployed: "2026-03-12"
+    required_probes:
+      - probe-runtime-004  # No agent error spikes in last hour
+
+  - id: otel-tracing
+    description: OpenTelemetry spans to Langfuse via hapax-council agents
+    deployed: "2026-03-10"
+    required_probes: []
+    # TODO: Add probe for Langfuse trace ingestion health
+
+  - id: systemd-timers
+    description: Recurring agents run on systemd user timers
+    deployed: "2026-03-09"
+    required_probes:
+      - probe-routine-001  # Timer count matches agent count
+      - probe-runtime-001  # health-monitor.timer fired recently
+
+  - id: restic-backup
+    description: Local restic backup to /data/backups/restic
+    deployed: "2026-03-09"
+    required_probes:
+      - probe-runtime-002  # Backup <36h old
+
+  # Agent-level capabilities (sync agents, profile facts, precedent store)
+  # are tracked in agent manifests (agents/manifests/*.yaml), not here.
+  # This file covers infrastructure that no single agent owns.

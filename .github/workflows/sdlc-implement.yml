@@ -31,6 +31,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Record start time
+        id: start
+        run: echo "time=$(date +%s)" >> "$GITHUB_OUTPUT"
+
+
       - uses: astral-sh/setup-uv@v5
       - run: uv sync
 
@@ -72,6 +77,8 @@ jobs:
 
       - name: Run Claude Code implementation
         uses: anthropics/claude-code-action@beta
+        env:
+          LANGFUSE_EXPORT_FILE: /tmp/langfuse-traces.jsonl
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -116,6 +123,28 @@ jobs:
           Co-Authored-By: Claude Sonnet <noreply@anthropic.com>"
           git push -u origin "agent/issue-${ISSUE}"
 
+      - name: Audit log implementation action (E-4)
+        if: always()
+        run: |
+          ISSUE=${{ steps.issue.outputs.number }}
+          DURATION=$(( $(date +%s) - ${{ steps.start.outputs.time }} ))
+          python -c "
+          import sys; sys.path.insert(0, '.')
+          from sdlc.audit import log_audit
+          log_audit(
+              action='implement',
+              actor='claude-code[bot]',
+              check_name='sdlc-implement',
+              fix_applied='issue-${ISSUE}',
+              classification='automated',
+              outcome='${{ job.status }}',
+              duration_ms=${DURATION}000,
+              pr_number=None,
+              metadata={'issue': ${ISSUE}, 'event': '${{ github.event_name }}'},
+          )
+          " || echo "::warning::Audit logging failed (non-fatal)"
+
+
       - name: Create or update PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -142,3 +171,75 @@ jobs:
               --label "agent-authored" \
               --head "$BRANCH"
           fi
+
+      - name: Save diff summary
+        if: always()
+        run: |
+          git diff --stat origin/main..HEAD > /tmp/diff-summary.txt 2>/dev/null || true
+          git diff origin/main..HEAD > /tmp/full-diff.patch 2>/dev/null || true
+
+      - name: Write job summary
+        if: always()
+        run: |
+          ISSUE=${{ steps.issue.outputs.number }}
+          BRANCH="agent/issue-${ISSUE}"
+          FILES_CHANGED=$(git diff --name-only origin/main..HEAD 2>/dev/null | wc -l || echo 0)
+          INSERTIONS=$(git diff --stat origin/main..HEAD 2>/dev/null | tail -1 | grep -oP '\d+ insertion' | grep -oP '\d+' || echo 0)
+          DELETIONS=$(git diff --stat origin/main..HEAD 2>/dev/null | tail -1 | grep -oP '\d+ deletion' | grep -oP '\d+' || echo 0)
+          DURATION=$(( $(date +%s) - ${{ steps.start.outputs.time }} ))
+
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Implementation Summary
+
+          | Field | Value |
+          |-------|-------|
+          | Issue | #${ISSUE} |
+          | Branch | \`${BRANCH}\` |
+          | Files changed | ${FILES_CHANGED} |
+          | Insertions | +${INSERTIONS} |
+          | Deletions | -${DELETIONS} |
+          | Outcome | ${{ job.status }} |
+          | Duration | ${DURATION}s |
+          EOF
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: implement-${{ steps.issue.outputs.number }}
+          path: |
+            /tmp/langfuse-traces.jsonl
+            /tmp/diff-summary.txt
+            /tmp/full-diff.patch
+          if-no-files-found: ignore
+
+      - name: Comment on issue
+        if: always() && steps.issue.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DURATION=$(( $(date +%s) - ${{ steps.start.outputs.time }} ))
+          gh issue comment ${{ steps.issue.outputs.number }} --body "## Implementation ${{ job.status }}
+
+          - **Duration:** ${DURATION}s
+          - **Workflow run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - **Branch:** \`agent/issue-${{ steps.issue.outputs.number }}\`" || true
+
+      - name: Notify via ntfy
+        if: always() && vars.NTFY_TOPIC != ''
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" = "success" ]; then
+            PRIORITY="default"
+            TAGS="white_check_mark,robot"
+          else
+            PRIORITY="high"
+            TAGS="x,robot"
+          fi
+          curl -sf \
+            -H "Title: SDLC Implement ${STATUS}" \
+            -H "Priority: ${PRIORITY}" \
+            -H "Tags: ${TAGS}" \
+            -H "Click: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -d "Issue #${{ steps.issue.outputs.number }} — ${STATUS}" \
+            "https://ntfy.sh/${{ vars.NTFY_TOPIC }}" || true

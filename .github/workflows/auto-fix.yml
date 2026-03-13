@@ -29,16 +29,40 @@ jobs:
           fetch-depth: 20
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check auto-fix attempt count
+      - name: Record start time
+        id: start
+        run: echo "time=$(date +%s)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Check auto-fix attempt count (circuit breaker)
         id: guard
         run: |
-          COUNT=$(git log --oneline --grep='\[auto-fix\]' origin/main..HEAD | wc -l)
-          echo "auto_fix_count=$COUNT" >> "$GITHUB_OUTPUT"
-          if [ "$COUNT" -ge 3 ]; then
-            echo "::warning::Auto-fix limit reached ($COUNT attempts). Labeling for human review."
+          # E-4: Use circuit_breaker.py instead of git log grep
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          CHECK_NAME="auto-fix:${BRANCH}"
+          RESULT=$(python -c "
+          import sys; sys.path.insert(0, '.')
+          from sdlc.circuit_breaker import CircuitBreaker
+          cb = CircuitBreaker(max_attempts=3, window_seconds=86400)
+          if cb.is_tripped('${CHECK_NAME}'):
+              print('tripped')
+          else:
+              remaining = cb.remaining_attempts('${CHECK_NAME}')
+              cb.record_attempt('${CHECK_NAME}')
+              print(f'ok:{remaining}')
+          ")
+          if [[ "$RESULT" == "tripped" ]]; then
+            echo "::warning::Auto-fix circuit breaker tripped for ${BRANCH}. Labeling for human review."
             echo "should_fix=false" >> "$GITHUB_OUTPUT"
+            echo "auto_fix_count=3" >> "$GITHUB_OUTPUT"
           else
+            REMAINING="${RESULT#ok:}"
+            COUNT=$((3 - REMAINING))
             echo "should_fix=true" >> "$GITHUB_OUTPUT"
+            echo "auto_fix_count=$COUNT" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Label PR for human review
@@ -114,3 +138,47 @@ jobs:
           Co-Authored-By: Claude Sonnet <noreply@anthropic.com>"
             git push
           fi
+
+      - name: Write job summary
+        if: always()
+        run: |
+          DURATION=$(( $(date +%s) - ${{ steps.start.outputs.time }} ))
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Auto-Fix Summary
+
+          | Field | Value |
+          |-------|-------|
+          | Branch | ${{ github.event.workflow_run.head_branch }} |
+          | Triggering run | ${{ github.event.workflow_run.id }} |
+          | Attempt | ${{ steps.guard.outputs.auto_fix_count }} / 3 |
+          | Fixable | ${{ steps.scope.outputs.fixable || 'skipped' }} |
+          | Outcome | ${{ job.status }} |
+          | Duration | ${DURATION}s |
+          EOF
+
+      - name: Upload CI failure log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-failure-log-${{ github.event.workflow_run.head_branch }}
+          path: /tmp/ci-failure.log
+          if-no-files-found: ignore
+
+      - name: Notify via ntfy
+        if: always() && vars.NTFY_TOPIC != ''
+        run: |
+          STATUS="${{ job.status }}"
+          if [ "$STATUS" = "success" ]; then
+            PRIORITY="default"
+            TAGS="white_check_mark,robot"
+          else
+            PRIORITY="high"
+            TAGS="x,robot"
+          fi
+          curl -sf \
+            -H "Title: Auto-Fix ${STATUS}" \
+            -H "Priority: ${PRIORITY}" \
+            -H "Tags: ${TAGS}" \
+            -H "Click: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -d "Branch ${{ github.event.workflow_run.head_branch }} — ${STATUS} (attempt ${{ steps.guard.outputs.auto_fix_count }}/3)" \
+            "https://ntfy.sh/${{ vars.NTFY_TOPIC }}" || true
