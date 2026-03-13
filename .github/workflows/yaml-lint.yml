@@ -21,6 +21,58 @@ jobs:
           yamllint -d relaxed axioms/ domains/ knowledge/
       - name: Deontic consistency check (E-3)
         run: python sdlc/consistency_check.py
+      - name: Deontic consistency check — JSON (E-3)
+        if: github.event_name == 'pull_request'
+        id: consistency_json
+        run: |
+          OUTPUT=$(python sdlc/consistency_check.py --json --check-resolutions)
+          echo "$OUTPUT" > /tmp/consistency-report.json
+          ERRORS=$(echo "$OUTPUT" | python -c "import sys,json; print(json.load(sys.stdin)['summary']['errors'])")
+          echo "errors=$ERRORS" >> "$GITHUB_OUTPUT"
+      - name: Comment consistency results on PR
+        if: github.event_name == 'pull_request' && steps.consistency_json.outputs.errors != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          REPORT=$(cat /tmp/consistency-report.json)
+          gh pr comment "${{ github.event.pull_request.number }}" --body "$(cat <<EOF
+          ## ⚠️ Deontic Consistency Conflicts Detected
+
+          \`\`\`json
+          $REPORT
+          \`\`\`
+
+          Run locally: \`python sdlc/consistency_check.py --json --check-resolutions\`
+          EOF
+          )"
+      - name: Sufficiency scope validation (E-1)
+        run: |
+          python -c "
+          import yaml, sys
+          from pathlib import Path
+          errors = []
+          warnings = []
+          for f in sorted(Path('axioms/implications').glob('*.yaml')):
+              data = yaml.safe_load(f.read_text())
+              for imp in data.get('implications', []):
+                  if imp.get('mode') != 'sufficiency':
+                      continue
+                  if imp.get('tier') not in ('T0', 'T1'):
+                      continue
+                  scope = imp.get('scope')
+                  if not scope:
+                      warnings.append(f\"{imp['id']}: T0/T1 sufficiency without scope\")
+                  elif scope.get('type') == 'enumerated' and not scope.get('items'):
+                      errors.append(f\"{imp['id']}: enumerated scope has no items\")
+          for w in warnings:
+              print(f'WARN: {w}')
+          for e in errors:
+              print(f'ERROR: {e}')
+          scoped = len(warnings) == 0
+          print(f'{len(warnings)} unscoped, {len(errors)} invalid')
+          if errors:
+              sys.exit(1)
+          "
       - name: Capability coverage check (E-2)
         run: |
           python -c "

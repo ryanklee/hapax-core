@@ -1,0 +1,43 @@
+# Operator Precedent: Gemini Live Direct API Exception
+#
+# Records the operator's adjudication that Gemini Live's direct Google API
+# access is an acceptable exception to the corporate_boundary axiom's
+# requirement to route through LiteLLM.
+
+precedent:
+  id: P-cb-gemini-live-001
+  authority: operator
+  tier: T1
+  decision: edge_case
+  created_at: "2026-03-13"
+
+  situation: >
+    The Gemini Live speech-to-speech backend (agents/hapax_voice/gemini_live.py)
+    connects directly to Google's Gemini API via WebSocket, bypassing the
+    LiteLLM proxy. This violates cb-llm-001 ("route all LLM calls through
+    LiteLLM proxy").
+
+  axiom_id: corporate_boundary
+  implication_id: cb-llm-001
+
+  reasoning: >
+    Gemini Live uses a real-time WebSocket streaming protocol for
+    speech-to-speech that is fundamentally incompatible with LiteLLM's
+    HTTP-based proxy model. The protocol requires bidirectional audio
+    streaming with sub-100ms latency. Routing through a proxy would
+    break the real-time audio pipeline.
+
+  decision_detail: >
+    Exception granted. Direct API access permitted for Gemini Live
+    specifically, with compensating controls: API key in pass store,
+    manual Langfuse tracing, automatic fallback to local Pipecat
+    pipeline when API unavailable.
+
+  compensating_controls:
+    - API key stored in pass (not env file or committed code)
+    - Usage traced in Langfuse via manual span instrumentation
+    - Automatic fallback to local Pipecat STT+TTS pipeline
+    - No user PII sent to Gemini API (audio only)
+
+  review_interval: quarterly
+  superseded_by: ""

@@ -13,11 +13,14 @@ implications, we can check for conflicts directly:
 Usage:
     uv run python sdlc/consistency_check.py
     uv run python sdlc/consistency_check.py --verbose
+    uv run python sdlc/consistency_check.py --json
+    uv run python sdlc/consistency_check.py --json --check-resolutions
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -228,6 +231,28 @@ def check_consistency(implications: list[Implication], *, verbose: bool = False)
     return conflicts
 
 
+def load_resolutions(*, path: Path = AXIOMS_PATH) -> dict[str, dict]:
+    """Load contradiction resolutions from precedents YAML.
+
+    Returns a dict keyed by "obligation_id:prohibition_id" pairs.
+    """
+    resolutions_file = path / "precedents" / "contradiction-resolutions.yaml"
+    if not resolutions_file.exists():
+        return {}
+
+    try:
+        data = yaml.safe_load(resolutions_file.read_text())
+    except Exception as e:
+        log.warning("Failed to load resolutions: %s", e)
+        return {}
+
+    result: dict[str, dict] = {}
+    for entry in data.get("resolutions", []):
+        key = f"{entry.get('obligation_id', '')}:{entry.get('prohibition_id', '')}"
+        result[key] = entry
+    return result
+
+
 def format_results(conflicts: list[Conflict], *, verbose: bool = False) -> str:
     """Format conflict results for human consumption."""
     if not conflicts:
@@ -257,22 +282,90 @@ def format_results(conflicts: list[Conflict], *, verbose: bool = False) -> str:
     return "\n".join(lines)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Deontic consistency checker for axiom implications")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Show full details for warnings")
-    args = parser.parse_args()
+def format_results_json(
+    conflicts: list[Conflict],
+    implications: list[Implication],
+    *,
+    check_resolutions: bool = False,
+) -> str:
+    """Format conflict results as structured JSON for downstream tools.
 
-    implications = load_all_implications()
-    print(f"Loaded {len(implications)} implications ({len(ARCHITECTURAL_CONSTRAINTS)} architectural constraints)")
+    Output schema:
+        {conflicts: [{obligation_id, prohibition_id, reason, severity, resolved_by_precedent?}],
+         summary: {errors, warnings, resolved, total_implications, obligations, prohibitions}}
+    """
+    resolutions = load_resolutions() if check_resolutions else {}
+
+    conflict_entries = []
+    resolved_count = 0
+    for c in conflicts:
+        key = f"{c.obligation.id}:{c.prohibition.id}"
+        resolution = resolutions.get(key)
+        entry: dict = {
+            "obligation_id": c.obligation.id,
+            "prohibition_id": c.prohibition.id,
+            "reason": c.reason,
+            "severity": c.severity,
+        }
+        if resolution:
+            entry["resolved_by_precedent"] = resolution.get("precedent_id", "")
+            entry["resolution_note"] = resolution.get("resolution", "")
+            resolved_count += 1
+        conflict_entries.append(entry)
 
     obligations = [i for i in implications if i.mode == "sufficiency"]
     prohibitions = [i for i in implications if i.mode == "compatibility"]
-    print(f"  Obligations (sufficiency): {len(obligations)}")
-    print(f"  Prohibitions (compatibility): {len(prohibitions)}")
-    print()
+
+    result = {
+        "conflicts": conflict_entries,
+        "summary": {
+            "errors": len([c for c in conflicts if c.severity == "error"]),
+            "warnings": len([c for c in conflicts if c.severity == "warning"]),
+            "resolved": resolved_count,
+            "total_implications": len(implications),
+            "obligations": len(obligations),
+            "prohibitions": len(prohibitions),
+        },
+    }
+    return json.dumps(result, indent=2)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Deontic consistency checker for axiom implications")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Show full details for warnings")
+    parser.add_argument("--json", action="store_true", help="Output structured JSON")
+    parser.add_argument(
+        "--check-resolutions",
+        action="store_true",
+        help="Cross-reference conflicts against precedent resolutions",
+    )
+    args = parser.parse_args()
+
+    implications = load_all_implications()
+
+    if not args.json:
+        print(
+            f"Loaded {len(implications)} implications"
+            f" ({len(ARCHITECTURAL_CONSTRAINTS)} architectural constraints)"
+        )
+        obligations = [i for i in implications if i.mode == "sufficiency"]
+        prohibitions = [i for i in implications if i.mode == "compatibility"]
+        print(f"  Obligations (sufficiency): {len(obligations)}")
+        print(f"  Prohibitions (compatibility): {len(prohibitions)}")
+        print()
 
     conflicts = check_consistency(implications, verbose=args.verbose)
-    print(format_results(conflicts, verbose=args.verbose))
+
+    if args.json:
+        print(
+            format_results_json(
+                conflicts,
+                implications,
+                check_resolutions=args.check_resolutions,
+            )
+        )
+    else:
+        print(format_results(conflicts, verbose=args.verbose))
 
     if any(c.severity == "error" for c in conflicts):
         sys.exit(1)

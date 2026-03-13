@@ -46,6 +46,12 @@ capabilities:
     required_probes:
       - probe-runtime-002  # Backup <36h old
 
+  - id: scope-coverage
+    description: T0/T1 sufficiency implications have enumerable scope definitions
+    deployed: "2026-03-13"
+    required_probes:
+      - probe-scope-coverage-001  # Enumerated scope items present
+
   # Agent-level capabilities (sync agents, profile facts, precedent store)
   # are tracked in agent manifests (agents/manifests/*.yaml), not here.
   # This file covers infrastructure that no single agent owns.
