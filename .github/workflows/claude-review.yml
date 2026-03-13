@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -28,8 +28,10 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          claude_args: "--model claude-sonnet-4-6 --max-turns 3 --allowedTools Read,Glob,Grep"
-          prompt: |
+          model: claude-sonnet-4-6
+          max_turns: 3
+          allowed_tools: "Read,Glob,Grep"
+          direct_prompt: |
             Review this PR to the hapax-constitution specification repository.
 
             This repo defines the canonical axiom system used by hapax-council
