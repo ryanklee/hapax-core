@@ -9,21 +9,22 @@
 #   - ADR: Design records as a first-class archetype
 #
 # See: docs/plans/2026-03-09-document-registry-design.md
+#
+# Updated 2026-03-13: migrated from old repo names (ai-agents, hapaxromana,
+# hapax-system, cockpit-web) to current 4-repo structure.
 
-version: 1
+version: 2
 
 # ── Document archetypes ──────────────────────────────────────────────
 archetypes:
   project-context:
-    description: "Per-repo working context for Claude Code"
+    description: "Per-repo working context for Claude Code sessions"
     required_sections:
-      - "## Project Memory"
       - "## Conventions"
     composite: true
   specification:
     description: "Architectural design, invariants, contracts"
-    required_sections:
-      - "## Architecture"
+    required_sections: []
     composite: false
   reference:
     description: "Canonical lookup tables, single source of truth"
@@ -39,53 +40,61 @@ archetypes:
     composite: false
   design-record:
     description: "Point-in-time design decisions"
-    required_sections:
-      - "## Goal"
+    required_sections: []
     composite: false
 
 # ── Repo declarations ────────────────────────────────────────────────
 repos:
-  ai-agents:
-    path: ~/projects/ai-agents
+  hapax-council:
+    path: ~/projects/hapax-council
     required_docs:
       - path: CLAUDE.md
         archetype: project-context
+      - path: README.md
+        archetype: project-context
+      - path: agents/hapax_voice/README.md
+        archetype: specification
+      - path: agents/hapax_voice/LAYER_STATUS.yaml
+        archetype: reference
     ci_sources:
       agents: "agents/"
-  hapaxromana:
-    path: ~/projects/hapaxromana
+      hooks: "hooks/scripts/"
+
+  hapax-officium:
+    path: ~/projects/hapax-officium
     required_docs:
       - path: CLAUDE.md
+        archetype: project-context
+      - path: README.md
         archetype: project-context
       - path: agent-architecture.md
         archetype: specification
       - path: operations-manual.md
         archetype: operational
+      - path: CONTRIBUTING.md
+        archetype: reference
+      - path: SECURITY.md
+        archetype: governance
+    ci_sources:
+      agents: "agents/"
+
+  hapax-constitution:
+    path: ~/projects/hapax-constitution
+    required_docs:
+      - path: CLAUDE.md
+        archetype: project-context
       - path: README.md
         archetype: project-context
-  hapax-system:
-    path: ~/projects/hapax-system
-    required_docs:
-      - path: CLAUDE.md
-        archetype: project-context
-      - path: rules/axioms.md
+      - path: pattern-guide.md
+        archetype: specification
+      - path: operations-manual.md
+        archetype: operational
+      - path: axioms/registry.yaml
         archetype: governance
-      - path: rules/system-context.md
-        archetype: reference
-      - path: rules/management-context.md
-        archetype: governance
-  cockpit-web:
-    path: ~/projects/cockpit-web
-    required_docs:
-      - path: CLAUDE.md
-        archetype: project-context
-  hapax-vscode:
-    path: ~/projects/hapax-vscode
-    required_docs:
-      - path: CLAUDE.md
-        archetype: project-context
-  obsidian-hapax:
-    path: ~/projects/obsidian-hapax
+    ci_sources: {}
+
+  distro-work:
+    path: ~/projects/distro-work
     required_docs:
       - path: CLAUDE.md
         archetype: project-context
@@ -94,48 +103,55 @@ repos:
 # "For every CI of type X, there must be a reference in document Y."
 coverage_rules:
   - ci_type: agent
-    reference_doc: "<hapax-system>/rules/system-context.md"
-    reference_section: "## Management Agents"
+    reference_doc: ~/projects/hapax-council/CLAUDE.md
+    reference_section: "## Key Modules"
     match_by: name
     severity: medium
-    description: "Every agent module must have a row in system-context.md"
+    description: "Every council agent must be referenced in CLAUDE.md"
+
   - ci_type: agent
-    reference_doc: "<hapaxromana>/agent-architecture.md"
-    match_by: name_in_heading
-    severity: low
-    description: "Every agent should have a section in agent-architecture.md"
+    reference_doc: ~/projects/hapax-officium/CLAUDE.md
+    reference_section: "## Agents"
+    match_by: name
+    severity: medium
+    description: "Every officium agent must be referenced in CLAUDE.md"
+
   - ci_type: timer
-    reference_doc: "<hapax-system>/rules/system-context.md"
-    reference_section: "## Management Timers"
-    match_by: name
-    severity: medium
-    description: "Every systemd timer must have a row in system-context.md"
-  - ci_type: service
-    reference_doc: "<claude-config>/rules/environment.md"
-    match_by: name
-    severity: medium
-    description: "Every Docker service must be documented in environment.md"
-  - ci_type: repo
-    reference_doc: "<hapaxromana>/CLAUDE.md"
-    reference_section: "## Related Repos"
-    match_by: name
-    severity: medium
-    description: "Every hapax repo must appear in hapaxromana's Related Repos"
-  - ci_type: mcp_server
-    reference_doc: "<claude-config>/CLAUDE.md"
-    reference_section: "## MCP Servers"
+    reference_doc: ~/projects/hapax-council/CLAUDE.md
     match_by: name
     severity: low
-    description: "Every MCP server should be listed in global CLAUDE.md"
+    description: "Every systemd timer should be documented in council CLAUDE.md"
+
+  - ci_type: service
+    reference_doc: ~/projects/hapax-council/CLAUDE.md
+    match_by: name
+    severity: medium
+    description: "Every Docker service must be documented in council CLAUDE.md"
+
+  - ci_type: repo
+    reference_doc: ~/projects/hapax-constitution/README.md
+    match_by: name
+    severity: medium
+    description: "Every hapax repo must appear in the constitution README"
 
 # ── Mutual awareness ────────────────────────────────────────────────
 mutual_awareness:
-  - type: repo_registry
-    description: "All hapax repos must appear in hapaxromana's Related Repos"
-    registry_doc: "<hapaxromana>/CLAUDE.md"
-    registry_section: "## Related Repos"
-    severity: medium
+  # All repos should reference the constitution as governance source
   - type: spec_reference
-    description: "Every repo should reference hapaxromana as spec source"
-    target_phrase: "hapaxromana"
+    description: "Every repo should reference hapax-constitution as governance source"
+    target_phrase: "hapax-constitution"
     severity: low
+
+  # Cross-project boundary doc must be identical across repos that have it
+  - type: byte_identical
+    description: "Cross-project boundary doc must be identical in constitution and officium"
+    docs:
+      - ~/projects/hapax-constitution/docs/cross-project-boundary.md
+      - ~/projects/hapax-officium/docs/cross-project-boundary.md
+    severity: high
+
+  # Workflow enforcement directive must be present in all repos
+  - type: spec_reference
+    description: "All repos must have the PR-before-moving-on directive"
+    target_phrase: "Always PR completed work before moving on"
+    severity: high
