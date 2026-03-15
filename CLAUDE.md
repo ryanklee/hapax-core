@@ -32,7 +32,7 @@ tests/               Test suite
 - **This is a spec repo.** Changes to `axioms/registry.yaml` are always high-complexity and require human review.
 - **YAML is the source of truth** for axiom definitions and implications. Markdown documents describe; YAML defines.
 - **Weight ordering matters.** Higher weight = higher precedence. Constitutional axioms always outweigh domain axioms (supremacy clause).
-- **Tier semantics are strict.** T0 = block (existential violation), T1 = review (requires awareness), T2 = warn (quality preference).
+- **Tier semantics are strict.** T0 = block (existential violation), T1 = review (requires awareness), T2 = warn (quality preference), T3 = lint (advisory style/documentation guidance, enforcement: linter).
 
 ## SDLC Pipeline
 
