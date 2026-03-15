@@ -41,13 +41,16 @@ jobs:
 
       - name: Resolve issue number
         id: issue
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_ISSUE: ${{ github.event.client_payload.issue_number }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            echo "number=${{ github.event.client_payload.issue_number }}" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            echo "number=${DISPATCH_ISSUE}" >> "$GITHUB_OUTPUT"
           else
             # Extract from PR body or branch name
-            BRANCH="${{ github.event.pull_request.head.ref }}"
-            NUMBER=$(echo "$BRANCH" | grep -oP '\d+$' || echo "")
+            NUMBER=$(echo "$PR_BRANCH" | grep -oP '\d+$' || echo "")
             echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
           fi
 
@@ -55,8 +58,8 @@ jobs:
         id: context
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ steps.issue.outputs.number }}
         run: |
-          ISSUE=${{ steps.issue.outputs.number }}
           TITLE=$(gh issue view "$ISSUE" --json title --jq '.title')
           BODY=$(gh issue view "$ISSUE" --json body --jq '.body')
           LABELS=$(gh issue view "$ISSUE" --json labels --jq '[.labels[].name] | join(",")')
@@ -65,8 +68,9 @@ jobs:
           echo "$BODY" > /tmp/issue-body.txt
 
       - name: Create or checkout branch
+        env:
+          ISSUE: ${{ steps.issue.outputs.number }}
         run: |
-          ISSUE=${{ steps.issue.outputs.number }}
           BRANCH="agent/issue-${ISSUE}"
           if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
             git checkout "$BRANCH"
@@ -103,16 +107,16 @@ jobs:
       - name: Commit and push
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ steps.issue.outputs.number }}
         run: |
           git config user.name "claude-code[bot]"
           git config user.email "claude-code[bot]@users.noreply.github.com"
           if git diff --quiet && git diff --cached --quiet; then
             echo "No changes produced."
-            gh issue comment ${{ steps.issue.outputs.number }} --body "Implementation agent could not produce changes. Flagging for human review." || true
-            gh issue edit ${{ steps.issue.outputs.number }} --add-label "needs-human" || true
+            gh issue comment "$ISSUE" --body "Implementation agent could not produce changes. Flagging for human review." || true
+            gh issue edit "$ISSUE" --add-label "needs-human" || true
             exit 0
           fi
-          ISSUE=${{ steps.issue.outputs.number }}
           git add -A
           git commit -m "feat: implement issue #${ISSUE}
 
@@ -125,22 +129,27 @@ jobs:
 
       - name: Audit log implementation action (E-4)
         if: always()
+        env:
+          ISSUE: ${{ steps.issue.outputs.number }}
+          START_TIME: ${{ steps.start.outputs.time }}
+          JOB_STATUS: ${{ job.status }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          ISSUE=${{ steps.issue.outputs.number }}
-          DURATION=$(( $(date +%s) - ${{ steps.start.outputs.time }} ))
+          export DURATION=$(( $(date +%s) - START_TIME ))
           python -c "
-          import sys; sys.path.insert(0, '.')
+          import os, sys; sys.path.insert(0, '.')
           from sdlc.audit import log_audit
+          issue = os.environ['ISSUE']
           log_audit(
               action='implement',
               actor='claude-code[bot]',
               check_name='sdlc-implement',
-              fix_applied='issue-${ISSUE}',
+              fix_applied=f'issue-{issue}',
               classification='automated',
-              outcome='${{ job.status }}',
-              duration_ms=${DURATION}000,
+              outcome=os.environ['JOB_STATUS'],
+              duration_ms=int(os.environ['DURATION']) * 1000,
               pr_number=None,
-              metadata={'issue': ${ISSUE}, 'event': '${{ github.event_name }}'},
+              metadata={'issue': int(issue), 'event': os.environ['EVENT_NAME']},
           )
           " || echo "::warning::Audit logging failed (non-fatal)"
 
@@ -148,15 +157,16 @@ jobs:
       - name: Create or update PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ steps.issue.outputs.number }}
+          ISSUE_TITLE: ${{ steps.context.outputs.title }}
         run: |
-          ISSUE=${{ steps.issue.outputs.number }}
           BRANCH="agent/issue-${ISSUE}"
           EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number // empty')
           if [ -n "$EXISTING_PR" ]; then
             echo "PR #$EXISTING_PR already exists for this branch."
           else
             gh pr create \
-              --title "feat: ${{ steps.context.outputs.title }}" \
+              --title "feat: ${ISSUE_TITLE}" \
               --body "## Summary
 
           Automated implementation for #${ISSUE}.
@@ -174,19 +184,24 @@ jobs:
 
       - name: Save diff summary
         if: always()
+        env:
+          ISSUE: ${{ steps.issue.outputs.number }}
         run: |
           git diff --stat origin/main..HEAD > /tmp/diff-summary.txt 2>/dev/null || true
           git diff origin/main..HEAD > /tmp/full-diff.patch 2>/dev/null || true
 
       - name: Write job summary
         if: always()
+        env:
+          ISSUE: ${{ steps.issue.outputs.number }}
+          START_TIME: ${{ steps.start.outputs.time }}
+          JOB_STATUS: ${{ job.status }}
         run: |
-          ISSUE=${{ steps.issue.outputs.number }}
           BRANCH="agent/issue-${ISSUE}"
           FILES_CHANGED=$(git diff --name-only origin/main..HEAD 2>/dev/null | wc -l || echo 0)
           INSERTIONS=$(git diff --stat origin/main..HEAD 2>/dev/null | tail -1 | grep -oP '\d+ insertion' | grep -oP '\d+' || echo 0)
           DELETIONS=$(git diff --stat origin/main..HEAD 2>/dev/null | tail -1 | grep -oP '\d+ deletion' | grep -oP '\d+' || echo 0)
-          DURATION=$(( $(date +%s) - ${{ steps.start.outputs.time }} ))
+          DURATION=$(( $(date +%s) - START_TIME ))
 
           cat >> "$GITHUB_STEP_SUMMARY" <<EOF
           ## Implementation Summary
@@ -198,7 +213,7 @@ jobs:
           | Files changed | ${FILES_CHANGED} |
           | Insertions | +${INSERTIONS} |
           | Deletions | -${DELETIONS} |
-          | Outcome | ${{ job.status }} |
+          | Outcome | ${JOB_STATUS} |
           | Duration | ${DURATION}s |
           EOF
 
@@ -217,19 +232,28 @@ jobs:
         if: always() && steps.issue.outputs.number != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ steps.issue.outputs.number }}
+          START_TIME: ${{ steps.start.outputs.time }}
+          JOB_STATUS: ${{ job.status }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          DURATION=$(( $(date +%s) - ${{ steps.start.outputs.time }} ))
-          gh issue comment ${{ steps.issue.outputs.number }} --body "## Implementation ${{ job.status }}
+          DURATION=$(( $(date +%s) - START_TIME ))
+          gh issue comment "$ISSUE" --body "## Implementation ${JOB_STATUS}
 
           - **Duration:** ${DURATION}s
-          - **Workflow run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          - **Branch:** \`agent/issue-${{ steps.issue.outputs.number }}\`" || true
+          - **Workflow run:** [${RUN_ID}](${WORKFLOW_URL})
+          - **Branch:** \`agent/issue-${ISSUE}\`" || true
 
       - name: Notify via ntfy
         if: always() && vars.NTFY_TOPIC != ''
+        env:
+          JOB_STATUS: ${{ job.status }}
+          ISSUE: ${{ steps.issue.outputs.number }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          NTFY_TOPIC: ${{ vars.NTFY_TOPIC }}
         run: |
-          STATUS="${{ job.status }}"
-          if [ "$STATUS" = "success" ]; then
+          if [ "$JOB_STATUS" = "success" ]; then
             PRIORITY="default"
             TAGS="white_check_mark,robot"
           else
@@ -237,9 +261,9 @@ jobs:
             TAGS="x,robot"
           fi
           curl -sf \
-            -H "Title: SDLC Implement ${STATUS}" \
+            -H "Title: SDLC Implement ${JOB_STATUS}" \
             -H "Priority: ${PRIORITY}" \
             -H "Tags: ${TAGS}" \
-            -H "Click: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            -d "Issue #${{ steps.issue.outputs.number }} — ${STATUS}" \
-            "https://ntfy.sh/${{ vars.NTFY_TOPIC }}" || true
+            -H "Click: ${WORKFLOW_URL}" \
+            -d "Issue #${ISSUE} — ${JOB_STATUS}" \
+            "https://ntfy.sh/${NTFY_TOPIC}" || true
