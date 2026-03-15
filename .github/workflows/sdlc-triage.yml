@@ -28,9 +28,10 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           LANGFUSE_EXPORT_FILE: /tmp/langfuse-traces.jsonl
+          ISSUE: ${{ github.event.issue.number }}
         run: |
           set -eo pipefail
-          OUTPUT=$(uv run python -m scripts.sdlc_triage --issue-number ${{ github.event.issue.number }})
+          OUTPUT=$(uv run python -m scripts.sdlc_triage --issue-number "$ISSUE")
           echo "$OUTPUT"
 
           # Parse structured output.
@@ -46,18 +47,19 @@ jobs:
         if: steps.triage.outputs.reject != '' || steps.triage.outputs.complexity == 'L'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REASON: ${{ steps.triage.outputs.reject }}
+          ISSUE: ${{ github.event.issue.number }}
         run: |
-          REASON="${{ steps.triage.outputs.reject }}"
           if [ -z "$REASON" ]; then
             REASON="Complexity is L -- requires human implementation."
           fi
-          gh issue comment ${{ github.event.issue.number }} --body "## Triage Result: Not Agent-Eligible
+          gh issue comment "$ISSUE" --body "## Triage Result: Not Agent-Eligible
 
           **Reason:** $REASON
 
           This issue has been flagged for human attention."
 
-          gh issue edit ${{ github.event.issue.number }} \
+          gh issue edit "$ISSUE" \
             --add-label "needs-human" \
             --remove-label "agent-eligible"
 
@@ -65,38 +67,45 @@ jobs:
         if: steps.triage.outputs.reject == '' && steps.triage.outputs.complexity != 'L'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ github.event.issue.number }}
+          TRIAGE_TYPE: ${{ steps.triage.outputs.type }}
+          TRIAGE_COMPLEXITY: ${{ steps.triage.outputs.complexity }}
         run: |
-          gh issue edit ${{ github.event.issue.number }} \
+          gh issue edit "$ISSUE" \
             --add-label "sdlc:triaged" \
-            --add-label "triage:${{ steps.triage.outputs.type }}" \
-            --add-label "complexity:${{ steps.triage.outputs.complexity }}"
+            --add-label "triage:${TRIAGE_TYPE}" \
+            --add-label "complexity:${TRIAGE_COMPLEXITY}"
 
-          gh issue comment ${{ github.event.issue.number }} --body "## Triage Result
+          gh issue comment "$ISSUE" --body "## Triage Result
 
-          - **Type:** ${{ steps.triage.outputs.type }}
-          - **Complexity:** ${{ steps.triage.outputs.complexity }}
+          - **Type:** ${TRIAGE_TYPE}
+          - **Complexity:** ${TRIAGE_COMPLEXITY}
           - **Status:** Triaged, queued for planning."
 
       - name: Dispatch to implementation
         if: steps.triage.outputs.reject == '' && steps.triage.outputs.complexity != 'L'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ISSUE: ${{ github.event.issue.number }}
         run: |
-          gh api repos/${{ github.repository }}/dispatches \
+          gh api "repos/${REPO}/dispatches" \
             -X POST -f event_type=sdlc-plan \
-            -f 'client_payload[issue_number]=${{ github.event.issue.number }}'
+            -f "client_payload[issue_number]=${ISSUE}"
 
       - name: Handle error
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ github.event.issue.number }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          gh issue edit ${{ github.event.issue.number }} \
+          gh issue edit "$ISSUE" \
             --add-label "needs-human" \
             --remove-label "agent-eligible"
-          gh issue comment ${{ github.event.issue.number }} --body "## Triage Failed
+          gh issue comment "$ISSUE" --body "## Triage Failed
 
-          The triage agent encountered an error. See [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details."
+          The triage agent encountered an error. See [workflow run](${WORKFLOW_URL}) for details."
 
       - name: Upload traces
         if: always()

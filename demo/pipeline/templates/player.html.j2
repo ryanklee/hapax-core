@@ -581,9 +581,9 @@ body.subtitles-hidden .narration-subtitle {
 
       <div class="slide-image-area">
         {% if scene.is_video %}
-        <video src="{{ scene.image_data }}" muted playsinline preload="auto"></video>
+        <video src="{{ scene.image_data | safe }}" muted playsinline preload="auto"></video>
         {% else %}
-        <img src="{{ scene.image_data }}" alt="{{ scene.title }}">
+        <img src="{{ scene.image_data | safe }}" alt="{{ scene.title }}">
         {% endif %}
         {% if scene.narration %}
         <div class="narration-subtitle">{{ scene.narration }}</div>
